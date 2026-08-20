@@ -1,0 +1,28 @@
+import { ClipboardCheck, Copy, FileDown, Mail, Pause, RotateCcw, Square, UserRoundCheck } from 'lucide-react'
+import { CTASection } from '../components/common/CTASection'
+import { PageHero } from '../components/common/PageHero'
+import { SectionHeader } from '../components/common/SectionHeader'
+import { AnimatedSection } from '../components/ui/AnimatedSection'
+import { usePageMeta } from '../hooks/usePageMeta'
+import heroImage from '../assets/03-product-clinical-workflow.jpg'
+
+const productSteps = [
+  { title: 'Ambient listening', text: 'Capture a natural, consented physician-patient conversation without requiring a separate dictation.', tag: '01' },
+  { title: 'AI speech-to-text', text: 'Convert the doctor-patient conversation into text for the documentation workflow.', tag: '02' },
+  { title: 'Create or select consultations', text: 'Start a new consultation or return to an existing one.', tag: '03' },
+  { title: 'Patient information', text: 'Enter patient details such as name, age, medical history and condition.', tag: '04' },
+]
+
+export default function Product() {
+  usePageMeta('Product', 'Explore NourDoc ambient listening, AI transcription, SOAP note generation, review controls and consultation management.')
+  return <>
+    <PageHero variant="product" image={heroImage} imageAlt="Clinical team reviewing information on a tablet" imagePosition="center 42%" eyebrow="Platform" title="One ambient layer across the entire clinical encounter." text="NourDoc supports the documentation lifecycle from spoken clinical conversation to structured documentation for clinician review." />
+    <section className="section container"><AnimatedSection><SectionHeader eyebrow="Ambient listening" title="Documentation that starts the moment the visit does." text="Natural conversation becomes the input. Consent prompts and recording indicators help keep capture explicit, while desktop, tablet and mobile usage support the clinical setting." /></AnimatedSection><div className="story-rail">{productSteps.map((step, index) => <AnimatedSection className="story-row" key={step.tag} variant="left" index={index}><span>{step.tag}</span><h3>{step.title}</h3><p>{step.text}</p></AnimatedSection>)}</div></section>
+    <section className="section section-soft"><div className="container product-control-grid"><AnimatedSection variant="left"><span className="eyebrow">Recording controls</span><h2>Clear control throughout capture.</h2><p>Clinicians can pause, discard or end a recording from within the current application workflow.</p><div className="control-buttons"><span><Pause />Pause</span><span><RotateCcw />Discard</span><span><Square />End</span></div></AnimatedSection><AnimatedSection className="review-panel" variant="scale" interactive><UserRoundCheck /><span className="eyebrow">Doctor acknowledgment</span><h3>Review before the record is saved.</h3><p>The clinician reviews and confirms the consultation summary before saving.</p></AnimatedSection></div></section>
+    <section className="section container"><AnimatedSection><SectionHeader eyebrow="Automatic SOAP notes" title="A familiar structure, without fabricated patient content." text="NourDoc converts voice data into four structured documentation sections for clinician review." align="center" /></AnimatedSection><div className="soap-grid">{[['S','Subjective'],['O','Objective'],['A','Assessment'],['P','Plan']].map(([letter, title], index) => <AnimatedSection className="soap-card" key={letter} variant="card" interactive index={index}><span>{letter}</span><h3>{title}</h3><div><i /><i /><i /></div></AnimatedSection>)}</div></section>
+    <section className="section security-preview"><div className="container product-detail-grid"><AnimatedSection variant="left"><span className="eyebrow eyebrow-light">Review & act</span><h2>Documentation stays useful after the draft.</h2><p>The current app listing confirms a focused set of note actions.</p></AnimatedSection><div className="action-grid">{[[ClipboardCheck,'Edit'],[Copy,'Copy'],[FileDown,'Save as PDF'],[Mail,'Email']].map(([Icon, label], index) => { const ActionIcon = Icon as typeof ClipboardCheck; return <AnimatedSection className="action-card" key={label as string} variant="card" interactive index={index}><ActionIcon /><span>{label as string}</span></AnimatedSection> })}</div></div></section>
+    <section className="section container split-feature"><AnimatedSection variant="left"><span className="eyebrow">Speaker separation</span><h2>Review the conversation by speaker.</h2><p>NourDoc distinguishes Speaker 1 / Doctor and Speaker 2 / Patient, with separate voice playback available for review.</p></AnimatedSection><AnimatedSection className="speaker-visual" variant="scale" interactive><div><span>D</span><i /><i /><i /></div><div><span>P</span><i /><i /><i /><i /></div><div><span>D</span><i /><i /></div></AnimatedSection></section>
+    <section className="section section-soft"><div className="container verification-grid"><AnimatedSection><span className="status-pill confirmed">Confirmed in current app listing</span><h2>Consultation management</h2><p>Access and organize consultations, manage recordings, review transcripts and create structured SOAP documentation.</p></AnimatedSection><AnimatedSection><span className="status-pill future">Platform direction — verify availability</span><h2>Enterprise capabilities</h2><p>Deeper EMR/HMIS integrations, API/FHIR availability, ICD suggestions and other legacy platform claims require product-team confirmation before being presented as currently available.</p></AnimatedSection></div></section>
+    <CTASection />
+  </>
+}
