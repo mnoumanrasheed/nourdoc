@@ -56,9 +56,3 @@ export const cardHover = {
   scale: 1.006,
   transition: { duration: motionDurations.fast, ease: motionEase },
 }
-
-export const pageTransition = {
-  initial: { opacity: 0, y: 10 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -6 },
-}

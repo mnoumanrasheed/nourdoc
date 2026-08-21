@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { ArrowUpRight, Menu, X } from 'lucide-react'
+import { motion, useReducedMotion } from 'framer-motion'
 import logo from '../../assets/nourdoc-logo.png'
 import { navItems } from '../../data/site'
 
 export function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const reduced = useReducedMotion()
   const menuButtonRef = useRef<HTMLButtonElement>(null)
   const mobileNavRef = useRef<HTMLElement>(null)
   const firstMobileLinkRef = useRef<HTMLAnchorElement>(null)
@@ -44,18 +46,18 @@ export function Navbar() {
   }, [open])
 
   return (
-    <header className={`nav-wrap ${scrolled ? 'nav-scrolled' : ''}`}>
-      <nav className="container navbar" aria-label="Primary navigation">
+    <header className={`nav-wrap ${scrolled ? 'nav-scrolled' : ''} ${open ? 'nav-open' : ''}`}>
+      <nav className="navbar" aria-label="Primary navigation">
         <Link to="/" className="brand" onClick={() => setOpen(false)} aria-label="NourDoc home">
           <img src={logo} alt="" /><span>Nour<span>Doc</span></span>
         </Link>
         <div className="desktop-nav">
-          {navItems.map(item => <NavLink key={item.path} to={item.path}>{item.label}</NavLink>)}
+          {navItems.map(item => <NavLink key={item.path} to={item.path}>{({ isActive }) => <>{item.label}{isActive && <motion.span className="nav-active-indicator" layoutId="nav-active" transition={{ type: 'spring', stiffness: 360, damping: 30 }} />}</>}</NavLink>)}
         </div>
-        <Link to="/contact" className="button button-primary nav-cta">Book a Demo<ArrowUpRight size={17} /></Link>
-        <button ref={menuButtonRef} className="menu-button" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="mobile-navigation" aria-label={open ? 'Close menu' : 'Open menu'}>
+        <motion.div className="nav-cta-wrap" whileHover={reduced ? undefined : { y: -2 }} whileTap={reduced ? undefined : { scale: .98 }}><Link to="/contact" className="button button-primary nav-cta" onClick={() => setOpen(false)}>Book a Demo<ArrowUpRight size={17} /></Link></motion.div>
+        <motion.button whileTap={reduced ? undefined : { scale: .92 }} ref={menuButtonRef} className="menu-button" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="mobile-navigation" aria-label={open ? 'Close menu' : 'Open menu'}>
           {open ? <X /> : <Menu />}
-        </button>
+        </motion.button>
       </nav>
       <nav ref={mobileNavRef} id="mobile-navigation" className={`mobile-nav ${open ? 'is-open' : ''}`} aria-hidden={!open} aria-label="Mobile navigation">
         <div className="container">

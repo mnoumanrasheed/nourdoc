@@ -22,9 +22,9 @@ export default function Home() {
         <div className="feature-grid">{capabilities.map(({ title, text, icon: Icon }, index) => <AnimatedSection key={title} variant="card" interactive index={index} className={`feature-card capability-card capability-card-${index + 1} ${index === 0 ? 'feature-card-accent' : ''}`}><Icon /><span className="card-index">0{index + 1}</span><h3>{title}</h3><p>{text}</p><span className="card-detail-indicator" aria-hidden="true" /></AnimatedSection>)}</div>
       </section>
 
-      <section className="section workflow-section">
-        <div className="container"><AnimatedSection><SectionHeader eyebrow="A clear clinical workflow" title="From visit to signed note in four clear steps." /></AnimatedSection>
-          <WorkflowJourney steps={workflow} />
+      <section className="section workflow-section home-workflow-section">
+        <div className="container home-workflow-inner"><AnimatedSection><SectionHeader eyebrow="A clear clinical workflow" title="From visit to signed note in four clear steps." /></AnimatedSection>
+          <WorkflowJourney steps={workflow} premium />
         </div>
       </section>
 
@@ -38,7 +38,22 @@ export default function Home() {
 
       <ImageStory reverse image={globalImage} objectPosition="38% center" alt="International physician in attentive conversation with a patient" eyebrow="Local relevance. Global readiness." title="Built around the expectations of modern healthcare." text="NourDoc brings Pakistani healthcare relevance together with the privacy, confidentiality and access-control priorities considered by U.S., U.K. and international organizations." />
 
-      <section className="section container"><AnimatedSection><SectionHeader eyebrow="Healthcare ecosystem" title="Designed to work alongside the organizations that deliver care." text="We present partner categories—not invented customer logos—because meaningful healthcare transformation is built through real collaboration." /></AnimatedSection><div className="partner-strip">{partnerCategories.slice(0, 6).map(({ title, icon: Icon }) => <div key={title}><Icon /><span>{title}</span></div>)}</div><Link to="/partners" className="text-link">Explore partnerships<ArrowRight /></Link></section>
+      <section className="section home-ecosystem-section">
+        <div className="container">
+          <AnimatedSection><SectionHeader eyebrow="Healthcare ecosystem" title="Designed to work alongside the organizations that deliver care." text="We present partner categories—not invented customer logos—because meaningful healthcare transformation is built through real collaboration." /></AnimatedSection>
+          <div className="partner-strip home-partner-strip">
+            {partnerCategories.slice(0, 6).map(({ title, icon: Icon }, index) => (
+              <AnimatedSection key={title} variant="card" interactive index={index}>
+                <span className="home-partner-index">0{index + 1}</span>
+                <span className="home-partner-icon"><Icon /></span>
+                <strong>{title}</strong>
+                <span className="home-partner-network" aria-hidden="true"><i /><i /><i /></span>
+              </AnimatedSection>
+            ))}
+          </div>
+          <Link to="/partners" className="text-link home-ecosystem-link">Explore partnerships<ArrowRight /></Link>
+        </div>
+      </section>
       <CTASection />
     </>
   )
