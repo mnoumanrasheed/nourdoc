@@ -7,6 +7,7 @@ const LOADER_DURATION_SECONDS = 5
 export function InitialLoader() {
   const [visible, setVisible] = useState(true)
   const rootRef = useRef<HTMLDivElement>(null)
+  const percentageRef = useRef<HTMLOutputElement>(null)
 
   useLayoutEffect(() => {
     const root = rootRef.current
@@ -36,10 +37,22 @@ export function InitialLoader() {
     }
 
     const context = gsap.context(() => {
+      const progress = { value: 0 }
+      const renderProgress = () => {
+        if (percentageRef.current) {
+          percentageRef.current.textContent = `${Math.round(progress.value)}%`
+        }
+      }
+
       if (reduced) {
         gsap.timeline()
           .set('.initial-loader-logo', { opacity: 1, y: 0, filter: 'blur(0px)' })
           .set('.initial-loader-tagline', { opacity: 1 })
+          .set('.initial-loader-progress-shell', { opacity: 1, y: 0 })
+          .set('.initial-loader-progress-fill', { scaleX: 0, transformOrigin: 'left center' })
+          .to(progress, { value: 100, duration: 4.15, ease: 'none', onUpdate: renderProgress }, 0)
+          .to('.initial-loader-progress-fill', { scaleX: 1, duration: 4.15, ease: 'none' }, 0)
+          .to('.initial-loader-progress-shell', { opacity: 0, y: 2, duration: .4 }, 4.2)
           .to(root, { opacity: 0, duration: .7, ease: 'power2.inOut' }, LOADER_DURATION_SECONDS - .7)
           .call(finish, [], LOADER_DURATION_SECONDS)
         return
@@ -57,30 +70,33 @@ export function InitialLoader() {
         .set('.initial-loader-packet', { opacity: 0, rotation: 0, transformOrigin: '100px 100px' })
         .set('.initial-loader-node', { opacity: 0, scale: .7, transformOrigin: '50% 50%' })
         .set('.initial-loader-progress-fill', { scaleX: 0, transformOrigin: 'left center' })
+        .set('.initial-loader-progress-shell', { opacity: 0, y: 7 })
         .set('.initial-loader-tagline', { opacity: 0, y: 5 })
         .set('.initial-loader-sweep', { opacity: 0, xPercent: -150 })
-        .fromTo('.initial-loader-canvas', { opacity: .82 }, { opacity: 1, duration: .7, ease: 'sine.inOut' }, 0)
-        .to('.initial-loader-glow', { opacity: .9, scale: 1, duration: .8, ease: 'sine.inOut' }, 0)
-        .to('.initial-loader-network', { opacity: .32, duration: .65, ease: 'sine.inOut' }, .08)
-        .to('.initial-loader-logo', { opacity: 1, y: 0, filter: 'blur(0px)', scale: 1, duration: .9 }, .6)
-        .to('.initial-loader-sweep', { opacity: .66, xPercent: 155, duration: .9, ease: 'power2.inOut' }, .72)
-        .to('.initial-loader-sweep', { opacity: 0, duration: .2 }, 1.54)
-        .to('.initial-loader-orbit-draw', { opacity: .82, strokeDashoffset: 0, duration: 1.3, ease: 'power2.inOut' }, 1.2)
-        .to('.initial-loader-orbit-detail', { opacity: .52, rotation: 0, duration: .9, ease: 'sine.inOut' }, 1.3)
-        .to('.initial-loader-node', { opacity: .62, scale: 1, duration: .65, stagger: .08, ease: 'sine.inOut' }, 1.3)
-        .to('.initial-loader-packet', { opacity: 1, duration: .35 }, 1.45)
-        .to('.initial-loader-packet', { rotation: 610, duration: 2.85, ease: 'sine.inOut' }, 1.45)
-        .to('.initial-loader-progress-fill', { scaleX: 1, duration: 2.6, ease: 'power2.inOut' }, 1.8)
-        .to('.initial-loader-tagline', { opacity: 1, y: 0, duration: .65, ease: 'power2.out' }, 1.9)
-        .to('.initial-loader-glow', { scale: 1.075, opacity: 1, duration: 1.15, repeat: 1, yoyo: true, ease: 'sine.inOut' }, 1.75)
-        .to('.initial-loader-node', { opacity: .3, scale: .82, duration: .52, stagger: { each: .12, repeat: 2, yoyo: true }, ease: 'sine.inOut' }, 2.05)
-        .to('.initial-loader-orbit-detail', { rotation: 46, opacity: .72, duration: 1.1, ease: 'sine.inOut' }, 3.2)
-        .fromTo('.initial-loader-sweep', { opacity: 0, xPercent: -150 }, { opacity: .48, xPercent: 155, duration: .86, ease: 'power2.inOut' }, 3.22)
-        .to('.initial-loader-sweep', { opacity: 0, duration: .2 }, 4.02)
-        .to('.initial-loader-orbit, .initial-loader-node', { opacity: 0, duration: .62, ease: 'power2.inOut' }, 4.2)
-        .to('.initial-loader-tagline, .initial-loader-progress', { opacity: 0, y: 3, duration: .5, ease: 'power2.inOut' }, 4.25)
-        .to('.initial-loader-logo', { opacity: .28, scale: .96, y: -2, duration: .68, ease: 'power3.inOut' }, 4.22)
-        .to('.initial-loader-canvas', { opacity: .48, duration: .72, ease: 'power3.inOut' }, 4.22)
+        .fromTo('.initial-loader-canvas', { opacity: .84 }, { opacity: 1, duration: 1, ease: 'sine.inOut' }, 0)
+        .to('.initial-loader-glow', { opacity: .86, scale: 1, duration: 1.15, ease: 'sine.inOut' }, 0)
+        .to('.initial-loader-network', { opacity: .26, duration: 1.1, ease: 'sine.inOut' }, .1)
+        .to('.initial-loader-logo', { opacity: 1, y: 0, filter: 'blur(0px)', scale: 1, duration: 1, ease: 'power3.out' }, .42)
+        .to('.initial-loader-sweep', { opacity: .56, xPercent: 155, duration: 1.05, ease: 'power2.inOut' }, .62)
+        .to('.initial-loader-sweep', { opacity: 0, duration: .25 }, 1.58)
+        .to('.initial-loader-orbit-draw', { opacity: .76, strokeDashoffset: 0, duration: 1.55, ease: 'power2.inOut' }, .82)
+        .to('.initial-loader-orbit-detail', { opacity: .46, rotation: 0, duration: 1.25, ease: 'sine.inOut' }, .95)
+        .to('.initial-loader-node', { opacity: .5, scale: 1, duration: .9, stagger: .09, ease: 'sine.inOut' }, 1)
+        .to('.initial-loader-packet', { opacity: 1, duration: .5 }, 1.16)
+        .to('.initial-loader-packet', { rotation: 360, duration: 3, ease: 'power1.inOut' }, 1.16)
+        .to('.initial-loader-tagline', { opacity: 1, y: 0, duration: .7, ease: 'power2.out' }, .75)
+        .to('.initial-loader-progress-shell', { opacity: 1, y: 0, duration: .65, ease: 'power2.out' }, .9)
+        .to(progress, { value: 100, duration: 3.25, ease: 'power1.inOut', onUpdate: renderProgress }, .95)
+        .to('.initial-loader-progress-fill', { scaleX: 1, duration: 3.25, ease: 'power1.inOut' }, .95)
+        .to('.initial-loader-glow', { scale: 1.055, opacity: 1, duration: 1.35, repeat: 1, yoyo: true, ease: 'sine.inOut' }, 1.5)
+        .to('.initial-loader-node', { opacity: .28, scale: .88, duration: .72, stagger: { each: .1, repeat: 1, yoyo: true }, ease: 'sine.inOut' }, 2.05)
+        .to('.initial-loader-orbit-detail', { rotation: 28, opacity: .64, duration: 1.4, ease: 'sine.inOut' }, 2.75)
+        .fromTo('.initial-loader-sweep', { opacity: 0, xPercent: -150 }, { opacity: .38, xPercent: 155, duration: 1.05, ease: 'power2.inOut' }, 3.02)
+        .to('.initial-loader-sweep', { opacity: 0, duration: .2 }, 3.98)
+        .to('.initial-loader-orbit, .initial-loader-node', { opacity: 0, duration: .68, ease: 'power2.inOut' }, 4.12)
+        .to('.initial-loader-tagline, .initial-loader-progress-shell', { opacity: 0, y: 3, duration: .5, ease: 'power2.inOut' }, 4.2)
+        .to('.initial-loader-logo', { opacity: .28, scale: .96, y: -2, duration: .7, ease: 'power3.inOut' }, 4.2)
+        .to('.initial-loader-canvas', { opacity: .48, duration: .74, ease: 'power3.inOut' }, 4.2)
         .to(root, { opacity: 0, duration: .78, ease: 'power3.inOut' }, LOADER_DURATION_SECONDS - .78)
         .call(finish, [], LOADER_DURATION_SECONDS)
     }, root)
@@ -123,7 +139,13 @@ export function InitialLoader() {
           </div>
 
           <p className="initial-loader-tagline">Ambient clinical intelligence</p>
-          <div className="initial-loader-progress" aria-hidden="true"><i className="initial-loader-progress-fill" /></div>
+          <div className="initial-loader-progress-shell">
+            <div className="initial-loader-progress-meta">
+              <span className="initial-loader-status"><i aria-hidden="true" />Preparing your experience</span>
+              <output ref={percentageRef} className="initial-loader-percentage" aria-hidden="true">0%</output>
+            </div>
+            <div className="initial-loader-progress" aria-hidden="true"><i className="initial-loader-progress-fill" /></div>
+          </div>
         </div>
       </div>
     </div>
