@@ -257,6 +257,7 @@ export default function Contact() {
       {/* HERO */}
       <div
         ref={heroRef}
+        className="inner-page-hero inner-page-hero-contact"
         style={{
           position: 'relative',
           overflow: 'hidden',
@@ -271,7 +272,7 @@ export default function Contact() {
 
         {/* PREMIUM CONTACT ROUTING NETWORK */}
         <div
-          className="contact-network"
+          className="inner-page-hero-visual contact-network"
           aria-hidden="true"
           style={{
             position: 'absolute',

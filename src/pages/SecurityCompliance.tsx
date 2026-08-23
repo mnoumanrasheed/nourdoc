@@ -274,6 +274,7 @@ export default function SecurityCompliance() {
       {/* HERO */}
       <div
         ref={heroRef}
+        className="inner-page-hero inner-page-hero-security"
         style={{
           position: 'relative',
           overflow: 'hidden',
@@ -291,7 +292,7 @@ export default function SecurityCompliance() {
 
         {/* PREMIUM SECURITY VISUAL */}
         <div
-          className="security-hero-visual"
+          className="inner-page-hero-visual security-hero-visual"
           aria-hidden="true"
           style={{
             position: 'absolute',

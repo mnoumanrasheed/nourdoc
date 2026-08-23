@@ -253,6 +253,7 @@ export default function Product() {
       {/* HERO */}
       <div
         ref={heroRef}
+        className="inner-page-hero inner-page-hero-product"
         style={{
           position: 'relative',
           overflow: 'hidden',
@@ -270,7 +271,7 @@ export default function Product() {
 
         {/* PREMIUM PRODUCT WORKFLOW ANIMATION */}
         <div
-          className="product-ai-visual"
+          className="inner-page-hero-visual product-ai-visual"
           aria-hidden="true"
           style={{
             position: 'absolute',

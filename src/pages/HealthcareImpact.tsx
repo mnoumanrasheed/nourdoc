@@ -206,6 +206,7 @@ export default function HealthcareImpact() {
       {/* HERO */}
       <div
         ref={heroRef}
+        className="inner-page-hero inner-page-hero-impact"
         style={{
           position: 'relative',
           overflow: 'hidden',
@@ -223,7 +224,7 @@ export default function HealthcareImpact() {
 
         {/* PREMIUM IMPACT CONSTELLATION */}
         <div
-          className="impact-visual"
+          className="inner-page-hero-visual impact-visual"
           aria-hidden="true"
           style={{
             position: 'absolute',

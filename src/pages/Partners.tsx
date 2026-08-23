@@ -219,6 +219,7 @@ export default function Partners() {
       {/* HERO */}
       <div
         ref={heroRef}
+        className="inner-page-hero inner-page-hero-partners"
         style={{
           position: 'relative',
           overflow: 'hidden',
@@ -236,7 +237,7 @@ export default function Partners() {
 
         {/* PREMIUM PARTNER ECOSYSTEM NETWORK */}
         <div
-          className="partners-network"
+          className="inner-page-hero-visual partners-network"
           aria-hidden="true"
           style={{
             position: 'absolute',

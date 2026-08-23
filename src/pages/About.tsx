@@ -219,6 +219,7 @@ export default function About() {
       {/* HERO */}
       <div
         ref={heroRef}
+        className="inner-page-hero inner-page-hero-about"
         style={{
           position: 'relative',
           overflow: 'hidden',
@@ -236,7 +237,7 @@ export default function About() {
 
         {/* PREMIUM ABOUT VISUAL */}
         <div
-          className="about-hero-visual"
+          className="inner-page-hero-visual about-hero-visual"
           aria-hidden="true"
           style={{
             position: 'absolute',

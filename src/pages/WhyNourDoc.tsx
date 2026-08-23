@@ -240,7 +240,7 @@ export default function WhyNourDoc() {
       {/* HERO */}
       <div
         ref={heroWrapRef}
-        className="why-hero-motion"
+        className="inner-page-hero inner-page-hero-why why-hero-motion"
         style={{
           position: 'relative',
           overflow: 'hidden',
@@ -258,6 +258,7 @@ export default function WhyNourDoc() {
 
         {/* CLINICAL AI RADAR */}
         <div
+          className="inner-page-hero-visual"
           aria-hidden="true"
           style={{
             position: 'absolute',
