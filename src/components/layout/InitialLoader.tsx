@@ -2,6 +2,8 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import logo from '../../assets/nourdoc-logo.png'
 
+const LOADER_DURATION_SECONDS = 5
+
 export function InitialLoader() {
   const [visible, setVisible] = useState(true)
   const rootRef = useRef<HTMLDivElement>(null)
@@ -35,16 +37,16 @@ export function InitialLoader() {
 
     const context = gsap.context(() => {
       if (reduced) {
-        gsap.timeline({ onComplete: finish })
+        gsap.timeline()
           .set('.initial-loader-logo', { opacity: 1, y: 0, filter: 'blur(0px)' })
           .set('.initial-loader-tagline', { opacity: 1 })
-          .to(root, { opacity: 0, duration: .7, ease: 'power2.inOut' }, .35)
+          .to(root, { opacity: 0, duration: .7, ease: 'power2.inOut' }, LOADER_DURATION_SECONDS - .7)
+          .call(finish, [], LOADER_DURATION_SECONDS)
         return
       }
 
       const timeline = gsap.timeline({
         defaults: { ease: 'power2.out' },
-        onComplete: finish,
       })
 
       timeline
@@ -79,7 +81,8 @@ export function InitialLoader() {
         .to('.initial-loader-tagline, .initial-loader-progress', { opacity: 0, y: 3, duration: .5, ease: 'power2.inOut' }, 4.25)
         .to('.initial-loader-logo', { opacity: .28, scale: .96, y: -2, duration: .68, ease: 'power3.inOut' }, 4.22)
         .to('.initial-loader-canvas', { opacity: .48, duration: .72, ease: 'power3.inOut' }, 4.22)
-        .to(root, { opacity: 0, duration: .78, ease: 'power3.inOut' }, 4.22)
+        .to(root, { opacity: 0, duration: .78, ease: 'power3.inOut' }, LOADER_DURATION_SECONDS - .78)
+        .call(finish, [], LOADER_DURATION_SECONDS)
     }, root)
 
     return () => {
