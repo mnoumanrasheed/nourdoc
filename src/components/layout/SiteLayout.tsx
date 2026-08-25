@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react'
+import { Suspense, useLayoutEffect } from 'react'
 import { useLocation, useOutlet } from 'react-router-dom'
 import { Footer } from './Footer'
 import { Navbar } from '../navigation/Navbar'
@@ -8,7 +8,7 @@ export function SiteLayout() {
   const outlet = useOutlet()
 
   useLayoutEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+    window.scrollTo(0, 0)
   }, [pathname])
 
   return (
@@ -16,8 +16,8 @@ export function SiteLayout() {
       <a className="skip-link" href="#main-content">Skip to main content</a>
       <Navbar />
       <main id="main-content">
-        <div key={pathname} className="page-transition">
-          {outlet}
+        <div className="page-transition">
+          <Suspense fallback={null}>{outlet}</Suspense>
         </div>
       </main>
       <Footer />

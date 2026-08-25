@@ -6,6 +6,19 @@
     <meta name="theme-color" content="#f7fbfa" />
     <style>html.initial-loading,html.initial-loading body,html.initial-loading #root{background:#06131a}</style>
     <link rel="icon" href="/favicon.ico" />
+    <script>
+      if (location.pathname === '/' || location.pathname === '/index.html') {
+        const heroPreload = document.createElement('link')
+        heroPreload.rel = 'preload'
+        heroPreload.as = 'image'
+        heroPreload.type = 'image/avif'
+        heroPreload.href = '/images/01-home-clinical-conversation-1600.avif'
+        heroPreload.imageSrcset = '/images/01-home-clinical-conversation-480.avif 480w, /images/01-home-clinical-conversation-768.avif 768w, /images/01-home-clinical-conversation-1200.avif 1200w, /images/01-home-clinical-conversation-1600.avif 1600w, /images/01-home-clinical-conversation-1800.avif 1800w'
+        heroPreload.imageSizes = '100vw'
+        heroPreload.fetchPriority = 'high'
+        document.head.append(heroPreload)
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet" />

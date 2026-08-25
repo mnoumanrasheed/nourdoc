@@ -1,8 +1,7 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 
-import storyImage from '../assets/pakistani-consultation.jpg'
-import heroImage from '../assets/07-about-nourdoc-local-doctor-web.jpg'
+import { aboutDoctorImage as heroImage, pakistaniConsultationImage as storyImage } from '../data/responsiveImages'
 
 import { CTASection } from '../components/common/CTASection'
 import { PageHero } from '../components/common/PageHero'

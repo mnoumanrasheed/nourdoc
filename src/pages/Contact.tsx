@@ -8,6 +8,8 @@ import {
   PlayCircle,
 } from 'lucide-react'
 import gsap from 'gsap'
+// @ts-expect-error The installed package does not include TypeScript declarations.
+import ReCAPTCHA from 'react-google-recaptcha'
 
 import { PageHero } from '../components/common/PageHero'
 import { SectionHeader } from '../components/common/SectionHeader'
@@ -43,21 +45,99 @@ const contactPaths = [
   },
 ]
 
+type ReCaptchaHandle = {
+  reset: () => void
+}
+
+type ContactResponse = {
+  success?: boolean
+  message?: string
+  error?: string
+}
+
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false)
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null)
+  const [recaptchaError, setRecaptchaError] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY
 
   const heroRef = useRef<HTMLDivElement>(null)
   const outerRingRef = useRef<HTMLDivElement>(null)
   const innerRingRef = useRef<HTMLDivElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
+  const recaptchaRef = useRef<ReCaptchaHandle | null>(null)
 
   usePageMeta(
     'Contact',
     'Contact NourDoc for product demonstrations, trials, sales, support, partnerships or investment inquiries.',
   )
 
-  const submit = (event: FormEvent<HTMLFormElement>) => {
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setSubmitted(true)
+
+    if (isSubmitting) return
+
+    const token = recaptchaToken
+    if (!token) {
+      setRecaptchaError(true)
+      return
+    }
+
+    setRecaptchaError(false)
+    setSubmitError(null)
+    setIsSubmitting(true)
+
+    const formData = new FormData(event.currentTarget)
+    const payload = {
+      name: String(formData.get('name') ?? '').trim(),
+      email: String(formData.get('email') ?? '').trim(),
+      organization: String(formData.get('organization') ?? '').trim(),
+      interest: String(formData.get('interest') ?? '').trim(),
+      message: String(formData.get('message') ?? '').trim(),
+      recaptchaToken: token,
+    }
+
+    try {
+      const response = await fetch('/api/contact.php', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
+
+      let result: ContactResponse = {}
+      try {
+        result = await response.json() as ContactResponse
+      } catch {
+        // The status check below supplies a safe message for invalid responses.
+      }
+
+      if (!response.ok || result.success !== true) {
+        throw new Error(
+          result.error
+          || result.message
+          || 'We could not send your inquiry. Please try again.',
+        )
+      }
+
+      formRef.current?.reset()
+      recaptchaRef.current?.reset()
+      setRecaptchaToken(null)
+      setSubmitted(true)
+    } catch (error) {
+      setSubmitted(false)
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : 'A network error occurred. Please try again.',
+      )
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   useEffect(() => {
@@ -861,7 +941,8 @@ export default function Contact() {
                 <h3>Your inquiry is ready for the NourDoc team.</h3>
 
                 <p>
-                  This frontend demonstration does not send data to a backend.
+                  Your inquiry has been sent successfully. The NourDoc team
+                  will review it and respond as soon as possible.
                 </p>
 
                 <button
@@ -873,7 +954,7 @@ export default function Contact() {
                 </button>
               </div>
             ) : (
-              <form className="contact-form" onSubmit={submit}>
+              <form ref={formRef} className="contact-form" onSubmit={submit}>
                 <label>
                   Full Name
                   <input name="name" autoComplete="name" required />
@@ -923,11 +1004,40 @@ export default function Contact() {
                   <textarea name="message" rows={5} required />
                 </label>
 
+                <div className="recaptcha-field full-field">
+                  <div className="recaptcha-frame">
+                    <ReCAPTCHA
+                      ref={recaptchaRef}
+                      sitekey={recaptchaSiteKey}
+                      onChange={(token: string | null) => {
+                        setRecaptchaToken(token)
+                        if (token) setRecaptchaError(false)
+                      }}
+                      onExpired={() => setRecaptchaToken(null)}
+                      onErrored={() => setRecaptchaToken(null)}
+                    />
+                  </div>
+
+                  {recaptchaError && (
+                    <p className="recaptcha-error" role="alert">
+                      Please verify that you are not a robot.
+                    </p>
+                  )}
+                </div>
+
+                {submitError && (
+                  <p className="form-submit-error full-field" role="alert">
+                    {submitError}
+                  </p>
+                )}
+
                 <button
                   className="button button-primary full-field"
                   type="submit"
+                  disabled={isSubmitting}
+                  aria-busy={isSubmitting}
                 >
-                  Send inquiry
+                  {isSubmitting ? 'Sending inquiry…' : 'Send inquiry'}
                   <ArrowRight />
                 </button>
               </form>
@@ -1023,6 +1133,45 @@ export default function Contact() {
             @media (max-width: 760px) {
               .faq-grid {
                 grid-template-columns: 1fr !important;
+              }
+            }
+
+            .recaptcha-field {
+              min-width: 0;
+              overflow: hidden;
+            }
+
+            .recaptcha-frame {
+              width: 304px;
+              transform-origin: left top;
+            }
+
+            .recaptcha-error {
+              margin: 8px 0 0;
+              color: #a23d45;
+              font-size: .86rem;
+              line-height: 1.45;
+            }
+
+            .form-submit-error {
+              margin: 0;
+              color: #a23d45;
+              font-size: .86rem;
+              line-height: 1.45;
+            }
+
+            .contact-form .button:disabled {
+              cursor: wait;
+              opacity: .7;
+            }
+
+            @media (max-width: 360px) {
+              .recaptcha-field {
+                min-height: 64px;
+              }
+
+              .recaptcha-frame {
+                transform: scale(.8);
               }
             }
 

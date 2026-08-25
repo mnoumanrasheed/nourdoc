@@ -8,7 +8,7 @@ export function Footer() {
       <div className="container footer-grid">
         <div className="footer-brand">
           <Link to="/" className="brand brand-light">
-            <img src={logo} alt="NourDoc" />
+            <img src={logo} alt="NourDoc" width="240" height="240" loading="lazy" decoding="async" />
             <span>
               Nour<span>Doc</span>
             </span>

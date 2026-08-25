@@ -1,17 +1,21 @@
-import { useLayoutEffect, useRef, useState, type ReactNode, type Ref } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode, type Ref } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { gsap } from 'gsap'
 import {
-  Activity, ArrowRight, Check, CircleGauge, FileText, HeartPulse, LockKeyhole,
+  Activity, ArrowLeft, ArrowRight, Check, CircleGauge, FileText, HeartPulse, LockKeyhole,
   Mic2, Network, ShieldCheck, Sparkles, Stethoscope, Workflow,
 } from 'lucide-react'
-import consultationImage from '../../assets/01-home-clinical-conversation.jpg'
-import naturalCareImage from '../../assets/02-why-nourdoc-local-clinician-web.jpg'
-import impactImage from '../../assets/04-healthcare-impact-patient-care.jpg'
-import securityImage from '../../assets/05-security-clinical-data-workflow.jpg'
+import {
+  healthcareImpactImage as impactImage,
+  homeConsultationImage as consultationImage,
+  securityWorkflowImage as securityImage,
+  whyNourDocImage as naturalCareImage,
+  type ResponsiveImageAsset,
+} from '../../data/responsiveImages'
+import { signalCriticalHeroReady } from '../../utils/criticalAssets'
+import { ResponsivePicture } from '../common/ResponsivePicture'
 
-const DISPLAY_SECONDS = 5
 const HERO_VISUAL_TEXT_STYLES = `
 .rotating-scene-visual .scene-shell-bar { font-size: 12.5px !important; }
 .rotating-scene-visual .scene-shell-bar > span,
@@ -38,6 +42,90 @@ const HERO_VISUAL_TEXT_STYLES = `
 .rotating-scene-visual .secure-record p,
 .rotating-scene-visual .secure-record footer { font-size: 10.5px !important; line-height: 1.35 !important; }
 
+/* Component-scoped fit and rhythm for the three narrative visualizations. */
+.rotating-hero .ambient-visual .ambient-pipeline {
+  grid-template-columns: minmax(0, 1fr) minmax(100px, .72fr) minmax(0, 1.35fr);
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+}
+.rotating-hero .ambient-visual .ambient-stage,
+.rotating-hero .ambient-visual .ambient-stage > .scene-glass-card { min-width: 0; max-height: 100%; }
+.rotating-hero .ambient-visual .ambient-dialogue,
+.rotating-hero .ambient-visual .ambient-note { padding: 12px 13px; }
+.rotating-hero .ambient-visual .ambient-dialogue p,
+.rotating-hero .ambient-visual .ambient-dialogue p b,
+.rotating-hero .ambient-visual .ambient-note-row p,
+.rotating-hero .ambient-visual .ambient-note-row b,
+.rotating-hero .ambient-visual .ambient-note-row small {
+  min-width: 0;
+  word-break: normal;
+  overflow-wrap: normal;
+  hyphens: none;
+}
+.rotating-hero .ambient-visual .ambient-dialogue p { font-size: clamp(8.5px, .68vw, 10px) !important; line-height: 1.42 !important; }
+.rotating-hero .ambient-visual .ambient-dialogue p b { font-size: clamp(8.5px, .7vw, 10px) !important; }
+.rotating-hero .ambient-visual .ambient-dialogue > div { grid-template-columns: 22px minmax(0, 1fr); gap: 7px; margin-top: 10px; }
+.rotating-hero .ambient-visual .ambient-dialogue > div > i { width: 22px; height: 22px; }
+.rotating-hero .ambient-visual .ambient-dialogue > small { margin-top: 10px; padding-top: 8px; font-size: 8px !important; }
+.rotating-hero .ambient-visual .ambient-core { align-self: center; padding: 13px 8px; }
+.rotating-hero .ambient-visual .ambient-core > span { font-size: clamp(8.5px, .68vw, 10px) !important; white-space: normal; }
+.rotating-hero .ambient-visual .scene-waveform { width: 100%; height: 72px; gap: clamp(1px, .2vw, 3px); }
+.rotating-hero .ambient-visual .scene-waveform i { max-height: 52px; }
+.rotating-hero .ambient-visual .ambient-core > small { font-size: 7px !important; }
+.rotating-hero .ambient-visual .ambient-note-row { grid-template-columns: 22px minmax(0, 1fr); gap: 6px; margin-top: 5px; padding: 5px 6px; }
+.rotating-hero .ambient-visual .ambient-note-row > i { width: 22px; height: 22px; }
+.rotating-hero .ambient-visual .ambient-note-row b { font-size: 9.5px !important; line-height: 1.25 !important; }
+.rotating-hero .ambient-visual .ambient-note-row small { font-size: 7.5px !important; line-height: 1.25 !important; }
+.rotating-hero .ambient-visual .ambient-review { margin-top: 7px; font-size: 8px !important; }
+.rotating-hero .ambient-visual .ambient-connector-a { left: 29.5%; }
+.rotating-hero .ambient-visual .ambient-connector-b { left: 58%; }
+
+.rotating-hero .context-visual .context-card-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 18px 70px;
+  padding: 18px 20px;
+}
+.rotating-hero .context-visual .context-card-float,
+.rotating-hero .context-visual .context-card { min-width: 0; min-height: 0; }
+.rotating-hero .context-visual .context-card { height: 100%; padding: 11px 13px; border-radius: 15px; }
+.rotating-hero .context-visual .context-card > b { margin-top: 7px; font-size: 11.5px !important; line-height: 1.2 !important; overflow-wrap: normal; word-break: normal; }
+.rotating-hero .context-visual .context-card > p { margin-top: 4px; font-size: 8.5px !important; line-height: 1.35 !important; overflow-wrap: normal; word-break: normal; }
+.rotating-hero .context-visual .context-card > svg { width: 16px; height: 16px; }
+.rotating-hero .context-visual .context-core {
+  top: calc(50% + 24px);
+  width: 74px;
+  height: 74px;
+  gap: 3px;
+}
+.rotating-hero .context-visual .context-core span { font-size: 9px !important; }
+.rotating-hero .context-visual .context-core i { inset: 8px; }
+
+.rotating-hero .security-visual .security-stage { padding: 16px 18px; }
+.rotating-hero .security-visual .secure-record-stack {
+  width: min(58%, 270px);
+  height: auto;
+  transform: translate(-50%, -50%) translateZ(48px);
+}
+.rotating-hero .security-visual .secure-layer { inset: 11px; border-radius: 16px; }
+.rotating-hero .security-visual .secure-layer-back { transform: translate3d(14px, -10px, -40px); }
+.rotating-hero .security-visual .secure-layer-mid { transform: translate3d(7px, -5px, -20px); }
+.rotating-hero .security-visual .secure-record { position: relative; inset: auto; padding: 16px 17px; border-radius: 16px; }
+.rotating-hero .security-visual .secure-record > div { gap: 9px; padding-bottom: 9px; }
+.rotating-hero .security-visual .secure-record > div > svg { width: 23px; height: 23px; }
+.rotating-hero .security-visual .secure-record > div span b { font-size: 12px !important; line-height: 1.2 !important; }
+.rotating-hero .security-visual .secure-record > div span small { font-size: 8.5px !important; line-height: 1.3 !important; }
+.rotating-hero .security-visual .secure-record > p { gap: 7px; margin: 6px 0; padding: 6px 7px; }
+.rotating-hero .security-visual .secure-record > p { font-size: 9px !important; line-height: 1.3 !important; }
+.rotating-hero .security-visual .secure-record footer { gap: 5px; padding-top: 8px; font-size: 8px !important; line-height: 1.3 !important; }
+.rotating-hero .security-visual .security-node { z-index: 5; padding: 7px 9px; white-space: nowrap; }
+.rotating-hero .security-visual .security-node-a { left: 4%; top: 8%; }
+.rotating-hero .security-visual .security-node-b { right: 4%; top: 8%; }
+.rotating-hero .security-visual .security-node-c { left: 5%; bottom: 8%; }
+.rotating-hero .security-visual .security-node-d { right: 5%; bottom: 8%; }
+.rotating-hero .security-visual .security-pulse { width: min(76%, 330px); height: auto; aspect-ratio: 1; }
+
 @media (max-width: 900px) {
   .rotating-scene-visual .scene-shell-bar { font-size: 12px !important; }
   .rotating-scene-visual .ambient-dialogue p,
@@ -51,6 +139,71 @@ const HERO_VISUAL_TEXT_STYLES = `
   .rotating-scene-visual .security-node span,
   .rotating-scene-visual .secure-record p,
   .rotating-scene-visual .secure-record footer { font-size: 10.5px !important; }
+
+  .rotating-hero .ambient-visual .ambient-pipeline { grid-template-columns: minmax(0, .95fr) minmax(82px, .7fr) minmax(0, 1.3fr); gap: 8px; padding: 12px; }
+  .rotating-hero .ambient-visual .ambient-dialogue,
+  .rotating-hero .ambient-visual .ambient-note { padding: 9px 10px; }
+  .rotating-hero .ambient-visual .ambient-dialogue p,
+  .rotating-hero .ambient-visual .ambient-dialogue p b { font-size: 8px !important; }
+  .rotating-hero .ambient-visual .ambient-note-row { margin-top: 4px; padding: 4px 5px; }
+  .rotating-hero .ambient-visual .ambient-note-row b { font-size: 8px !important; }
+  .rotating-hero .ambient-visual .ambient-note-row small { font-size: 6.5px !important; }
+  .rotating-hero .ambient-visual .scene-waveform { height: 58px; }
+
+  .rotating-hero .context-visual .context-card-grid { gap: 14px 54px; padding: 14px 16px; }
+  .rotating-hero .context-visual .context-card { padding: 9px 10px; }
+  .rotating-hero .context-visual .context-card > b { margin-top: 5px; font-size: 9.5px !important; }
+  .rotating-hero .context-visual .context-card > p { font-size: 7.5px !important; }
+  .rotating-hero .context-visual .context-core { width: 66px; height: 66px; }
+
+  .rotating-hero .security-visual .security-stage { padding: 12px; }
+  .rotating-hero .security-visual .secure-record-stack { width: min(58%, 235px); }
+  .rotating-hero .security-visual .secure-record { padding: 12px 13px; }
+  .rotating-hero .security-visual .secure-record > div span b { font-size: 11px !important; }
+  .rotating-hero .security-visual .secure-record > div span small { font-size: 7.5px !important; }
+  .rotating-hero .security-visual .secure-record > p { margin: 5px 0; padding: 5px 6px; }
+  .rotating-hero .security-visual .secure-record > p { font-size: 8px !important; }
+  .rotating-hero .security-visual .secure-record footer { font-size: 7.5px !important; }
+  .rotating-hero .security-visual .security-node { padding: 6px 7px; }
+}
+
+@media (max-width: 700px) {
+  .rotating-hero .ambient-visual .ambient-pipeline { grid-template-columns: minmax(0, .95fr) minmax(76px, .68fr) minmax(0, 1.3fr); gap: 6px; padding: 8px; }
+  .rotating-hero .ambient-visual .ambient-stage { height: clamp(160px, calc(22vw + 85px), 190px); }
+  .rotating-hero .ambient-visual .ambient-stage > .scene-glass-card { height: 100%; }
+  .rotating-hero .ambient-visual .ambient-dialogue,
+  .rotating-hero .ambient-visual .ambient-note { display: flex; flex-direction: column; padding: 7px 8px; }
+  .rotating-hero .ambient-visual .ambient-dialogue > div { grid-template-columns: 18px minmax(0, 1fr); gap: 4px; margin-top: 7px; }
+  .rotating-hero .ambient-visual .ambient-dialogue > div > i { width: 18px; height: 18px; }
+  .rotating-hero .ambient-visual .ambient-dialogue > small { margin-top: auto; padding-top: 6px; font-size: 6px !important; }
+  .rotating-hero .ambient-visual .ambient-core { display: grid; align-content: center; padding-inline: 4px; }
+  .rotating-hero .ambient-visual .ambient-core > span { font-size: 7px !important; }
+  .rotating-hero .ambient-visual .scene-waveform { height: 52px; }
+  .rotating-hero .ambient-visual .ambient-note-row { grid-template-columns: 19px minmax(0, 1fr); padding: 4px; }
+  .rotating-hero .ambient-visual .ambient-note-row:nth-of-type(1),
+  .rotating-hero .ambient-visual .ambient-note-row:nth-of-type(2),
+  .rotating-hero .ambient-visual .ambient-note-row:nth-of-type(3) { display: grid; }
+  .rotating-hero .ambient-visual .ambient-note-row > i { width: 19px; height: 19px; }
+  .rotating-hero .ambient-visual .ambient-note-row b { font-size: 7px !important; }
+  .rotating-hero .ambient-visual .ambient-note-row small { font-size: 5.8px !important; }
+
+  .rotating-hero .context-visual .context-card-grid { gap: 10px 44px; padding: 10px 12px; }
+  .rotating-hero .context-visual .context-card { padding: 8px; }
+  .rotating-hero .context-visual .context-card > b { font-size: 8px !important; }
+  .rotating-hero .context-visual .context-card > p { font-size: 6.5px !important; }
+  .rotating-hero .context-visual .context-core { top: calc(50% + 21px); width: 58px; height: 58px; }
+  .rotating-hero .context-visual .context-core span { font-size: 7px !important; }
+
+  .rotating-hero .security-visual .security-stage { padding: 9px; }
+  .rotating-hero .security-visual .secure-record-stack { width: min(58%, 210px); }
+  .rotating-hero .security-visual .secure-record { padding: 10px 11px; }
+  .rotating-hero .security-visual .secure-record > div { padding-bottom: 7px; }
+  .rotating-hero .security-visual .secure-record > div span b { font-size: 10.5px !important; }
+  .rotating-hero .security-visual .secure-record > div span small { font-size: 7px !important; }
+  .rotating-hero .security-visual .secure-record > p { margin: 4px 0; padding: 4px 5px; }
+  .rotating-hero .security-visual .secure-record > p { font-size: 7.5px !important; }
+  .rotating-hero .security-visual .secure-record footer { padding-top: 6px; font-size: 7px !important; }
+  .rotating-hero .security-visual .security-node { padding: 5px 6px; }
 }
 `
 const waveform = [18, 29, 44, 24, 52, 34, 63, 40, 57, 28, 48, 62, 36, 22, 43, 55, 31]
@@ -225,9 +378,9 @@ function ContextVisual({ active }: VisualProps) {
         timeline.add(gsap.to(path, { strokeDashoffset: -76, duration: 2.9 + index * .25, repeat: -1, ease: 'none' }), 0)
         if (packets[index]) timeline.add(pathTraveller(path, packets[index], 2.25 + index * .22, index * .24), 0)
       })
-      timeline.add(gsap.to(root.querySelector('.context-core'), { scale: 1.075, duration: 1.35, repeat: -1, yoyo: true, ease: 'sine.inOut' }), 0)
+      timeline.add(gsap.to(root.querySelector('.context-core'), { scale: 1.025, duration: 1.35, repeat: -1, yoyo: true, ease: 'sine.inOut' }), 0)
       gsap.utils.toArray<HTMLElement>('.context-card-float', root).forEach((card, index) => {
-        timeline.add(gsap.to(card, { y: index % 2 ? 6 : -6, duration: 3.3 + index * .25, delay: index * .28, repeat: -1, yoyo: true, ease: 'sine.inOut' }), 0)
+        timeline.add(gsap.to(card, { y: index % 2 ? 4 : -4, duration: 3.3 + index * .25, delay: index * .28, repeat: -1, yoyo: true, ease: 'sine.inOut' }), 0)
       })
     }, root)
     timelineRef.current = timeline
@@ -397,11 +550,11 @@ function ImpactVisual({ active }: VisualProps) {
         className="impact-dashboard"
         style={{
           display: 'grid',
-          gridTemplateColumns: '34% 66%',
+          gridTemplateColumns: 'minmax(0, 34fr) minmax(0, 66fr)',
           gridTemplateRows: '1fr auto',
           gap: 12,
-          minHeight: '100%',
-          padding: 14,
+          minHeight: 0,
+          padding: 16,
         }}
       >
         <div
@@ -410,12 +563,12 @@ function ImpactVisual({ active }: VisualProps) {
             position: 'relative',
             padding: 16,
             overflow: 'hidden',
-            minHeight: 220,
+            minHeight: 0,
           }}
         >
           <span style={{ display: 'block', fontSize: 13, opacity: .82, marginBottom: 8 }}>Documentation flow</span>
 
-          <div className="impact-ring" style={{ position: 'relative', width: 122, height: 122, margin: '10px auto 12px' }}>
+          <div className="impact-ring" style={{ position: 'relative', width: 104, height: 104, margin: '8px auto 10px' }}>
             <svg viewBox="0 0 120 120" style={{ width: '100%', height: '100%' }}>
               <circle cx="60" cy="60" r="48" />
               <circle className="impact-ring-value" cx="60" cy="60" r="48" />
@@ -440,24 +593,6 @@ function ImpactVisual({ active }: VisualProps) {
             Workflow signal improving
           </p>
 
-          <div
-            style={{
-              marginTop: 14,
-              paddingTop: 12,
-              borderTop: '1px solid rgba(126,216,223,.12)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 10,
-            }}
-          >
-            <span style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12, opacity: .82 }}>
-              <ShieldCheck size={13} />
-              Clinician review
-            </span>
-            <b style={{ fontSize: 12, color: '#7fd7c6' }}>Required</b>
-          </div>
-
           <i
             className="impact-bridge-packet"
             aria-hidden="true"
@@ -480,7 +615,7 @@ function ImpactVisual({ active }: VisualProps) {
             position: 'relative',
             overflow: 'hidden',
             padding: 16,
-            minHeight: 220,
+            minHeight: 0,
           }}
         >
           <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
@@ -491,8 +626,8 @@ function ImpactVisual({ active }: VisualProps) {
             </b>
           </header>
 
-          <div style={{ position: 'relative', minHeight: 142, overflow: 'hidden', borderRadius: 12 }}>
-            <svg viewBox="0 0 320 130" preserveAspectRatio="none" aria-hidden="true" style={{ width: '100%', height: 142 }}>
+          <div style={{ position: 'relative', minHeight: 112, overflow: 'hidden', borderRadius: 12 }}>
+            <svg viewBox="0 0 320 130" preserveAspectRatio="none" aria-hidden="true" style={{ width: '100%', height: 112 }}>
               <defs>
                 <linearGradient id="impactAreaFill" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="rgba(90,219,229,.26)" />
@@ -549,10 +684,10 @@ function ImpactVisual({ active }: VisualProps) {
           }}
         >
           {[
-            [HeartPulse, 'Clinical focus', 'Active', 'LIVE'],
-            [CircleGauge, 'Workflow progress', '4 stages', '04'],
-            [Check, 'Clinician review', 'Required', 'OK'],
-          ].map(([Icon, title, text, value], index) => {
+            [HeartPulse, 'Clinical focus', 'Active'],
+            [CircleGauge, 'Workflow progress', '4 stages'],
+            [Check, 'Clinician review', 'Required'],
+          ].map(([Icon, title, text]) => {
             const MetricIcon = Icon as typeof HeartPulse
             return (
               <div
@@ -560,32 +695,20 @@ function ImpactVisual({ active }: VisualProps) {
                 key={String(title)}
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '30px 1fr auto',
+                  gridTemplateColumns: '24px minmax(0, 1fr)',
                   alignItems: 'center',
-                  gap: 8,
-                  minHeight: 54,
-                  padding: '10px 12px',
+                  gap: 7,
+                  minHeight: 42,
+                  padding: '6px 8px',
                       }}
               >
-                <span style={{ width: 30, height: 30, borderRadius: 9, display: 'grid', placeItems: 'center', background: 'rgba(83,171,193,.12)' }}>
-                  <MetricIcon size={15} />
+                <span style={{ width: 24, height: 24, borderRadius: 7, display: 'grid', placeItems: 'center', background: 'rgba(83,171,193,.12)' }}>
+                  <MetricIcon size={13} />
                 </span>
                 <p style={{ margin: 0 }}>
-                  <b style={{ display: 'block', fontSize: 11.5 }}>{String(title)}</b>
-                  <small style={{ fontSize: 10, opacity: .72 }}>{String(text)}</small>
+                  <b style={{ display: 'block', fontSize: 10.5 }}>{String(title)}</b>
+                  <small style={{ fontSize: 9, opacity: .72 }}>{String(text)}</small>
                 </p>
-                <span
-                  style={{
-                    fontSize: 10.5,
-                    color: index === 0 ? '#7fd7c6' : '#8ad5df',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 5,
-                  }}
-                >
-                  <i className="impact-status-dot" style={{ width: 5, height: 5, borderRadius: '50%', background: '#67bda8', display: 'inline-block' }} />
-                  {String(value)}
-                </span>
               </div>
             )
           })}
@@ -670,7 +793,7 @@ function SecurityVisual({ active }: VisualProps) {
       const pulse = root.querySelector<HTMLElement>('.security-pulse')
       if (pulse) {
         timeline.to(pulse, {
-          scale: 1.08,
+          scale: 1.025,
           opacity: .9,
           duration: 1.25,
           repeat: -1,
@@ -690,7 +813,7 @@ function SecurityVisual({ active }: VisualProps) {
         }, 0)
       })
 
-      timeline.to('.secure-record-stack', {
+      timeline.to('.secure-record', {
         y: -3,
         duration: 2.1,
         repeat: -1,
@@ -730,7 +853,7 @@ function SecurityVisual({ active }: VisualProps) {
           opacity: 1,
           visibility: 'visible',
           position: 'relative',
-          minHeight: 360,
+          minHeight: 0,
         }}
       >
         <svg
@@ -751,7 +874,7 @@ function SecurityVisual({ active }: VisualProps) {
 
         <div className="security-node security-node-a" style={{ opacity: 1, visibility: 'visible' }}>
           <Network size={14} />
-          <span>Clinical data</span>
+          <span>Clinical workflow</span>
         </div>
 
         <div className="security-node security-node-b" style={{ opacity: 1, visibility: 'visible' }}>
@@ -761,12 +884,12 @@ function SecurityVisual({ active }: VisualProps) {
 
         <div className="security-node security-node-c" style={{ opacity: 1, visibility: 'visible' }}>
           <FileText size={14} />
-          <span>Audit record</span>
+          <span>Audit</span>
         </div>
 
         <div className="security-node security-node-d" style={{ opacity: 1, visibility: 'visible' }}>
           <Check size={14} />
-          <span>Access verified</span>
+          <span>Verified</span>
         </div>
 
         <motion.div
@@ -775,7 +898,6 @@ function SecurityVisual({ active }: VisualProps) {
             opacity: 1,
             visibility: 'visible',
           }}
-          whileHover={{ y: -4 }}
         >
           <i className="secure-layer secure-layer-back" />
           <i className="secure-layer secure-layer-mid" />
@@ -785,7 +907,6 @@ function SecurityVisual({ active }: VisualProps) {
             style={{
               opacity: 1,
               visibility: 'visible',
-              position: 'relative',
               overflow: 'hidden',
             }}
           >
@@ -819,7 +940,8 @@ function SecurityVisual({ active }: VisualProps) {
   )
 }
 
-type Scene = { eyebrow: string; shortLabel: string; title: string; description: string; image: string; position: string; visual: (active: boolean) => ReactNode }
+type Scene = { eyebrow: string; shortLabel: string; title: string; description: string; image: ResponsiveImageAsset; position: string; visual: (active: boolean) => ReactNode }
+type SceneRequestPriority = 'high' | 'low'
 
 const scenes: Scene[] = [
   { eyebrow: 'Ambient Intelligence', shortLabel: 'Ambient', title: 'Patient conversations, perfectly documented.', description: 'NourDoc listens to natural doctor-patient dialogue and creates structured clinical documentation, helping physicians reduce time spent on manual note-taking.', image: consultationImage, position: '52% center', visual: (active) => <AmbientVisual active={active} /> },
@@ -831,12 +953,65 @@ const scenes: Scene[] = [
 export function CinematicStory() {
   const rootRef = useRef<HTMLElement>(null)
   const activeRef = useRef(0)
-  const cycleRef = useRef<gsap.core.Timeline | null>(null)
   const transitionRef = useRef<gsap.core.Timeline | null>(null)
   const backgroundRef = useRef<gsap.core.Tween | null>(null)
   const goToRef = useRef<(index: number) => void>(() => undefined)
+  const readyScenesRef = useRef(new Set<number>())
+  const pendingSceneRef = useRef<number | null>(null)
+  const preloadStartedRef = useRef(false)
+  const idleHandlesRef = useRef<number[]>([])
+  const pageReadyListenerRef = useRef<(() => void) | null>(null)
   const [activeIndex, setActiveIndex] = useState(0)
+  const [requestedScenes, setRequestedScenes] = useState<Record<number, SceneRequestPriority>>({ 0: 'high' })
   const reduced = false
+
+  const requestScene = useCallback((index: number, priority: SceneRequestPriority) => {
+    setRequestedScenes((current) => {
+      if (current[index] === 'high' || current[index] === priority) return current
+      return { ...current, [index]: priority }
+    })
+  }, [])
+
+  const scheduleIdleScenes = useCallback(() => {
+    if (preloadStartedRef.current) return
+    preloadStartedRef.current = true
+    const requestIdle = window.requestIdleCallback ?? ((callback: IdleRequestCallback) => window.setTimeout(() => callback({ didTimeout: false, timeRemaining: () => 16 }), 1))
+    idleHandlesRef.current.push(requestIdle(() => requestScene(2, 'low'), { timeout: 1800 }))
+    idleHandlesRef.current.push(requestIdle(() => requestScene(3, 'low'), { timeout: 2600 }))
+  }, [requestScene])
+
+  const handleSceneDecoded = useCallback((index: number) => {
+    if (readyScenesRef.current.has(index)) return
+    readyScenesRef.current.add(index)
+
+    if (index === 0) {
+      signalCriticalHeroReady()
+      requestScene(1, 'low')
+
+      if (document.body.hasAttribute('aria-busy')) {
+        const onPageReady = () => {
+          pageReadyListenerRef.current = null
+          scheduleIdleScenes()
+        }
+        pageReadyListenerRef.current = onPageReady
+        window.addEventListener('nourdoc:ready', onPageReady, { once: true })
+      } else {
+        scheduleIdleScenes()
+      }
+    }
+
+    if (pendingSceneRef.current === index) {
+      pendingSceneRef.current = null
+      window.requestAnimationFrame(() => goToRef.current(index))
+    }
+  }, [requestScene, scheduleIdleScenes])
+
+  useEffect(() => () => {
+    const cancelIdle = window.cancelIdleCallback ?? window.clearTimeout
+    idleHandlesRef.current.forEach((handle) => cancelIdle(handle))
+    if (pageReadyListenerRef.current) window.removeEventListener('nourdoc:ready', pageReadyListenerRef.current)
+    delete document.documentElement.dataset.heroReady
+  }, [])
 
   useLayoutEffect(() => {
     const root = rootRef.current
@@ -845,16 +1020,13 @@ export function CinematicStory() {
 
     const context = gsap.context(() => {
       const sceneElements = gsap.utils.toArray<HTMLElement>('.rotating-scene', root)
-      const fills = gsap.utils.toArray<HTMLElement>('.rotation-progress-fill', root)
       const intensity = mobile ? .45 : 1
 
       gsap.set(sceneElements, { autoAlpha: 0, zIndex: 0, transformPerspective: 1400, transformOrigin: 'center center' })
       gsap.set(sceneElements[0], { autoAlpha: 1, zIndex: 2 })
-      gsap.set(fills, { scaleX: 0, transformOrigin: 'left center' })
       let intro: gsap.core.Timeline | null = null
 
-      const stopMotion = () => {
-        cycleRef.current?.kill(); cycleRef.current = null
+      const stopBackground = () => {
         backgroundRef.current?.kill(); backgroundRef.current = null
       }
 
@@ -869,7 +1041,7 @@ export function CinematicStory() {
             scale: 1.07,
             x: mobile ? -1 : -5,
             y: mobile ? 1 : 3,
-            duration: DISPLAY_SECONDS,
+            duration: 18,
             ease: 'sine.inOut',
             force3D: true,
             overwrite: 'auto',
@@ -877,32 +1049,19 @@ export function CinematicStory() {
         }
       }
 
-      const startCycle = () => {
-        if (document.hidden || document.body.hasAttribute('aria-busy') || transitionRef.current?.isActive()) return
-
-        cycleRef.current?.kill()
-        cycleRef.current = null
-        gsap.set(fills, { scaleX: 0 })
-
-        const fill = fills[activeRef.current]
-        const scene = sceneElements[activeRef.current]
-        if (!fill || !scene) return
-
-        cycleRef.current = gsap.timeline({
-          onComplete: () => goToRef.current((activeRef.current + 1) % sceneElements.length),
-        }).to(fill, { scaleX: 1, duration: DISPLAY_SECONDS, ease: 'none', force3D: true })
-
-        startBackground(scene)
-      }
-
       const goTo = (requested: number) => {
         const next = (requested + sceneElements.length) % sceneElements.length
         const current = activeRef.current
         if (transitionRef.current?.isActive()) return
-        if (next === current) { startCycle(); return }
+        if (next === current) return
+        if (!readyScenesRef.current.has(next)) {
+          pendingSceneRef.current = next
+          requestScene(next, 'high')
+          return
+        }
 
         intro?.kill(); intro = null
-        stopMotion()
+        stopBackground()
         const outgoing = sceneElements[current]
         const incoming = sceneElements[next]
         const incomingImage = incoming.querySelector('.rotating-scene-image')
@@ -926,7 +1085,7 @@ export function CinematicStory() {
             gsap.set(incoming, { autoAlpha: 1, zIndex: 2, clearProps: 'transform,willChange' })
             gsap.set(incomingImage, { clearProps: 'willChange' })
             transitionRef.current = null
-            startCycle()
+            startBackground(incoming)
           },
         })
         transitionRef.current = timeline
@@ -954,10 +1113,10 @@ export function CinematicStory() {
       const firstVisual = first.querySelector('.scene-visual-shell')
       if (reduced) {
         gsap.set([firstSequence, firstVisual], { opacity: 1, clearProps: 'transform,filter' })
-        startCycle()
+        startBackground(first)
       } else {
         gsap.set(first.querySelector('.rotating-scene-image'), { willChange: 'transform' })
-        intro = gsap.timeline({ defaults: { ease: 'power3.out' }, onComplete: startCycle })
+        intro = gsap.timeline({ defaults: { ease: 'power3.out' }, onComplete: () => startBackground(first) })
         intro.from(first.querySelector('.rotating-scene-image'), { scale: 1.03, x: 7, duration: 1.15 }, 0)
           .from(firstSequence, { y: 12, duration: .45, stagger: .045, force3D: true }, 0)
           .fromTo(firstVisual,
@@ -967,29 +1126,50 @@ export function CinematicStory() {
           )
       }
 
-      const onVisibility = () => {
-        if (document.hidden) {
-          stopMotion()
-          transitionRef.current?.pause()
-          return
-        }
+      const onKeyDown = (event: KeyboardEvent) => {
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+        if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return
 
-        gsap.ticker.wake()
-        if (transitionRef.current) transitionRef.current.resume()
-        else startCycle()
+        const target = event.target as HTMLElement | null
+        if (target?.matches('input, textarea, select, [contenteditable="true"]')) return
+
+        const bounds = root.getBoundingClientRect()
+        if (bounds.bottom <= 0 || bounds.top >= window.innerHeight) return
+
+        event.preventDefault()
+        goTo(event.key === 'ArrowLeft' ? activeRef.current - 1 : activeRef.current + 1)
       }
-      const onPageReady = () => startCycle()
-      document.addEventListener('visibilitychange', onVisibility)
-      window.addEventListener('nourdoc:ready', onPageReady)
+
+      let pointerStart: { x: number; y: number; id: number } | null = null
+      const onPointerDown = (event: PointerEvent) => {
+        if (event.pointerType === 'mouse') return
+        pointerStart = { x: event.clientX, y: event.clientY, id: event.pointerId }
+      }
+      const onPointerUp = (event: PointerEvent) => {
+        if (!pointerStart || pointerStart.id !== event.pointerId) return
+        const deltaX = event.clientX - pointerStart.x
+        const deltaY = event.clientY - pointerStart.y
+        pointerStart = null
+        if (Math.abs(deltaX) < 48 || Math.abs(deltaX) <= Math.abs(deltaY)) return
+        goTo(deltaX > 0 ? activeRef.current - 1 : activeRef.current + 1)
+      }
+      const onPointerCancel = () => { pointerStart = null }
+
+      window.addEventListener('keydown', onKeyDown)
+      root.addEventListener('pointerdown', onPointerDown)
+      root.addEventListener('pointerup', onPointerUp)
+      root.addEventListener('pointercancel', onPointerCancel)
       return () => {
-        document.removeEventListener('visibilitychange', onVisibility)
-        window.removeEventListener('nourdoc:ready', onPageReady)
-        intro?.kill(); stopMotion(); transitionRef.current?.kill()
+        window.removeEventListener('keydown', onKeyDown)
+        root.removeEventListener('pointerdown', onPointerDown)
+        root.removeEventListener('pointerup', onPointerUp)
+        root.removeEventListener('pointercancel', onPointerCancel)
+        intro?.kill(); stopBackground(); transitionRef.current?.kill()
       }
     }, root)
 
     return () => context.revert()
-  }, [reduced])
+  }, [reduced, requestScene])
 
   return (
     <section ref={rootRef} className="rotating-hero" aria-label="NourDoc clinical intelligence overview">
@@ -997,7 +1177,22 @@ export function CinematicStory() {
       <div className="rotating-hero-viewport">
         {scenes.map((scene, index) => (
           <article className={`rotating-scene rotating-scene-${index + 1}`} key={scene.eyebrow} aria-hidden={activeIndex !== index}>
-            <div className="rotating-scene-bg" aria-hidden="true"><div className="rotating-scene-image" style={{ backgroundImage: `url(${scene.image})`, backgroundPosition: scene.position }} /></div>
+            <div className="rotating-scene-bg" aria-hidden="true">
+              {requestedScenes[index] && (
+                <ResponsivePicture
+                  asset={scene.image}
+                  sizes="100vw"
+                  pictureClassName="rotating-scene-picture"
+                  className="rotating-scene-image"
+                  alt=""
+                  loading="eager"
+                  fetchPriority={requestedScenes[index]}
+                  decoding="async"
+                  style={{ objectPosition: scene.position }}
+                  onDecoded={() => handleSceneDecoded(index)}
+                />
+              )}
+            </div>
             <div className="rotating-scene-overlay" aria-hidden="true" /><div className="scene-atmosphere" aria-hidden="true" /><div className="scene-light-sweep" aria-hidden="true" />
             <svg className="scene-data-lines" viewBox="0 0 1440 900" preserveAspectRatio="none" aria-hidden="true"><path d="M0 690 C300 650 400 510 685 520 S1080 690 1440 410" /><path d="M610 0 C610 230 820 290 955 370 S1230 420 1440 225" /><circle cx="685" cy="520" r="3" /><circle cx="955" cy="370" r="3" /><circle cx="1215" cy="535" r="3" /></svg>
             <div className="scene-depth-nodes" aria-hidden="true"><i /><i /><i /><i /><i /><i /></div>
@@ -1015,8 +1210,14 @@ export function CinematicStory() {
             </div>
           </article>
         ))}
-        <div className="container rotation-controls" aria-label="Choose hero scene">
-          {scenes.map((scene, index) => <button type="button" key={scene.eyebrow} className={`rotation-control ${activeIndex === index ? 'is-active' : ''}`} onClick={() => goToRef.current(index)} aria-current={activeIndex === index ? 'true' : undefined} aria-label={`Show scene ${index + 1}: ${scene.eyebrow}`}><span><b>0{index + 1}</b>{scene.shortLabel}</span><i><em className="rotation-progress-fill" /></i></button>)}
+        <div className="container rotation-controls">
+          <div className="rotation-indicators" aria-label="Choose hero scene">
+            {scenes.map((scene, index) => <button type="button" key={scene.eyebrow} className={`rotation-control ${activeIndex === index ? 'is-active' : ''}`} onClick={() => goToRef.current(index)} aria-current={activeIndex === index ? 'true' : undefined} aria-label={`Show scene ${index + 1}: ${scene.eyebrow}`}><span><b>0{index + 1}</b>{scene.shortLabel}</span><i><em className="rotation-progress-fill" /></i></button>)}
+          </div>
+          <div className="rotation-arrows" aria-label="Navigate hero scenes">
+            <button type="button" onClick={() => goToRef.current(activeRef.current - 1)} aria-label="Previous scene"><ArrowLeft aria-hidden="true" /><span>Previous Scene</span></button>
+            <button type="button" onClick={() => goToRef.current(activeRef.current + 1)} aria-label="Next scene"><ArrowRight aria-hidden="true" /><span>Next Scene</span></button>
+          </div>
         </div>
       </div>
     </section>

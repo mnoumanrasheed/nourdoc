@@ -24,7 +24,7 @@ import { AnimatedSection } from '../components/ui/AnimatedSection'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { createAnimationVisibilityController } from '../utils/animationPerformance'
 
-import heroImage from '../assets/03-product-clinical-workflow.jpg'
+import { productWorkflowImage as heroImage } from '../data/responsiveImages'
 
 const productSteps = [
   {

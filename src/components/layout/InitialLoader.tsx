@@ -2,7 +2,8 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import logo from '../../assets/nourdoc-logo.png'
 
-const LOADER_DURATION_SECONDS = 5
+const MIN_LOADER_SECONDS = 1.8
+const MAX_LOADER_SECONDS = 4
 
 export function InitialLoader() {
   const [visible, setVisible] = useState(true)
@@ -15,11 +16,23 @@ export function InitialLoader() {
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const preventScroll = (event: Event) => event.preventDefault()
+    const progress = { value: 0 }
     let scrollLocked = true
+    let finished = false
+    let minimumElapsed = false
+    let heroReady = document.documentElement.dataset.heroReady === 'true'
+    let mainTimeline: gsap.core.Timeline | null = null
+    let exitTimeline: gsap.core.Timeline | null = null
 
     document.body.setAttribute('aria-busy', 'true')
     window.addEventListener('wheel', preventScroll, { passive: false })
     window.addEventListener('touchmove', preventScroll, { passive: false })
+
+    const renderProgress = () => {
+      if (percentageRef.current) {
+        percentageRef.current.textContent = `${Math.round(progress.value)}%`
+      }
+    }
 
     const unlockPage = () => {
       if (!scrollLocked) return
@@ -32,76 +45,100 @@ export function InitialLoader() {
     }
 
     const finish = () => {
+      if (finished) return
+      finished = true
       unlockPage()
       setVisible(false)
     }
 
+    const completeEarly = () => {
+      if (!minimumElapsed || !heroReady || finished || !mainTimeline) return
+      if (mainTimeline.time() >= MAX_LOADER_SECONDS - .45) return
+
+      mainTimeline.pause()
+      exitTimeline?.kill()
+      exitTimeline = gsap.timeline({ defaults: { ease: 'power2.inOut' } })
+        .to(progress, { value: 100, duration: .16, onUpdate: renderProgress }, 0)
+        .to('.initial-loader-progress-fill', { scaleX: 1, duration: .16 }, 0)
+        .to('.initial-loader-orbit, .initial-loader-node, .initial-loader-tagline, .initial-loader-progress-shell', { opacity: 0, y: 2, duration: .22 }, .04)
+        .to('.initial-loader-logo', { opacity: .42, scale: .98, duration: .24 }, .04)
+        .to(root, { opacity: 0, duration: .32 }, .08)
+        .call(finish, [], .4)
+    }
+
+    const onHeroReady = () => {
+      heroReady = true
+      completeEarly()
+    }
+    window.addEventListener('nourdoc:hero-ready', onHeroReady)
+
     const context = gsap.context(() => {
-      const progress = { value: 0 }
-      const renderProgress = () => {
-        if (percentageRef.current) {
-          percentageRef.current.textContent = `${Math.round(progress.value)}%`
-        }
-      }
-
-      if (reduced) {
-        gsap.timeline()
-          .set('.initial-loader-logo', { opacity: 1, y: 0, filter: 'blur(0px)' })
-          .set('.initial-loader-tagline', { opacity: 1 })
-          .set('.initial-loader-progress-shell', { opacity: 1, y: 0 })
-          .set('.initial-loader-progress-fill', { scaleX: 0, transformOrigin: 'left center' })
-          .to(progress, { value: 100, duration: 4.15, ease: 'none', onUpdate: renderProgress }, 0)
-          .to('.initial-loader-progress-fill', { scaleX: 1, duration: 4.15, ease: 'none' }, 0)
-          .to('.initial-loader-progress-shell', { opacity: 0, y: 2, duration: .4 }, 4.2)
-          .to(root, { opacity: 0, duration: .7, ease: 'power2.inOut' }, LOADER_DURATION_SECONDS - .7)
-          .call(finish, [], LOADER_DURATION_SECONDS)
-        return
-      }
-
-      const timeline = gsap.timeline({
-        defaults: { ease: 'power2.out' },
-      })
+      const timeline = gsap.timeline({ defaults: { ease: 'power2.out' } })
+      mainTimeline = timeline
 
       timeline
         .set(root, { opacity: 1 })
+        .set('.initial-loader-progress-fill', { scaleX: 0, transformOrigin: 'left center' })
+
+      if (reduced) {
+        timeline
+          .set('.initial-loader-logo', { opacity: 1, y: 0, filter: 'blur(0px)' })
+          .set('.initial-loader-tagline', { opacity: 1 })
+          .set('.initial-loader-progress-shell', { opacity: 1, y: 0 })
+          .to(progress, { value: 100, duration: 3.2, ease: 'none', onUpdate: renderProgress }, .2)
+          .to('.initial-loader-progress-fill', { scaleX: 1, duration: 3.2, ease: 'none' }, .2)
+          .to('.initial-loader-tagline, .initial-loader-progress-shell', { opacity: 0, duration: .25 }, 3.35)
+          .to(root, { opacity: 0, duration: .4, ease: 'power2.inOut' }, 3.6)
+          .call(finish, [], MAX_LOADER_SECONDS)
+        return
+      }
+
+      timeline
         .set('.initial-loader-logo', { opacity: 0, y: 8, filter: 'blur(4px)', scale: .99 })
         .set('.initial-loader-orbit-draw', { strokeDasharray: 553, strokeDashoffset: 553, opacity: 0 })
         .set('.initial-loader-orbit-detail', { opacity: 0, rotation: -12, transformOrigin: '50% 50%' })
         .set('.initial-loader-packet', { opacity: 0, rotation: 0, transformOrigin: '100px 100px' })
         .set('.initial-loader-node', { opacity: 0, scale: .7, transformOrigin: '50% 50%' })
-        .set('.initial-loader-progress-fill', { scaleX: 0, transformOrigin: 'left center' })
         .set('.initial-loader-progress-shell', { opacity: 0, y: 7 })
         .set('.initial-loader-tagline', { opacity: 0, y: 5 })
         .set('.initial-loader-sweep', { opacity: 0, xPercent: -150 })
-        .fromTo('.initial-loader-canvas', { opacity: .84 }, { opacity: 1, duration: 1, ease: 'sine.inOut' }, 0)
-        .to('.initial-loader-glow', { opacity: .86, scale: 1, duration: 1.15, ease: 'sine.inOut' }, 0)
-        .to('.initial-loader-network', { opacity: .26, duration: 1.1, ease: 'sine.inOut' }, .1)
-        .to('.initial-loader-logo', { opacity: 1, y: 0, filter: 'blur(0px)', scale: 1, duration: 1, ease: 'power3.out' }, .42)
-        .to('.initial-loader-sweep', { opacity: .56, xPercent: 155, duration: 1.05, ease: 'power2.inOut' }, .62)
-        .to('.initial-loader-sweep', { opacity: 0, duration: .25 }, 1.58)
-        .to('.initial-loader-orbit-draw', { opacity: .76, strokeDashoffset: 0, duration: 1.55, ease: 'power2.inOut' }, .82)
-        .to('.initial-loader-orbit-detail', { opacity: .46, rotation: 0, duration: 1.25, ease: 'sine.inOut' }, .95)
-        .to('.initial-loader-node', { opacity: .5, scale: 1, duration: .9, stagger: .09, ease: 'sine.inOut' }, 1)
-        .to('.initial-loader-packet', { opacity: 1, duration: .5 }, 1.16)
-        .to('.initial-loader-packet', { rotation: 360, duration: 3, ease: 'power1.inOut' }, 1.16)
-        .to('.initial-loader-tagline', { opacity: 1, y: 0, duration: .7, ease: 'power2.out' }, .75)
-        .to('.initial-loader-progress-shell', { opacity: 1, y: 0, duration: .65, ease: 'power2.out' }, .9)
-        .to(progress, { value: 100, duration: 3.25, ease: 'power1.inOut', onUpdate: renderProgress }, .95)
-        .to('.initial-loader-progress-fill', { scaleX: 1, duration: 3.25, ease: 'power1.inOut' }, .95)
-        .to('.initial-loader-glow', { scale: 1.055, opacity: 1, duration: 1.35, repeat: 1, yoyo: true, ease: 'sine.inOut' }, 1.5)
-        .to('.initial-loader-node', { opacity: .28, scale: .88, duration: .72, stagger: { each: .1, repeat: 1, yoyo: true }, ease: 'sine.inOut' }, 2.05)
-        .to('.initial-loader-orbit-detail', { rotation: 28, opacity: .64, duration: 1.4, ease: 'sine.inOut' }, 2.75)
-        .fromTo('.initial-loader-sweep', { opacity: 0, xPercent: -150 }, { opacity: .38, xPercent: 155, duration: 1.05, ease: 'power2.inOut' }, 3.02)
-        .to('.initial-loader-sweep', { opacity: 0, duration: .2 }, 3.98)
-        .to('.initial-loader-orbit, .initial-loader-node', { opacity: 0, duration: .68, ease: 'power2.inOut' }, 4.12)
-        .to('.initial-loader-tagline, .initial-loader-progress-shell', { opacity: 0, y: 3, duration: .5, ease: 'power2.inOut' }, 4.2)
-        .to('.initial-loader-logo', { opacity: .28, scale: .96, y: -2, duration: .7, ease: 'power3.inOut' }, 4.2)
-        .to('.initial-loader-canvas', { opacity: .48, duration: .74, ease: 'power3.inOut' }, 4.2)
-        .to(root, { opacity: 0, duration: .78, ease: 'power3.inOut' }, LOADER_DURATION_SECONDS - .78)
-        .call(finish, [], LOADER_DURATION_SECONDS)
+        .fromTo('.initial-loader-canvas', { opacity: .84 }, { opacity: 1, duration: .65, ease: 'sine.inOut' }, 0)
+        .to('.initial-loader-glow', { opacity: .86, scale: 1, duration: .8, ease: 'sine.inOut' }, 0)
+        .to('.initial-loader-network', { opacity: .26, duration: .75, ease: 'sine.inOut' }, .05)
+        .to('.initial-loader-logo', { opacity: 1, y: 0, filter: 'blur(0px)', scale: 1, duration: .65, ease: 'power3.out' }, .2)
+        .to('.initial-loader-sweep', { opacity: .56, xPercent: 155, duration: .72, ease: 'power2.inOut' }, .32)
+        .to('.initial-loader-sweep', { opacity: 0, duration: .16 }, 1.02)
+        .to('.initial-loader-orbit-draw', { opacity: .76, strokeDashoffset: 0, duration: 1.05, ease: 'power2.inOut' }, .42)
+        .to('.initial-loader-orbit-detail', { opacity: .46, rotation: 0, duration: .9, ease: 'sine.inOut' }, .5)
+        .to('.initial-loader-node', { opacity: .5, scale: 1, duration: .55, stagger: .07, ease: 'sine.inOut' }, .55)
+        .to('.initial-loader-packet', { opacity: 1, duration: .3 }, .7)
+        .to('.initial-loader-packet', { rotation: 360, duration: 2, ease: 'power1.inOut' }, .7)
+        .to('.initial-loader-tagline', { opacity: 1, y: 0, duration: .45, ease: 'power2.out' }, .38)
+        .to('.initial-loader-progress-shell', { opacity: 1, y: 0, duration: .4, ease: 'power2.out' }, .5)
+        .to(progress, { value: 100, duration: 2.75, ease: 'power1.inOut', onUpdate: renderProgress }, .55)
+        .to('.initial-loader-progress-fill', { scaleX: 1, duration: 2.75, ease: 'power1.inOut' }, .55)
+        .to('.initial-loader-glow', { scale: 1.045, opacity: 1, duration: 1.1, repeat: 1, yoyo: true, ease: 'sine.inOut' }, 1.15)
+        .to('.initial-loader-node', { opacity: .28, scale: .9, duration: .55, stagger: { each: .07, repeat: 1, yoyo: true }, ease: 'sine.inOut' }, 1.5)
+        .to('.initial-loader-orbit-detail', { rotation: 24, opacity: .62, duration: .9, ease: 'sine.inOut' }, 2.1)
+        .fromTo('.initial-loader-sweep', { opacity: 0, xPercent: -150 }, { opacity: .38, xPercent: 155, duration: .7, ease: 'power2.inOut' }, 2.45)
+        .to('.initial-loader-sweep', { opacity: 0, duration: .15 }, 3.12)
+        .to('.initial-loader-orbit, .initial-loader-node', { opacity: 0, duration: .35, ease: 'power2.inOut' }, 3.25)
+        .to('.initial-loader-tagline, .initial-loader-progress-shell', { opacity: 0, y: 3, duration: .28, ease: 'power2.inOut' }, 3.35)
+        .to('.initial-loader-logo', { opacity: .32, scale: .97, y: -2, duration: .4, ease: 'power3.inOut' }, 3.42)
+        .to('.initial-loader-canvas', { opacity: .48, duration: .4, ease: 'power3.inOut' }, 3.5)
+        .to(root, { opacity: 0, duration: .4, ease: 'power3.inOut' }, 3.6)
+        .call(finish, [], MAX_LOADER_SECONDS)
     }, root)
 
+    const minimumTimer = window.setTimeout(() => {
+      minimumElapsed = true
+      completeEarly()
+    }, MIN_LOADER_SECONDS * 1000)
+
     return () => {
+      window.clearTimeout(minimumTimer)
+      window.removeEventListener('nourdoc:hero-ready', onHeroReady)
+      exitTimeline?.kill()
       context.revert()
       unlockPage()
     }
@@ -133,7 +170,7 @@ export function InitialLoader() {
               <g className="initial-loader-packet"><circle cx="100" cy="12" r="3.6" /></g>
             </svg>
             <div className="initial-loader-logo" role="img" aria-label="NourDoc">
-              <span className="initial-loader-logo-image"><img src={logo} alt="" /><i className="initial-loader-sweep" aria-hidden="true" /></span>
+              <span className="initial-loader-logo-image"><img src={logo} alt="" width="240" height="240" loading="eager" fetchPriority="high" decoding="async" /><i className="initial-loader-sweep" aria-hidden="true" /></span>
               <strong>Nour<span>Doc</span></strong>
             </div>
           </div>

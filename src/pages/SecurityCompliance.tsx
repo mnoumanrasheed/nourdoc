@@ -17,7 +17,7 @@ import { securityTopics } from '../data/site'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { createAnimationVisibilityController } from '../utils/animationPerformance'
 
-import heroImage from '../assets/05-security-clinical-data-workflow.jpg'
+import { securityWorkflowImage as heroImage } from '../data/responsiveImages'
 
 const additional = [
   {

@@ -3,8 +3,7 @@ import { ArrowRight, Check, Minus } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import gsap from 'gsap'
 
-import localImage from '../assets/pakistani-consultation.jpg'
-import heroImage from '../assets/02-why-nourdoc-local-clinician-web.jpg'
+import { pakistaniConsultationImage as localImage, whyNourDocImage as heroImage } from '../data/responsiveImages'
 
 import { CTASection } from '../components/common/CTASection'
 import { PageHero } from '../components/common/PageHero'

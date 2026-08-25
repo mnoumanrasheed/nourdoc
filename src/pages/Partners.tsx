@@ -12,7 +12,7 @@ import { partnerCategories } from '../data/site'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { createAnimationVisibilityController } from '../utils/animationPerformance'
 
-import heroImage from '../assets/06-partners-healthcare-collaboration.jpg'
+import { partnersImage as heroImage } from '../data/responsiveImages'
 
 const partnerDescriptions: Record<string, string> = {
   Hospitals: 'Enterprise clinical environments',

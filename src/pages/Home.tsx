@@ -1,7 +1,5 @@
 import { ArrowRight, CheckCircle2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import localImage from '../assets/01-home-clinical-conversation.jpg'
-import globalImage from '../assets/international-consultation.jpg'
 import { CTASection } from '../components/common/CTASection'
 import { SectionHeader } from '../components/common/SectionHeader'
 import { ImageStory } from '../components/sections/ImageStory'
@@ -9,6 +7,7 @@ import { CinematicStory } from '../components/sections/CinematicStory'
 import { WorkflowJourney } from '../components/sections/WorkflowJourney'
 import { AnimatedSection } from '../components/ui/AnimatedSection'
 import { capabilities, impactAreas, partnerCategories, securityTopics, workflow } from '../data/site'
+import { homeConsultationImage as localImage, internationalConsultationImage as globalImage } from '../data/responsiveImages'
 import { usePageMeta } from '../hooks/usePageMeta'
 
 export default function Home() {
@@ -28,7 +27,7 @@ export default function Home() {
         </div>
       </section>
 
-      <ImageStory priority image={localImage} objectPosition="48% center" alt="Physician speaking with a patient in a clinical consultation room" eyebrow="Healthcare impact" title="More time for care. Less time looking at screens." text="Documentation should support the clinical encounter rather than interrupt it. NourDoc is designed to reduce paperwork and allow clinicians to remain more focused on patients." points={['Less documentation burden', 'More patient attention', 'Clinician-controlled review']} />
+      <ImageStory image={localImage} objectPosition="48% center" alt="Physician speaking with a patient in a clinical consultation room" eyebrow="Healthcare impact" title="More time for care. Less time looking at screens." text="Documentation should support the clinical encounter rather than interrupt it. NourDoc is designed to reduce paperwork and allow clinicians to remain more focused on patients." points={['Less documentation burden', 'More patient attention', 'Clinician-controlled review']} />
 
       <section className="section section-soft"><div className="container"><AnimatedSection><SectionHeader eyebrow="Outcomes, not exaggeration" title="Designed to support the whole healthcare encounter." text="NourDoc focuses on practical improvements across the areas healthcare organizations care about—without relying on unverified headline statistics." /></AnimatedSection><div className="impact-grid">{impactAreas.map(({ title, text, icon: Icon }, index) => <AnimatedSection className="impact-card" key={title} variant="card" interactive index={index}><Icon /><h3>{title}</h3><p>{text}</p></AnimatedSection>)}</div></div></section>
 

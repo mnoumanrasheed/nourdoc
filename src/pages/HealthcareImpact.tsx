@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 
-import localImage from '../assets/pakistani-consultation.jpg'
-import patientExperienceImage from '../assets/international-consultation.jpg'
-import heroImage from '../assets/04-healthcare-impact-patient-care.jpg'
+import {
+  healthcareImpactImage as heroImage,
+  internationalConsultationImage as patientExperienceImage,
+  pakistaniConsultationImage as localImage,
+} from '../data/responsiveImages'
 
 import { CTASection } from '../components/common/CTASection'
 import { PageHero } from '../components/common/PageHero'

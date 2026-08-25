@@ -4,6 +4,7 @@ import { ArrowUpRight, Menu, X } from 'lucide-react'
 import { motion, useReducedMotion } from 'framer-motion'
 import logo from '../../assets/nourdoc-logo.png'
 import { navItems } from '../../data/site'
+import { preloadRoute } from '../../utils/routeLoaders'
 
 export function Navbar() {
   const [open, setOpen] = useState(false)
@@ -48,23 +49,23 @@ export function Navbar() {
   return (
     <header className={`nav-wrap ${scrolled ? 'nav-scrolled' : ''} ${open ? 'nav-open' : ''}`}>
       <nav className="navbar" aria-label="Primary navigation">
-        <Link to="/" className="brand" onClick={() => setOpen(false)} aria-label="NourDoc home">
-          <img src={logo} alt="" /><span>Nour<span>Doc</span></span>
+        <Link to="/" className="brand" onPointerEnter={() => preloadRoute('/')} onFocus={() => preloadRoute('/')} onTouchStart={() => preloadRoute('/')} onClick={() => setOpen(false)} aria-label="NourDoc home">
+          <img src={logo} alt="" width="240" height="240" loading="eager" fetchPriority="high" decoding="async" /><span>Nour<span>Doc</span></span>
         </Link>
         <div className="desktop-nav">
-          {navItems.map(item => <NavLink key={item.path} to={item.path}>{({ isActive }) => <>{item.label}{isActive && <motion.span className="nav-active-indicator" layoutId="nav-active" transition={{ type: 'spring', stiffness: 360, damping: 30 }} />}</>}</NavLink>)}
+          {navItems.map(item => <NavLink key={item.path} to={item.path} onPointerEnter={() => preloadRoute(item.path)} onFocus={() => preloadRoute(item.path)} onTouchStart={() => preloadRoute(item.path)}>{({ isActive }) => <>{item.label}{isActive && <motion.span className="nav-active-indicator" layoutId="nav-active" transition={{ type: 'spring', stiffness: 360, damping: 30 }} />}</>}</NavLink>)}
         </div>
-        <motion.div className="nav-cta-wrap" whileHover={reduced ? undefined : { y: -2 }} whileTap={reduced ? undefined : { scale: .98 }}><Link to="/contact" className="button button-primary nav-cta" onClick={() => setOpen(false)}>Book a Demo<ArrowUpRight size={17} /></Link></motion.div>
+        <motion.div className="nav-cta-wrap" whileHover={reduced ? undefined : { y: -2 }} whileTap={reduced ? undefined : { scale: .98 }}><Link to="/contact" className="button button-primary nav-cta" onPointerEnter={() => preloadRoute('/contact')} onFocus={() => preloadRoute('/contact')} onTouchStart={() => preloadRoute('/contact')} onClick={() => setOpen(false)}>Book a Demo<ArrowUpRight size={17} /></Link></motion.div>
         <motion.button whileTap={reduced ? undefined : { scale: .92 }} ref={menuButtonRef} className="menu-button" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="mobile-navigation" aria-label={open ? 'Close menu' : 'Open menu'}>
           {open ? <X /> : <Menu />}
         </motion.button>
       </nav>
       <nav ref={mobileNavRef} id="mobile-navigation" className={`mobile-nav ${open ? 'is-open' : ''}`} aria-hidden={!open} aria-label="Mobile navigation">
         <div className="container">
-          <NavLink ref={firstMobileLinkRef} to="/" onClick={() => setOpen(false)}>Home</NavLink>
-          {navItems.map(item => <NavLink key={item.path} to={item.path} onClick={() => setOpen(false)}>{item.label}</NavLink>)}
-          <NavLink to="/contact" onClick={() => setOpen(false)}>Contact</NavLink>
-          <Link to="/contact" className="button button-primary" onClick={() => setOpen(false)}>Book a Demo<ArrowUpRight size={17} /></Link>
+          <NavLink ref={firstMobileLinkRef} to="/" onPointerEnter={() => preloadRoute('/')} onTouchStart={() => preloadRoute('/')} onFocus={() => preloadRoute('/')} onClick={() => setOpen(false)}>Home</NavLink>
+          {navItems.map(item => <NavLink key={item.path} to={item.path} onPointerEnter={() => preloadRoute(item.path)} onTouchStart={() => preloadRoute(item.path)} onFocus={() => preloadRoute(item.path)} onClick={() => setOpen(false)}>{item.label}</NavLink>)}
+          <NavLink to="/contact" onPointerEnter={() => preloadRoute('/contact')} onTouchStart={() => preloadRoute('/contact')} onFocus={() => preloadRoute('/contact')} onClick={() => setOpen(false)}>Contact</NavLink>
+          <Link to="/contact" className="button button-primary" onPointerEnter={() => preloadRoute('/contact')} onTouchStart={() => preloadRoute('/contact')} onFocus={() => preloadRoute('/contact')} onClick={() => setOpen(false)}>Book a Demo<ArrowUpRight size={17} /></Link>
         </div>
       </nav>
     </header>

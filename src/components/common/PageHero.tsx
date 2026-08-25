@@ -1,10 +1,13 @@
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { ArrowDown } from 'lucide-react'
-import { useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
-import { motionDurations, motionEase, motionEaseSoft } from '../../utils/motion'
+import type { ResponsiveImageAsset } from '../../data/responsiveImages'
+import { motionEase, motionEaseSoft } from '../../utils/motion'
+import { signalCriticalHeroReady } from '../../utils/criticalAssets'
 import type { HeroVariant } from '../sections/HeroMotif'
+import { ResponsivePicture } from './ResponsivePicture'
 
 const signalPaths: Record<HeroVariant, string[]> = {
   why: ['M-30 286 C112 252 134 91 271 134 S407 268 552 64', 'M-18 116 C118 48 207 188 320 116 S445 74 548 214', 'M72 388 C126 246 262 272 334 187 S430 142 500 -24'],
@@ -20,7 +23,7 @@ function HeroSignal({ variant, reduced }: { variant: HeroVariant; reduced: boole
   const signalRef = useRef<HTMLDivElement>(null)
   const paths = signalPaths[variant]
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const root = signalRef.current
     if (!root || reduced) return
     const loops: gsap.core.Animation[] = []
@@ -60,7 +63,7 @@ function HeroSignal({ variant, reduced }: { variant: HeroVariant; reduced: boole
   }, [paths, reduced])
 
   return (
-    <motion.div ref={signalRef} className={`page-hero-signal page-hero-signal-${variant}`} aria-hidden="true" initial={reduced ? false : { opacity: 0, scale: .97, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: .9, delay: .72, ease: motionEaseSoft }}>
+    <motion.div ref={signalRef} className={`page-hero-signal page-hero-signal-${variant}`} aria-hidden="true" initial={reduced ? false : { opacity: 0, scale: .99, y: 6 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: .5, delay: .18, ease: motionEaseSoft }}>
       <svg viewBox="0 0 520 360" preserveAspectRatio="none">
         {paths.map((path) => <path className="page-hero-signal-path" d={path} key={path} />)}
         {Array.from({ length: 5 }, (_, index) => <circle className="page-hero-traveller" r={index % 2 ? 3 : 3.8} key={index} />)}
@@ -72,7 +75,7 @@ function HeroSignal({ variant, reduced }: { variant: HeroVariant; reduced: boole
   )
 }
 
-export function PageHero({ eyebrow, title, text, variant, image, imageAlt, imagePosition = 'center' }: { eyebrow: string; title: string; text: string; variant: HeroVariant; image?: string; imageAlt?: string; imagePosition?: string }) {
+export function PageHero({ eyebrow, title, text, variant, image, imageAlt, imagePosition = 'center' }: { eyebrow: string; title: string; text: string; variant: HeroVariant; image?: ResponsiveImageAsset; imageAlt?: string; imagePosition?: string }) {
   const reduced = useReducedMotion()
   const compact = useMediaQuery('(max-width: 900px)')
   const heroRef = useRef<HTMLElement>(null)
@@ -85,7 +88,12 @@ export function PageHero({ eyebrow, title, text, variant, image, imageAlt, image
 
   useLayoutEffect(() => {
     const root = heroRef.current
-    if (!root || reduced || !image) return
+    if (!root) return
+    if (!image) {
+      signalCriticalHeroReady()
+      return
+    }
+    if (reduced) return
     let drift: gsap.core.Tween | null = null
     const context = gsap.context(() => {
       const plane = root.querySelector('.hero-media-image-plane')
@@ -105,23 +113,23 @@ export function PageHero({ eyebrow, title, text, variant, image, imageAlt, image
 
   return (
     <header ref={heroRef} className={`page-hero page-hero-theme page-hero-${variant}-theme section-grid-bg ${image ? 'page-hero-has-image' : ''}`}>
-      {image && <motion.div className={`hero-media hero-media-${variant}`} initial={reduced ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: .04, ease: motionEaseSoft }}>
+      {image && <div className={`hero-media hero-media-${variant}`}>
         <div className="hero-media-image-plane">
-          <motion.img src={image} alt={imageAlt ?? ''} fetchPriority="high" style={{ objectPosition: imagePosition, x: still ? 0 : mediaX, y: still ? 0 : mediaY, rotateX: still ? 0 : mediaRotateX, rotateY: still ? 0 : mediaRotateY }} />
+          <ResponsivePicture asset={image} sizes="100vw" pictureClassName="hero-media-picture" alt={imageAlt ?? ''} loading="eager" fetchPriority="high" decoding="async" onDecoded={signalCriticalHeroReady} style={{ objectPosition: imagePosition, x: still ? 0 : mediaX, y: still ? 0 : mediaY, rotateX: still ? 0 : mediaRotateX, rotateY: still ? 0 : mediaRotateY }} />
         </div>
         <span className="hero-media-overlay" aria-hidden="true" />
         <HeroSignal variant={variant} reduced={reduced} />
-      </motion.div>}
+      </div>}
       <div className="hero-depth-particles" aria-hidden="true">
         {Array.from({ length: 6 }, (_, index) => <i key={index} />)}
       </div>
-      <motion.div className="page-hero-ambient" aria-hidden="true" initial={reduced ? false : { opacity: 0, scale: .98 }} animate={reduced ? undefined : { opacity: 1, scale: [1, 1.06, 1], x: [0, 18, 0], y: [0, -10, 0] }} transition={{ opacity: { duration: .8, delay: .16 }, scale: { duration: 15, repeat: Infinity, ease: 'easeInOut' }, x: { duration: 15, repeat: Infinity, ease: 'easeInOut' }, y: { duration: 15, repeat: Infinity, ease: 'easeInOut' } }} />
-      <motion.div className={`container page-hero-inner page-hero-${variant}`} initial={reduced ? false : 'hidden'} animate="visible" variants={{ hidden: {}, visible: { transition: { staggerChildren: .11, delayChildren: image ? .36 : .06 } } }}>
+      <motion.div className="page-hero-ambient" aria-hidden="true" initial={reduced ? false : { opacity: 0, scale: .99 }} animate={reduced ? undefined : { opacity: 1, scale: [1, 1.06, 1], x: [0, 18, 0], y: [0, -10, 0] }} transition={{ opacity: { duration: .3 }, scale: { duration: 15, repeat: Infinity, ease: 'easeInOut' }, x: { duration: 15, repeat: Infinity, ease: 'easeInOut' }, y: { duration: 15, repeat: Infinity, ease: 'easeInOut' } }} />
+      <motion.div className={`container page-hero-inner page-hero-${variant}`} initial={reduced ? false : 'hidden'} animate="visible" variants={{ hidden: {}, visible: { transition: { staggerChildren: .07, delayChildren: .04 } } }}>
         <div className="page-hero-content">
-          <motion.span className="eyebrow" variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { duration: motionDurations.base, ease: motionEase } } }}>{eyebrow}</motion.span>
-          <div className="page-hero-title-mask"><motion.h1 variants={{ hidden: { opacity: 0, y: '32%' }, visible: { opacity: 1, y: 0, transition: { duration: .86, ease: motionEaseSoft } } }}>{title}</motion.h1></div>
+          <motion.span className="eyebrow" variants={{ hidden: { opacity: 0, y: 6 }, visible: { opacity: 1, y: 0, transition: { duration: .24, ease: motionEase } } }}>{eyebrow}</motion.span>
+          <div className="page-hero-title-mask"><motion.h1 variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: .28, ease: motionEaseSoft } } }}>{title}</motion.h1></div>
         </div>
-        <motion.div className="page-hero-copy" variants={{ hidden: { opacity: 0, y: 16, filter: 'blur(4px)' }, visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: .68, ease: motionEase } } }}>
+        <motion.div className="page-hero-copy" variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: .28, ease: motionEase } } }}>
           <p>{text}</p>
           <motion.div variants={{ hidden: { opacity: 0, y: -6 }, visible: { opacity: 1, y: 0, transition: { duration: .5, ease: motionEase } } }}><ArrowDown aria-hidden="true" /></motion.div>
         </motion.div>
