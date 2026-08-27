@@ -45,11 +45,51 @@ export function Footer() {
           <span>GDPR Ready</span>
         </div>
 
-        <div>
-          <h3>Get started</h3>
-          <Link to="/contact">Book a Demo</Link>
-          <Link to="/contact">Request a Trial</Link>
-          <Link to="/contact">Support</Link>
+        <div className="footer-contact-column">
+          <h3>Contact</h3>
+          <div className="footer-contact-item">
+            <span className="footer-contact-label">Sales</span>
+            <a
+              href="mailto:hello@nour-doc.com"
+              className="footer-contact-email"
+              aria-label="Email NourDoc Sales"
+            >
+              hello@nour-doc.com
+            </a>
+          </div>
+
+          <div className="footer-contact-item">
+            <span className="footer-contact-label">Support</span>
+            <a
+              href="mailto:support@nour-doc.com"
+              className="footer-contact-email"
+              aria-label="Email NourDoc Support"
+            >
+              support@nour-doc.com
+            </a>
+          </div>
+
+          <div className="footer-contact-item">
+            <span className="footer-contact-label">Partnerships</span>
+            <a
+              href="mailto:hello@nour-doc.com"
+              className="footer-contact-email"
+              aria-label="Email NourDoc Partnerships"
+            >
+              hello@nour-doc.com
+            </a>
+          </div>
+
+          <div className="footer-contact-item">
+            <span className="footer-contact-label">Investors</span>
+            <a
+              href="mailto:hello@nour-doc.com"
+              className="footer-contact-email"
+              aria-label="Email NourDoc Investors"
+            >
+              hello@nour-doc.com
+            </a>
+          </div>
         </div>
       </div>
 

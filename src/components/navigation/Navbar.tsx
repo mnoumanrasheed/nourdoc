@@ -60,12 +60,68 @@ export function Navbar() {
           {open ? <X /> : <Menu />}
         </motion.button>
       </nav>
-      <nav ref={mobileNavRef} id="mobile-navigation" className={`mobile-nav ${open ? 'is-open' : ''}`} aria-hidden={!open} aria-label="Mobile navigation">
-        <div className="container">
-          <NavLink ref={firstMobileLinkRef} to="/" onPointerEnter={() => preloadRoute('/')} onTouchStart={() => preloadRoute('/')} onFocus={() => preloadRoute('/')} onClick={() => setOpen(false)}>Home</NavLink>
-          {navItems.map(item => <NavLink key={item.path} to={item.path} onPointerEnter={() => preloadRoute(item.path)} onTouchStart={() => preloadRoute(item.path)} onFocus={() => preloadRoute(item.path)} onClick={() => setOpen(false)}>{item.label}</NavLink>)}
-          <NavLink to="/contact" onPointerEnter={() => preloadRoute('/contact')} onTouchStart={() => preloadRoute('/contact')} onFocus={() => preloadRoute('/contact')} onClick={() => setOpen(false)}>Contact</NavLink>
-          <Link to="/contact" className="button button-primary" onPointerEnter={() => preloadRoute('/contact')} onTouchStart={() => preloadRoute('/contact')} onFocus={() => preloadRoute('/contact')} onClick={() => setOpen(false)}>Book a Demo<ArrowUpRight size={17} /></Link>
+      <div
+        className={`mobile-nav-backdrop ${open ? 'is-open' : ''}`}
+        onClick={() => setOpen(false)}
+        aria-hidden="true"
+      />
+      <nav
+        ref={mobileNavRef}
+        id="mobile-navigation"
+        className={`mobile-nav ${open ? 'is-open' : ''}`}
+        aria-hidden={!open}
+        aria-label="Mobile navigation"
+      >
+        <div className="mobile-nav-panel">
+          <div className="mobile-nav-links">
+            <NavLink
+              ref={firstMobileLinkRef}
+              to="/"
+              className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`}
+              onPointerEnter={() => preloadRoute('/')}
+              onTouchStart={() => preloadRoute('/')}
+              onFocus={() => preloadRoute('/')}
+              onClick={() => setOpen(false)}
+            >
+              <span>Home</span>
+              <span className="mobile-nav-dot" aria-hidden="true" />
+            </NavLink>
+            {navItems.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`}
+                onPointerEnter={() => preloadRoute(item.path)}
+                onTouchStart={() => preloadRoute(item.path)}
+                onFocus={() => preloadRoute(item.path)}
+                onClick={() => setOpen(false)}
+              >
+                <span>{item.label}</span>
+                <span className="mobile-nav-dot" aria-hidden="true" />
+              </NavLink>
+            ))}
+            <NavLink
+              to="/contact"
+              className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`}
+              onPointerEnter={() => preloadRoute('/contact')}
+              onTouchStart={() => preloadRoute('/contact')}
+              onFocus={() => preloadRoute('/contact')}
+              onClick={() => setOpen(false)}
+            >
+              <span>Contact</span>
+              <span className="mobile-nav-dot" aria-hidden="true" />
+            </NavLink>
+          </div>
+          <Link
+            to="/contact"
+            className="button button-primary mobile-nav-cta"
+            onPointerEnter={() => preloadRoute('/contact')}
+            onTouchStart={() => preloadRoute('/contact')}
+            onFocus={() => preloadRoute('/contact')}
+            onClick={() => setOpen(false)}
+          >
+            Book a Demo<ArrowUpRight size={16} />
+          </Link>
         </div>
       </nav>
     </header>

@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import {
   ArrowRight,
-  Building2,
+  ArrowUpRight,
   Handshake,
   Headphones,
   LineChart,
+  Mail,
   PlayCircle,
 } from 'lucide-react'
 import gsap from 'gsap'
@@ -17,31 +18,34 @@ import { AnimatedSection } from '../components/ui/AnimatedSection'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { createAnimationVisibilityController } from '../utils/animationPerformance'
 
-const contactPaths = [
+const departmentContacts = [
   {
-    title: 'Book a Demo',
-    text: 'Explore the product workflow with our team.',
+    title: 'Sales',
+    description: 'For product demonstrations and commercial enquiries.',
+    email: 'hello@nour-doc.com',
+    ariaLabel: 'Email NourDoc Sales',
     icon: PlayCircle,
   },
   {
-    title: 'Request a Trial',
-    text: 'Discuss trial suitability and next steps.',
-    icon: Building2,
-  },
-  {
     title: 'Support',
-    text: 'Get help with NourDoc.',
+    description: 'For product assistance and support enquiries.',
+    email: 'support@nour-doc.com',
+    ariaLabel: 'Email NourDoc Support',
     icon: Headphones,
   },
   {
-    title: 'Investor Relations',
-    text: 'Start an investment conversation.',
-    icon: LineChart,
+    title: 'Partnerships',
+    description: 'For strategic, healthcare, and technology partnerships.',
+    email: 'hello@nour-doc.com',
+    ariaLabel: 'Email NourDoc Partnerships',
+    icon: Handshake,
   },
   {
-    title: 'Partnerships',
-    text: 'Explore an ecosystem partnership.',
-    icon: Handshake,
+    title: 'Investors',
+    description: 'For investor and corporate enquiries.',
+    email: 'hello@nour-doc.com',
+    ariaLabel: 'Email NourDoc Investors',
+    icon: LineChart,
   },
 ]
 
@@ -805,7 +809,7 @@ export default function Contact() {
         </div>
       </div>
 
-      {/* CONTACT PATHS */}
+      {/* CONTACT THE RIGHT TEAM */}
       <section
         className="section"
         style={{
@@ -818,91 +822,38 @@ export default function Contact() {
         <div className="container">
           <AnimatedSection>
             <SectionHeader
-              eyebrow="Start in the right place"
-              title="How can we help?"
-              text="Choose the path that best matches your goal and we’ll guide the conversation from there."
+              eyebrow="Direct Channels"
+              title="Contact the Right Team"
+              text="Connect directly with our specialized teams for product demonstrations, technical support, strategic partnerships, or investor relations."
             />
           </AnimatedSection>
 
-          <div
-            className="contact-paths"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-              gap: 16,
-              marginTop: 34,
-            }}
-          >
-            {contactPaths.map(({ title, text, icon: Icon }, index) => (
+          <div className="team-contact-grid">
+            {departmentContacts.map(({ title, description, email, ariaLabel, icon: Icon }, index) => (
               <AnimatedSection key={title} variant="card" index={index}>
-                <a
-                  className="contact-path"
-                  href="#contact-form"
-                  style={{
-                    position: 'relative',
-                    minHeight: 210,
-                    padding: 24,
-                    borderRadius: 22,
-                    border: '1px solid rgba(19,121,139,.13)',
-                    background:
-                      'linear-gradient(145deg, rgba(255,255,255,.98), rgba(240,248,247,.98))',
-                    boxShadow: '0 16px 38px rgba(16,47,53,.055)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    textDecoration: 'none',
-                    color: '#173d43',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <span
-                    style={{
-                      width: 42,
-                      height: 42,
-                      borderRadius: 14,
-                      display: 'grid',
-                      placeItems: 'center',
-                      background: 'rgba(83,171,193,.1)',
-                      border: '1px solid rgba(83,171,193,.12)',
-                      color: '#16879a',
-                    }}
-                  >
-                    <Icon size={20} />
-                  </span>
-
-                  <div style={{ marginTop: 'auto', paddingTop: 44 }}>
-                    <h3
-                      style={{
-                        margin: 0,
-                        color: '#173d43',
-                        fontSize: '1.02rem',
-                        fontWeight: 700,
-                      }}
-                    >
-                      {title}
-                    </h3>
-
-                    <p
-                      style={{
-                        margin: '8px 0 0',
-                        color: '#667d80',
-                        lineHeight: 1.6,
-                        fontSize: '.92rem',
-                      }}
-                    >
-                      {text}
-                    </p>
+                <div className="team-contact-card">
+                  <div className="team-contact-header">
+                    <span className="team-contact-icon">
+                      <Icon size={20} />
+                    </span>
+                    <span className="team-contact-badge">{`0${index + 1}`}</span>
                   </div>
 
-                  <ArrowRight
-                    size={17}
-                    style={{
-                      position: 'absolute',
-                      right: 20,
-                      bottom: 20,
-                      color: '#16879a',
-                    }}
-                  />
-                </a>
+                  <div className="team-contact-body">
+                    <h3 className="team-contact-title">{title}</h3>
+                    <p className="team-contact-desc">{description}</p>
+                  </div>
+
+                  <a
+                    href={`mailto:${email}`}
+                    className="team-contact-email-link"
+                    aria-label={ariaLabel}
+                  >
+                    <Mail size={15} className="team-contact-mail-icon" />
+                    <span>{email}</span>
+                    <ArrowUpRight size={14} className="team-contact-arrow" />
+                  </a>
+                </div>
               </AnimatedSection>
             ))}
           </div>
@@ -918,17 +869,16 @@ export default function Contact() {
             <h2>Tell us what you’re working on.</h2>
 
             <p>
-              We’ll use your details only to respond to your inquiry. Public
-              contact email addresses should be confirmed by the NourDoc team
-              before launch.
+              We’ll use your details only to respond to your inquiry. Share your
+              goals and requirements with our team, and we’ll get back to you promptly.
             </p>
 
             <div className="contact-note">
-              <strong>Contact details pending launch confirmation</strong>
+              <strong>Prefer direct email?</strong>
 
               <span>
-                The supplied brief lists multiple legacy and current support
-                addresses, so none are published here as definitive.
+                Reach our dedicated department teams directly at our published email
+                addresses above or via the footer directory.
               </span>
             </div>
           </AnimatedSection>

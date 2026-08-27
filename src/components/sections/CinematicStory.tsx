@@ -1016,7 +1016,7 @@ export function CinematicStory() {
   useLayoutEffect(() => {
     const root = rootRef.current
     if (!root) return
-    const mobile = window.matchMedia('(max-width: 700px)').matches
+    const mobile = window.matchMedia('(max-width: 768px)').matches
 
     const context = gsap.context(() => {
       const sceneElements = gsap.utils.toArray<HTMLElement>('.rotating-scene', root)
@@ -1076,7 +1076,7 @@ export function CinematicStory() {
         activeRef.current = next
         setActiveIndex(next)
 
-        const duration = reduced ? .26 : .95
+        const duration = reduced ? .26 : (mobile ? .48 : .95)
         const timeline = gsap.timeline({
           defaults: { ease: reduced ? 'power1.out' : 'power3.inOut' },
           onComplete: () => {
@@ -1091,18 +1091,60 @@ export function CinematicStory() {
         transitionRef.current = timeline
 
         timeline
-          .set(incoming, { autoAlpha: 0, zIndex: 3, rotateY: reduced ? 0 : 2.6 * intensity, rotateX: reduced ? 0 : -.45 * intensity, scale: reduced ? 1 : .975, z: reduced ? 0 : -38 * intensity, force3D: true })
-          .set(incomingImage, { scale: reduced ? 1 : 1.03, x: reduced ? 0 : 8 * intensity, y: reduced ? 0 : -4 * intensity })
-          .set(incomingSequence, { opacity: 0, y: reduced ? 0 : 24 })
-          .set(incomingVisual, { opacity: 0, x: reduced ? 0 : 34 * intensity, scale: reduced ? 1 : .97 })
+          .set(incoming, {
+            autoAlpha: 0,
+            zIndex: 3,
+            rotateY: (reduced || mobile) ? 0 : 2.6 * intensity,
+            rotateX: (reduced || mobile) ? 0 : -.45 * intensity,
+            scale: (reduced || mobile) ? 1 : .975,
+            z: (reduced || mobile) ? 0 : -38 * intensity,
+            force3D: true,
+          })
+          .set(incomingImage, {
+            scale: (reduced || mobile) ? 1 : 1.03,
+            x: (reduced || mobile) ? 0 : 8 * intensity,
+            y: (reduced || mobile) ? 0 : -4 * intensity,
+          })
+          .set(incomingSequence, { opacity: 0, y: reduced ? 0 : (mobile ? 10 : 24) })
+          .set(incomingVisual, {
+            opacity: 0,
+            x: (reduced || mobile) ? 0 : 34 * intensity,
+            scale: (reduced || mobile) ? 1 : .97,
+          })
           .set(sweep, { opacity: 0, xPercent: -120 })
-          .to(outgoing, { rotateY: reduced ? 0 : -2.6 * intensity, rotateX: reduced ? 0 : .45 * intensity, scale: reduced ? 1 : 1.025, z: reduced ? 0 : 30 * intensity, autoAlpha: 0, duration, force3D: true }, 0)
-          .to(outgoingImage, { scale: reduced ? 1 : 1.075, x: reduced ? 0 : -8 * intensity, y: reduced ? 0 : 4 * intensity, duration }, 0)
+          .to(outgoing, {
+            rotateY: (reduced || mobile) ? 0 : -2.6 * intensity,
+            rotateX: (reduced || mobile) ? 0 : .45 * intensity,
+            scale: (reduced || mobile) ? 1 : 1.025,
+            z: (reduced || mobile) ? 0 : 30 * intensity,
+            autoAlpha: 0,
+            duration,
+            force3D: true,
+          }, 0)
+          .to(outgoingImage, {
+            scale: (reduced || mobile) ? 1 : 1.075,
+            x: (reduced || mobile) ? 0 : -8 * intensity,
+            y: (reduced || mobile) ? 0 : 4 * intensity,
+            duration,
+          }, 0)
           .to(incoming, { rotateY: 0, rotateX: 0, scale: 1, z: 0, autoAlpha: 1, duration, force3D: true }, 0)
-          .to(incomingImage, { scale: reduced ? 1 : 1.025, x: 0, y: 0, duration }, 0)
-          .to(incomingSequence, { opacity: 1, y: 0, duration: reduced ? .22 : .58, stagger: reduced ? 0 : .075, ease: 'power3.out', force3D: true }, reduced ? .04 : .34)
-          .to(incomingVisual, { opacity: 1, x: 0, scale: 1, duration: reduced ? .25 : .72, ease: 'power3.out' }, reduced ? .05 : .48)
-          .to(sweep, { opacity: reduced ? 0 : .32, xPercent: 120, duration: .9, ease: 'power2.inOut' }, .22)
+          .to(incomingImage, { scale: (reduced || mobile) ? 1 : 1.025, x: 0, y: 0, duration }, 0)
+          .to(incomingSequence, {
+            opacity: 1,
+            y: 0,
+            duration: reduced ? .22 : (mobile ? .35 : .58),
+            stagger: reduced ? 0 : (mobile ? .04 : .075),
+            ease: 'power3.out',
+            force3D: true,
+          }, reduced ? .04 : (mobile ? .12 : .34))
+          .to(incomingVisual, {
+            opacity: 1,
+            x: 0,
+            scale: 1,
+            duration: reduced ? .25 : (mobile ? .38 : .72),
+            ease: 'power3.out',
+          }, reduced ? .05 : (mobile ? .18 : .48))
+          .to(sweep, { opacity: (reduced || mobile) ? 0 : .32, xPercent: 120, duration: .9, ease: 'power2.inOut' }, .22)
           .to(sweep, { opacity: 0, duration: .18, ease: 'power1.out' }, 1.12)
       }
 
