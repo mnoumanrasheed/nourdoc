@@ -2699,3 +2699,233 @@ body:has(.hero-story){overflow-x:clip}
   .hero-app-access-arrow,
   .product-app-trial-link svg{transition:none}
 }
+
+/* ========================================================================
+   FINAL AUTHORITATIVE FIX — NourDoc 4-scene layered Home hero
+   Keep this block LAST in index.css.
+   It intentionally overrides older rotating/cinematic hero rules.
+   ======================================================================== */
+
+@media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
+  /* The section supplies scroll distance; the viewport itself stays sticky. */
+  .rotating-hero.scrolling-story.hero-story {
+    --hero-story-travel: 285svh;
+    position: relative !important;
+    height: calc(100svh - var(--navbar-height) + var(--hero-story-travel)) !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    isolation: isolate;
+    background: #06131a;
+  }
+
+  .rotating-hero.scrolling-story.hero-story > .rotating-hero-viewport.hero-stage {
+    position: sticky !important;
+    top: var(--navbar-height) !important;
+    width: 100%;
+    height: calc(100svh - var(--navbar-height)) !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    isolation: isolate;
+    perspective: none !important;
+    transform-style: flat !important;
+  }
+
+  /* All scenes share exactly the same physical stage. */
+  .rotating-hero.scrolling-story.hero-story .scrolling-story-scene {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    display: block !important;
+    opacity: 1;
+    visibility: visible;
+    overflow: hidden !important;
+    backface-visibility: hidden;
+    transform-style: flat !important;
+    will-change: transform;
+    contain: layout paint;
+  }
+
+  /* Safe pre-GSAP state: scene 1 is visible, following scenes wait below it.
+     GSAP inline transforms take ownership immediately after mount. */
+  .rotating-hero.scrolling-story.hero-story .scrolling-story-scene:first-child {
+    transform: translate3d(0, 0, 0);
+  }
+
+  .rotating-hero.scrolling-story.hero-story .scrolling-story-scene:not(:first-child) {
+    transform: translate3d(0, 100%, 0);
+  }
+
+  .rotating-hero.scrolling-story.hero-story .scrolling-story-scene .rotating-scene-layout {
+    width: min(calc(100% - 48px), 1380px);
+    height: 100% !important;
+    min-height: 100% !important;
+    margin-inline: auto;
+    padding-top: clamp(92px, 9vh, 116px) !important;
+    padding-bottom: clamp(64px, 7vh, 92px) !important;
+    grid-template-columns: minmax(0, 45fr) minmax(0, 55fr);
+    gap: clamp(34px, 4.2vw, 68px);
+    align-items: center;
+    align-content: center;
+    transform-style: flat !important;
+  }
+
+  /* Keep the text and product visual on independent transform layers. */
+  .rotating-hero.scrolling-story.hero-story .rotating-scene-copy {
+    transform: none !important;
+    transform-style: flat !important;
+  }
+
+  .rotating-hero.scrolling-story.hero-story .rotating-scene-visual.hero-visual-scroll {
+    position: relative;
+    z-index: 7;
+    width: 100%;
+    max-width: 700px;
+    margin-left: auto;
+    justify-self: end;
+    isolation: isolate;
+    transform-style: flat !important;
+  }
+
+  .rotating-hero.scrolling-story.hero-story .hero-visual-float {
+    width: 100%;
+    transform-origin: 50% 50%;
+    backface-visibility: hidden;
+    will-change: transform;
+  }
+
+  .rotating-hero.scrolling-story.hero-story .hero-visual-content {
+    position: relative;
+    width: 100%;
+  }
+
+  /* A separate, tiny card-level motion layer guarantees that the visual
+     never looks frozen even while internal GSAP timelines are subtle.
+     It does NOT animate the GSAP-owned hero-visual-float node. */
+  .rotating-hero.scrolling-story.hero-story .scene-visual-motion {
+    transform-origin: 50% 50%;
+    animation: nourdoc-hero-card-breathe 6.2s ease-in-out infinite;
+    backface-visibility: hidden;
+    will-change: transform;
+  }
+
+  .rotating-hero.scrolling-story.hero-story .rotating-scene-2 .scene-visual-motion {
+    animation-duration: 6.9s;
+    animation-delay: -1.7s;
+  }
+
+  .rotating-hero.scrolling-story.hero-story .rotating-scene-3 .scene-visual-motion {
+    animation-duration: 5.8s;
+    animation-delay: -2.8s;
+  }
+
+  .rotating-hero.scrolling-story.hero-story .rotating-scene-4 .scene-visual-motion {
+    animation-duration: 7.2s;
+    animation-delay: -3.6s;
+  }
+
+  /* Make the layered edge read clearly without adding a heavy effect. */
+  .rotating-hero.scrolling-story.hero-story .scrolling-story-scene::after {
+    content: "";
+    position: absolute;
+    z-index: 15;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 5%,
+      rgba(142, 218, 226, .16) 50%,
+      transparent 95%
+    );
+    pointer-events: none;
+  }
+
+  /* Avoid old CSS keyframes competing with GSAP on the paths GSAP owns. */
+  .rotating-hero.scrolling-story.hero-story .context-flow-path,
+  .rotating-hero.scrolling-story.hero-story .security-flow-path {
+    animation: none !important;
+  }
+}
+
+@keyframes nourdoc-hero-card-breathe {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, -3px, 0) scale(1.0025);
+  }
+}
+
+/* Tablet/mobile fallback: normal vertical flow, no sticky trap. */
+@media (max-width: 768px) {
+  .rotating-hero.scrolling-story.hero-story {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: clip !important;
+  }
+
+  .rotating-hero.scrolling-story.hero-story > .rotating-hero-viewport.hero-stage {
+    position: relative !important;
+    top: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  .rotating-hero.scrolling-story.hero-story .scrolling-story-scene {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    contain: none;
+    will-change: auto !important;
+  }
+
+  .rotating-hero.scrolling-story.hero-story .scrolling-story-scene .rotating-scene-layout {
+    height: auto !important;
+    min-height: 0 !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto !important;
+    gap: 20px !important;
+    padding-top: 64px !important;
+    padding-bottom: 58px !important;
+  }
+
+  .rotating-hero.scrolling-story.hero-story .scrolling-story-scene:first-child .rotating-scene-layout {
+    min-height: calc(100svh - var(--navbar-height, 72px)) !important;
+    padding-top: 88px !important;
+  }
+
+  .rotating-hero.scrolling-story.hero-story .rotating-scene-visual.hero-visual-scroll {
+    width: min(100%, 500px);
+    margin-inline: auto !important;
+    justify-self: center !important;
+  }
+
+  .rotating-hero.scrolling-story.hero-story .scene-visual-motion {
+    animation-duration: 7s;
+  }
+}
+
+/* Accessibility: all content remains visible and motion is removed. */
+@media (prefers-reduced-motion: reduce) {
+  .rotating-hero.scrolling-story.hero-story,
+  .rotating-hero.scrolling-story.hero-story > .rotating-hero-viewport.hero-stage,
+  .rotating-hero.scrolling-story.hero-story .scrolling-story-scene {
+    transform: none !important;
+  }
+
+  .rotating-hero.scrolling-story.hero-story .scene-visual-motion {
+    animation: none !important;
+    transform: none !important;
+    will-change: auto !important;
+  }
+}
+

@@ -211,23 +211,105 @@ const HERO_VISUAL_TEXT_STYLES = `
   .rotating-hero .security-visual .secure-record footer { padding-top: 6px; font-size: 7px !important; }
   .rotating-hero .security-visual .security-node { padding: 5px 6px; }
 }
+
+/* ---------------------------------------------------------
+   Desktop layered hero story
+   --------------------------------------------------------- */
+@media (min-width: 769px) {
+  .rotating-hero.scrolling-story.hero-story:not(.scrolling-story-static) {
+    position: relative !important;
+    height: 385svh !important;
+    min-height: 385svh !important;
+    overflow: visible !important;
+    isolation: isolate;
+  }
+
+  .rotating-hero.scrolling-story.hero-story:not(.scrolling-story-static) > .rotating-hero-viewport.hero-stage {
+    position: sticky !important;
+    top: var(--navbar-height, 80px) !important;
+    width: 100%;
+    height: calc(100svh - var(--navbar-height, 80px)) !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    isolation: isolate;
+    contain: paint;
+  }
+
+  .rotating-hero.scrolling-story.hero-story:not(.scrolling-story-static) .scrolling-story-scene {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    overflow: hidden;
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+
+  .rotating-hero.scrolling-story.hero-story:not(.scrolling-story-static) .rotating-scene-bg,
+  .rotating-hero.scrolling-story.hero-story:not(.scrolling-story-static) .rotating-scene-overlay,
+  .rotating-hero.scrolling-story.hero-story:not(.scrolling-story-static) .scene-atmosphere,
+  .rotating-hero.scrolling-story.hero-story:not(.scrolling-story-static) .scene-light-sweep {
+    pointer-events: none;
+  }
+
+  .rotating-hero.scrolling-story.hero-story:not(.scrolling-story-static) .hero-visual-scroll {
+    transform: translateZ(0);
+  }
+
+  .rotating-hero.scrolling-story.hero-story:not(.scrolling-story-static) .hero-visual-float {
+    transform-origin: 50% 50%;
+    backface-visibility: hidden;
+  }
+}
+
+/* Reliable mobile / reduced-complexity fallback: normal vertical scenes. */
+@media (max-width: 768px) {
+  .rotating-hero.scrolling-story.hero-story {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  .rotating-hero.scrolling-story.hero-story > .rotating-hero-viewport.hero-stage {
+    position: relative !important;
+    top: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  .rotating-hero.scrolling-story.hero-story .scrolling-story-scene {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+}
+
 `
 const waveform = [18, 29, 44, 24, 52, 34, 63, 40, 57, 28, 48, 62, 36, 22, 43, 55, 31]
 
 type VisualProps = { active: boolean }
 
-function setTimelineState(timeline: gsap.core.Timeline | null, active: boolean) {
+function setTimelineState(timeline: gsap.core.Timeline | null, active: boolean, hasStartedRef?: { current: boolean }) {
   if (!timeline) return
 
   if (active) {
-    // Restart the active scene from a clean state. This prevents repeated/infinite
-    // child tweens from resuming from a stale browser-throttled frame.
+    // Wake the GSAP ticker to ensure smooth animation
     gsap.ticker.wake()
-    timeline.timeScale(1).restart(true)
+    // Resume or start the timeline without resetting to zero
+    if (hasStartedRef && !hasStartedRef.current) {
+      hasStartedRef.current = true
+      timeline.play()
+    } else {
+      timeline.resume()
+    }
   } else {
-    // Reset inactive scenes instead of leaving their infinite tweens suspended
-    // at an arbitrary point in the animation.
-    timeline.pause(0)
+    // Pause inactive timelines without resetting to zero
+    // This prevents visible restarts when scrolling back
+    timeline.pause()
   }
 }
 
@@ -262,6 +344,7 @@ function AmbientVisual({ active }: VisualProps) {
   const reduced = useReducedMotion()
   const rootRef = useRef<HTMLDivElement>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
+  const hasStartedRef = useRef(false)
   const initialActiveRef = useRef(active)
 
   useLayoutEffect(() => {
@@ -295,12 +378,12 @@ function AmbientVisual({ active }: VisualProps) {
     }, root)
 
     timelineRef.current = timeline
-    setTimelineState(timeline, initialActiveRef.current)
+    setTimelineState(timeline, initialActiveRef.current, hasStartedRef)
     return () => { timelineRef.current = null; timeline.kill(); context.revert() }
   }, [reduced])
 
   useLayoutEffect(() => {
-    if (!reduced) setTimelineState(timelineRef.current, active)
+    if (!reduced) setTimelineState(timelineRef.current, active, hasStartedRef)
   }, [active, reduced])
 
   return (
@@ -341,6 +424,7 @@ function ContextVisual({ active }: VisualProps) {
   const reduced = useReducedMotion()
   const rootRef = useRef<HTMLDivElement>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
+  const hasStartedRef = useRef(false)
   const initialActiveRef = useRef(active)
   const cards = [
     ['Conversation', 'Natural dialogue retained', Mic2],
@@ -366,12 +450,12 @@ function ContextVisual({ active }: VisualProps) {
       })
     }, root)
     timelineRef.current = timeline
-    setTimelineState(timeline, initialActiveRef.current)
+    setTimelineState(timeline, initialActiveRef.current, hasStartedRef)
     return () => { timelineRef.current = null; timeline.kill(); context.revert() }
   }, [reduced])
 
   useLayoutEffect(() => {
-    if (!reduced) setTimelineState(timelineRef.current, active)
+    if (!reduced) setTimelineState(timelineRef.current, active, hasStartedRef)
   }, [active, reduced])
 
   return (
@@ -389,6 +473,7 @@ function ImpactVisual({ active }: VisualProps) {
   const reduced = useReducedMotion()
   const rootRef = useRef<HTMLDivElement>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
+  const hasStartedRef = useRef(false)
   const initialActiveRef = useRef(active)
 
   useLayoutEffect(() => {
@@ -483,7 +568,7 @@ function ImpactVisual({ active }: VisualProps) {
     }, root)
 
     timelineRef.current = timeline
-    setTimelineState(timeline, initialActiveRef.current)
+    setTimelineState(timeline, initialActiveRef.current, hasStartedRef)
 
     return () => {
       timelineRef.current = null
@@ -493,7 +578,7 @@ function ImpactVisual({ active }: VisualProps) {
   }, [reduced])
 
   useLayoutEffect(() => {
-    if (!reduced) setTimelineState(timelineRef.current, active)
+    if (!reduced) setTimelineState(timelineRef.current, active, hasStartedRef)
   }, [active, reduced])
 
   return (
@@ -682,6 +767,7 @@ function SecurityVisual({ active }: VisualProps) {
   const reduced = useReducedMotion()
   const rootRef = useRef<HTMLDivElement>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
+  const hasStartedRef = useRef(false)
   const initialActiveRef = useRef(active)
 
   useLayoutEffect(() => {
@@ -742,7 +828,7 @@ function SecurityVisual({ active }: VisualProps) {
     }, root)
 
     timelineRef.current = timeline
-    setTimelineState(timeline, initialActiveRef.current)
+    setTimelineState(timeline, initialActiveRef.current, hasStartedRef)
 
     return () => {
       timelineRef.current = null
@@ -752,7 +838,7 @@ function SecurityVisual({ active }: VisualProps) {
   }, [reduced])
 
   useLayoutEffect(() => {
-    if (!reduced) setTimelineState(timelineRef.current, active)
+    if (!reduced) setTimelineState(timelineRef.current, active, hasStartedRef)
   }, [active, reduced])
 
   return (
@@ -1016,19 +1102,57 @@ export function CinematicStory() {
   useLayoutEffect(() => {
     const story = storyRef.current
     const scenes = sceneRefs.current.filter((scene): scene is HTMLElement => Boolean(scene))
-    if (!story || !layered || scenes.length !== storyScenes.length) return
+    if (!story || !layered || scenes.length !== storyScenes.length) {
+      setActiveIndex(0)
+      return
+    }
 
-    let dominantScene = 0
+    const START_HOLD = .16
+    const TRANSITION_DURATION = 1
+    const END_HOLD = .16
+    const transitionCount = scenes.length - 1
+    const totalUnits = START_HOLD + transitionCount * TRANSITION_DURATION + END_HOLD
+
+    let activeScene = 0
+    let refreshFrame = 0
+
+    const setSceneActivity = (nextIndex: number) => {
+      if (nextIndex === activeScene) return
+      activeScene = nextIndex
+      setActiveIndex(nextIndex)
+
+      scenes.forEach((scene, index) => {
+        scene.style.pointerEvents = index === nextIndex ? 'auto' : 'none'
+      })
+    }
+
     const context = gsap.context(() => {
+      // Every layer is fully opaque. Scenes 2–4 begin just below the sticky
+      // viewport so they physically cover the previous layer while scrolling.
       gsap.set(scenes, {
-        autoAlpha: 0,
-        yPercent: 10,
-        scale: .985,
+        autoAlpha: 1,
+        scale: 1,
         pointerEvents: 'none',
         transformOrigin: '50% 50%',
+        force3D: true,
       })
-      gsap.set(scenes[0], { autoAlpha: 1, yPercent: 0, scale: 1, pointerEvents: 'auto' })
-      scenes.forEach((scene, index) => gsap.set(scene, { zIndex: index + 1 }))
+
+      gsap.set(scenes[0], {
+        yPercent: 0,
+        scale: 1,
+        pointerEvents: 'auto',
+      })
+
+      if (scenes.length > 1) {
+        gsap.set(scenes.slice(1), {
+          yPercent: 100,
+          scale: 1,
+        })
+      }
+
+      scenes.forEach((scene, index) => {
+        gsap.set(scene, { zIndex: index + 1 })
+      })
 
       const timeline = gsap.timeline({
         defaults: { ease: 'none' },
@@ -1036,49 +1160,70 @@ export function CinematicStory() {
           trigger: story,
           start: 'top top',
           end: 'bottom bottom',
-          scrub: .65,
+          scrub: .8,
           invalidateOnRefresh: true,
+          fastScrollEnd: false,
           onUpdate: (self) => {
-            const nextScene = self.progress < .2 ? 0 : self.progress < .5 ? 1 : self.progress < .8 ? 2 : 3
-            if (nextScene === dominantScene) return
-            dominantScene = nextScene
-            setActiveIndex(nextScene)
-            scenes.forEach((scene, index) => { scene.style.pointerEvents = index === nextScene ? 'auto' : 'none' })
+            // Keep the internal animation synchronized with the layer that is
+            // entering the stage. This avoids the old hard-coded .20/.50/.80
+            // thresholds that allowed a visible card to remain paused.
+            const units = self.progress * totalUnits
+            let nextIndex = 0
+
+            if (units >= START_HOLD) {
+              nextIndex = Math.min(
+                scenes.length - 1,
+                1 + Math.floor((units - START_HOLD) / TRANSITION_DURATION),
+              )
+            }
+
+            setSceneActivity(nextIndex)
           },
         },
       })
 
-      timeline.to(scenes[0], { autoAlpha: 1, yPercent: 0, scale: 1, duration: .18 })
+      // Small opening hold so the first hero can be read before the next layer
+      // starts to rise.
+      timeline.to(scenes[0], {
+        yPercent: 0,
+        scale: 1,
+        duration: START_HOLD,
+      })
+
       for (let index = 1; index < scenes.length; index += 1) {
-        const label = `scene-${index + 1}`
-        const visual = scenes[index].querySelector<HTMLElement>('.hero-visual-scroll')
-        const outgoingForeground = scenes[index - 1].querySelectorAll<HTMLElement>('.rotating-scene-copy, .hero-visual-scroll')
+        const incoming = scenes[index]
+        const outgoing = scenes[index - 1]
+        const label = `layer-${index + 1}`
+
         timeline
           .addLabel(label)
-          .to(scenes[index - 1], { autoAlpha: .64, scale: .98, duration: 1 }, label)
-          .to(outgoingForeground, { opacity: 0, duration: .42 }, label)
-          .fromTo(
-            scenes[index],
-            { autoAlpha: 0, yPercent: 10, scale: .985 },
-            { autoAlpha: 1, yPercent: 0, scale: 1, duration: 1 },
-            label,
-          )
-        if (index > 1) {
-          timeline.to(scenes[index - 2], { autoAlpha: 0, duration: .35 }, label)
-        }
-        if (visual) {
-          timeline.fromTo(
-            visual,
-            { yPercent: index % 2 ? -4 : 4 },
-            { yPercent: index % 2 ? 3 : -3, duration: 1 },
-            label,
-          )
-        }
+          .to(outgoing, {
+            yPercent: -2.25,
+            scale: .978,
+            duration: TRANSITION_DURATION,
+          }, label)
+          .to(incoming, {
+            yPercent: 0,
+            scale: 1,
+            duration: TRANSITION_DURATION,
+          }, label)
       }
-      timeline.to(scenes[scenes.length - 1], { autoAlpha: 1, yPercent: 0, scale: 1, duration: .18 })
+
+      timeline.to(scenes[scenes.length - 1], {
+        yPercent: 0,
+        scale: 1,
+        duration: END_HOLD,
+      })
+
+      refreshFrame = window.requestAnimationFrame(() => {
+        ScrollTrigger.refresh()
+      })
     }, story)
 
-    return () => context.revert()
+    return () => {
+      if (refreshFrame) window.cancelAnimationFrame(refreshFrame)
+      context.revert()
+    }
   }, [layered])
 
   return (

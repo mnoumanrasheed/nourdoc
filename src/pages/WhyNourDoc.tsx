@@ -86,26 +86,167 @@ export default function WhyNourDoc() {
 
     if (!hero || !shell) return
 
+    // Check for reduced-motion preference
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    const loops: gsap.core.Tween[] = []
+
     const ctx = gsap.context(() => {
+      // ── Entrance animation (opacity/y/scale only — no transform that conflicts with children) ──
       gsap.fromTo(
         shell,
-        {
-          opacity: 0,
-          y: 24,
-          scale: 0.97,
-        },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 1,
-          delay: 0.15,
-          ease: 'power3.out',
-        },
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 1, delay: 0.15, ease: 'power3.out' },
       )
+
+      if (reducedMotion) return
+
+      // ── Outer orbit: clockwise ──
+      const outerOrbit = shell.querySelector<HTMLElement>('.why-impact-orbit-outer')
+      if (outerOrbit) {
+        gsap.set(outerOrbit, { transformOrigin: '50% 50%', rotation: 0 })
+        loops.push(gsap.to(outerOrbit, {
+          rotation: 360,
+          duration: 12,
+          repeat: -1,
+          ease: 'none',
+        }))
+      }
+
+      // ── Middle orbit: counter-clockwise ──
+      const middleOrbit = shell.querySelector<HTMLElement>('.why-impact-orbit-middle')
+      if (middleOrbit) {
+        gsap.set(middleOrbit, { transformOrigin: '50% 50%', rotation: 0 })
+        loops.push(gsap.to(middleOrbit, {
+          rotation: -360,
+          duration: 8,
+          repeat: -1,
+          ease: 'none',
+        }))
+      }
+
+      // ── Inner orbit: clockwise (faster) ──
+      const innerOrbit = shell.querySelector<HTMLElement>('.why-impact-orbit-inner')
+      if (innerOrbit) {
+        gsap.set(innerOrbit, { transformOrigin: '50% 50%', rotation: 0 })
+        loops.push(gsap.to(innerOrbit, {
+          rotation: 360,
+          duration: 5.8,
+          repeat: -1,
+          ease: 'none',
+        }))
+      }
+
+      // ── Center hub float ──
+      const center = shell.querySelector<HTMLElement>('.why-impact-center')
+      if (center) {
+        loops.push(gsap.to(center, {
+          y: -4,
+          scale: 1.025,
+          duration: 3.4,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+        }))
+      }
+
+      // ── Core glow breathe ──
+      const coreGlow = shell.querySelector<HTMLElement>('.why-impact-core-glow')
+      if (coreGlow) {
+        loops.push(gsap.to(coreGlow, {
+          scale: 1.2,
+          opacity: 1,
+          duration: 2,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+        }))
+      }
+
+      // ── Outer container float ──
+      const floatEl = shell.querySelector<HTMLElement>('.why-impact-float')
+      if (floatEl) {
+        loops.push(gsap.to(floatEl, {
+          x: 3,
+          y: -8,
+          scale: 1.008,
+          duration: 5.5,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+        }))
+      }
+
+      // ── Orbit nodes pulse ──
+      const nodes = gsap.utils.toArray<HTMLElement>('.why-impact-node', shell)
+      nodes.forEach((node, i) => {
+        loops.push(gsap.to(node, {
+          scale: 1.65,
+          opacity: 1,
+          duration: 1.45,
+          delay: i * 0.22,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+        }))
+      })
+
+      // ── Pulse rings expand ──
+      const pulseOne = shell.querySelector<HTMLElement>('.why-impact-pulse-one')
+      const pulseTwo = shell.querySelector<HTMLElement>('.why-impact-pulse-two')
+      if (pulseOne) {
+        loops.push(gsap.fromTo(pulseOne,
+          { scale: 0.65, opacity: 0.55 },
+          { scale: 1.85, opacity: 0, duration: 2.6, repeat: -1, ease: 'power1.out' },
+        ))
+      }
+      if (pulseTwo) {
+        loops.push(gsap.fromTo(pulseTwo,
+          { scale: 0.65, opacity: 0.55 },
+          { scale: 1.85, opacity: 0, duration: 2.6, delay: 1.3, repeat: -1, ease: 'power1.out' },
+        ))
+      }
+
+      // ── SVG connection line dash flow ──
+      const flowPaths = gsap.utils.toArray<SVGPathElement>('.why-impact-flow', shell)
+      flowPaths.forEach((path) => {
+        gsap.set(path, { strokeDashoffset: 0 })
+        loops.push(gsap.to(path, {
+          strokeDashoffset: -80,
+          duration: 2.8,
+          repeat: -1,
+          ease: 'none',
+        }))
+      })
+
+      // ── Corner cards gentle float ──
+      const cardTL = shell.querySelector<HTMLElement>('.impact-card-tl')
+      const cardTR = shell.querySelector<HTMLElement>('.impact-card-tr')
+      const cardBR = shell.querySelector<HTMLElement>('.impact-card-br')
+      const cardBL = shell.querySelector<HTMLElement>('.impact-card-bl')
+      if (cardTL) loops.push(gsap.to(cardTL, { x: -4, y: -8, duration: 4.1, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
+      if (cardTR) loops.push(gsap.to(cardTR, { x: 4, y: -7, duration: 4.8, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
+      if (cardBR) loops.push(gsap.to(cardBR, { x: 4, y: 7, duration: 4.4, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
+      if (cardBL) loops.push(gsap.to(cardBL, { x: -4, y: 7, duration: 5.1, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
+
+      // ── Particles float ──
+      const pA = shell.querySelector<HTMLElement>('.why-impact-particle-a')
+      const pB = shell.querySelector<HTMLElement>('.why-impact-particle-b')
+      const pC = shell.querySelector<HTMLElement>('.why-impact-particle-c')
+      if (pA) loops.push(gsap.to(pA, { x: 15, y: -12, scale: 1.35, opacity: 1, duration: 3.8, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
+      if (pB) loops.push(gsap.to(pB, { x: -12, y: 15, scale: 1.25, opacity: 1, duration: 4.4, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 0.5 }))
+      if (pC) loops.push(gsap.to(pC, { x: 11, y: 12, scale: 1.3, opacity: 1, duration: 4.0, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 1.0 }))
+
     }, hero)
 
+    // Pause/resume when off-screen (saves CPU)
+    const observer = new IntersectionObserver(([entry]) => {
+      loops.forEach((loop) => entry.isIntersecting ? loop.resume() : loop.pause())
+    }, { threshold: 0.05 })
+    observer.observe(shell)
+
     return () => {
+      observer.disconnect()
       ctx.revert()
     }
   }, [])
@@ -356,10 +497,6 @@ export default function WhyNourDoc() {
         .why-impact-float {
           position: absolute;
           inset: 0;
-
-          animation:
-            whyImpactCornerFloat 5.5s ease-in-out infinite;
-
           will-change: transform;
         }
 
@@ -428,22 +565,11 @@ export default function WhyNourDoc() {
         }
 
         .why-impact-flow {
-          stroke:
-            rgba(103, 224, 232, .82);
-
+          stroke: rgba(103, 224, 232, .82);
           stroke-width: 1.4;
-
           stroke-dasharray: 4 8;
-
           stroke-linecap: round;
-
-          filter:
-            drop-shadow(
-              0 0 4px rgba(91, 224, 232, .38)
-            );
-
-          animation:
-            whyFlow 2.8s linear infinite;
+          filter: drop-shadow(0 0 4px rgba(91, 224, 232, .38));
         }
 
         /* =========================================================
@@ -452,58 +578,36 @@ export default function WhyNourDoc() {
 
         .why-impact-orbit {
           position: absolute;
-
           border-radius: 50%;
-
           transform-origin: 50% 50%;
-
           will-change: transform;
         }
 
         .why-impact-orbit-outer {
           width: 66%;
           height: 66%;
-
           left: 17%;
           top: 17%;
-
-          border:
-            1px dashed rgba(104, 226, 234, .82);
-
+          border: 1px dashed rgba(104, 226, 234, .82);
           box-shadow:
             0 0 24px rgba(55, 201, 213, .13),
             inset 0 0 25px rgba(55, 201, 213, .07);
-
-          animation:
-            whyOuterOrbit 12s linear infinite !important;
         }
 
         .why-impact-orbit-middle {
           width: 46%;
           height: 46%;
-
           left: 27%;
           top: 27%;
-
-          border:
-            1px solid rgba(111, 227, 234, .68);
-
-          animation:
-            whyMiddleOrbit 8s linear infinite !important;
+          border: 1px solid rgba(111, 227, 234, .68);
         }
 
         .why-impact-orbit-inner {
           width: 29%;
           height: 29%;
-
           left: 35.5%;
           top: 35.5%;
-
-          border:
-            1px dashed rgba(171, 245, 248, .86);
-
-          animation:
-            whyInnerOrbit 5.8s linear infinite !important;
+          border: 1px dashed rgba(171, 245, 248, .86);
         }
 
         /* =========================================================
@@ -512,23 +616,16 @@ export default function WhyNourDoc() {
 
         .why-impact-node {
           position: absolute;
-
           width: 8px;
           height: 8px;
-
           border-radius: 50%;
-
           background: #ebffff;
-
-          opacity: .8;
-
+          opacity: .55;
           box-shadow:
             0 0 8px rgba(234, 255, 255, 1),
             0 0 18px rgba(72, 224, 233, .95),
             0 0 28px rgba(72, 224, 233, .45);
-
-          animation:
-            whyOrbitNodePulse 1.45s ease-in-out infinite !important;
+          will-change: transform, opacity;
         }
 
         .node-outer-one {
@@ -572,31 +669,20 @@ export default function WhyNourDoc() {
 
         .why-impact-center {
           position: absolute;
-
           left: 50%;
           top: 50%;
-
           width: 92px;
           height: 92px;
-
           margin-left: -46px;
           margin-top: -46px;
-
           z-index: 8;
-
-          animation:
-            whyCenterFloat 3.4s ease-in-out infinite;
-
           will-change: transform;
         }
 
         .why-impact-core-glow {
           position: absolute;
-
           inset: -18%;
-
           border-radius: 50%;
-
           background:
             radial-gradient(
               circle,
@@ -604,15 +690,10 @@ export default function WhyNourDoc() {
               rgba(27, 141, 158, .12) 45%,
               transparent 72%
             );
-
-          border:
-            1px solid rgba(99, 230, 237, .25);
-
-          box-shadow:
-            0 0 28px rgba(71, 218, 228, .18);
-
-          animation:
-            whyCoreBreath 2s ease-in-out infinite;
+          border: 1px solid rgba(99, 230, 237, .25);
+          box-shadow: 0 0 28px rgba(71, 218, 228, .18);
+          opacity: .72;
+          will-change: transform, opacity;
         }
 
         .why-impact-core {
@@ -692,13 +773,11 @@ export default function WhyNourDoc() {
         }
 
         .why-impact-pulse-one {
-          animation:
-            whyPulse 2.6s ease-out infinite;
+          will-change: transform, opacity;
         }
 
         .why-impact-pulse-two {
-          animation:
-            whyPulse 2.6s 1.3s ease-out infinite;
+          will-change: transform, opacity;
         }
 
         /* =========================================================
@@ -769,33 +848,26 @@ export default function WhyNourDoc() {
         .impact-card-tl {
           top: 8%;
           left: 0;
-
-          animation:
-            whyCardTL 4.1s ease-in-out infinite;
+          will-change: transform;
         }
 
         .impact-card-tr {
           top: 8%;
           right: 0;
-
-          animation:
-            whyCardTR 4.8s ease-in-out infinite;
+          will-change: transform;
         }
 
         .impact-card-br {
           right: 0;
           bottom: 8%;
 
-          animation:
-            whyCardBR 4.4s ease-in-out infinite;
+          will-change: transform;
         }
 
         .impact-card-bl {
           left: 0;
           bottom: 8%;
-
-          animation:
-            whyCardBL 5.1s ease-in-out infinite;
+          will-change: transform;
         }
 
         /* =========================================================
@@ -821,34 +893,28 @@ export default function WhyNourDoc() {
         .why-impact-particle-a {
           width: 5px;
           height: 5px;
-
           left: 22%;
           top: 44%;
-
-          animation:
-            whyParticleA 3.8s ease-in-out infinite;
+          opacity: .45;
+          will-change: transform, opacity;
         }
 
         .why-impact-particle-b {
           width: 4px;
           height: 4px;
-
           right: 18%;
           top: 34%;
-
-          animation:
-            whyParticleB 4.4s ease-in-out infinite;
+          opacity: .45;
+          will-change: transform, opacity;
         }
 
         .why-impact-particle-c {
           width: 5px;
           height: 5px;
-
           right: 24%;
           bottom: 25%;
-
-          animation:
-            whyParticleC 4s ease-in-out infinite;
+          opacity: .45;
+          will-change: transform, opacity;
         }
 
         /* =========================================================
@@ -1092,8 +1158,7 @@ export default function WhyNourDoc() {
           }
 
           .why-impact-float {
-            animation:
-              whyImpactMobileFloat 5.2s ease-in-out infinite;
+            animation: none;
           }
 
           .why-impact-card {
@@ -1161,6 +1226,8 @@ export default function WhyNourDoc() {
           .why-impact-particle,
           .why-impact-flow {
             animation: none !important;
+            transform: none !important;
+            transition: none !important;
           }
         }
       `}</style>
