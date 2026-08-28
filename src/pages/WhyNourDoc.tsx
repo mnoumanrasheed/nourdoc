@@ -207,7 +207,7 @@ export default function WhyNourDoc() {
       // SVG connection line dash flow
       const flowPaths = gsap.utils.toArray<SVGPathElement>('.why-impact-flow', shell)
       flowPaths.forEach((path) => {
-        gsap.set(path, { strokeDashoffset: 0 })
+        gsap.set(path, { strokeDasharray: '8 14', strokeDashoffset: 0 })
         loops.push(gsap.to(path, {
           strokeDashoffset: -80,
           duration: 2.8,
@@ -236,7 +236,10 @@ export default function WhyNourDoc() {
 
     }, hero)
 
-    // Pause/resume when off-screen to conserve resources
+    // Start playing immediately (shell is visible on page load)
+    gsap.ticker.wake()
+
+    // Pause when scrolled off-screen, resume when back in view
     const observer = new IntersectionObserver(([entry]) => {
       loops.forEach((loop) => {
         if (entry.isIntersecting) {

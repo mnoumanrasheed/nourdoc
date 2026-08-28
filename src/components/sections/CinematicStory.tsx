@@ -887,18 +887,31 @@ export function CinematicStory() {
   useLayoutEffect(() => {
     const story = storyRef.current
     const scenes = sceneRefs.current.filter((scene): scene is HTMLElement => Boolean(scene))
+
     if (!story || !layered || scenes.length !== storyScenes.length) {
-      setActiveIndex(0)
       activeSceneRef.current = 0
+      setActiveIndex(0)
       return
     }
 
     activeSceneRef.current = 0
     setActiveIndex(0)
+    let refreshFrame = 0
 
     const context = gsap.context(() => {
-      // Scene 1 starts at yPercent 0, Scenes 2–4 wait below at yPercent 100
+      /*
+       * GSAP is the ONLY owner of scene transforms in layered mode.
+       * CSS positions the four cards on the same sticky stage but does not
+       * pre-translate Scenes 2–4. This prevents a CSS translateY(100%) from
+       * being parsed as pixel `y` and then combined with GSAP `yPercent: 100`.
+       */
       gsap.set(scenes, {
+        x: 0,
+        y: 0,
+        xPercent: 0,
+        yPercent: 0,
+        scale: 1,
+        rotation: 0,
         autoAlpha: 1,
         pointerEvents: 'none',
         transformOrigin: '50% 50%',
@@ -907,17 +920,26 @@ export function CinematicStory() {
 
       gsap.set(scenes[0], {
         yPercent: 0,
-        scale: 1,
         pointerEvents: 'auto',
         zIndex: 1,
       })
 
-      for (let i = 1; i < scenes.length; i++) {
-        gsap.set(scenes[i], {
-          yPercent: 100,
-          scale: 1,
-          pointerEvents: 'none',
-          zIndex: i + 1,
+      gsap.set(scenes.slice(1), {
+        yPercent: 100,
+      })
+
+      scenes.slice(1).forEach((scene, index) => {
+        gsap.set(scene, { zIndex: index + 2 })
+      })
+
+      const setActiveScene = (nextIndex: number) => {
+        if (nextIndex === activeSceneRef.current) return
+
+        activeSceneRef.current = nextIndex
+        setActiveIndex(nextIndex)
+
+        scenes.forEach((scene, index) => {
+          scene.style.pointerEvents = index === nextIndex ? 'auto' : 'none'
         })
       }
 
@@ -927,54 +949,37 @@ export function CinematicStory() {
           trigger: story,
           start: 'top top',
           end: 'bottom bottom',
-          scrub: 0.6,
+          scrub: 0.35,
           invalidateOnRefresh: true,
-          fastScrollEnd: false,
           onUpdate: (self) => {
-            const p = self.progress
-            let nextIndex = 0
-            if (p >= 0.83) {
-              nextIndex = 3
-            } else if (p >= 0.50) {
-              nextIndex = 2
-            } else if (p >= 0.17) {
-              nextIndex = 1
+            // Midpoint thresholds keep the visually dominant card active.
+            if (self.progress >= 5 / 6) {
+              setActiveScene(3)
+            } else if (self.progress >= 1 / 2) {
+              setActiveScene(2)
+            } else if (self.progress >= 1 / 6) {
+              setActiveScene(1)
             } else {
-              nextIndex = 0
-            }
-
-            if (nextIndex !== activeSceneRef.current) {
-              activeSceneRef.current = nextIndex
-              setActiveIndex(nextIndex)
-
-              scenes.forEach((scene, index) => {
-                scene.style.pointerEvents = index === nextIndex ? 'auto' : 'none'
-              })
+              setActiveScene(0)
             }
           },
         },
       })
 
-      // Exactly 3 scene transitions covering each other:
-      // Transition 1: Scene 2 rises over Scene 1
+      // True layered scroll: the previous card stays in place while the next
+      // card physically rises from below and covers it.
       timeline
         .to(scenes[1], { yPercent: 0, duration: 1 }, 0)
-        .to(scenes[0], { yPercent: -2, scale: 0.98, duration: 1 }, 0)
-
-      // Transition 2: Scene 3 rises over Scene 2
-      timeline
         .to(scenes[2], { yPercent: 0, duration: 1 }, 1)
-        .to(scenes[1], { yPercent: -2, scale: 0.98, duration: 1 }, 1)
-
-      // Transition 3: Scene 4 rises over Scene 3
-      timeline
         .to(scenes[3], { yPercent: 0, duration: 1 }, 2)
-        .to(scenes[2], { yPercent: -2, scale: 0.98, duration: 1 }, 2)
 
-      ScrollTrigger.refresh()
+      refreshFrame = window.requestAnimationFrame(() => {
+        ScrollTrigger.refresh()
+      })
     }, story)
 
     return () => {
+      if (refreshFrame) window.cancelAnimationFrame(refreshFrame)
       context.revert()
     }
   }, [layered])
@@ -982,7 +987,7 @@ export function CinematicStory() {
   return (
     <section
       ref={storyRef}
-      className={`hero-story rotating-hero scrolling-story${reduced ? ' scrolling-story-static' : ''}`}
+      className={`hero-story rotating-hero scrolling-story ${layered ? 'is-layered' : 'is-static'}`}
       aria-label="NourDoc clinical intelligence overview"
     >
       <div className="hero-stage rotating-hero-viewport">
