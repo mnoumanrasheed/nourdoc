@@ -17,7 +17,7 @@ export function SiteLayout() {
       <Navbar />
       <main id="main-content">
         <div className="page-transition">
-          <Suspense fallback={null}>{outlet}</Suspense>
+          <Suspense fallback={<div className="route-loading-shell" aria-hidden="true" />}>{outlet}</Suspense>
         </div>
       </main>
       <Footer />

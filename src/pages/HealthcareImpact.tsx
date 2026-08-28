@@ -14,11 +14,13 @@ import { ImageStory } from '../components/sections/ImageStory'
 import { AnimatedSection } from '../components/ui/AnimatedSection'
 
 import { impactAreas } from '../data/site'
+import { useHeroVisualScroll } from '../hooks/useHeroVisualScroll'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { createAnimationVisibilityController } from '../utils/animationPerformance'
 
 export default function HealthcareImpact() {
   const heroRef = useRef<HTMLDivElement>(null)
+  useHeroVisualScroll(heroRef)
   const outerRingRef = useRef<HTMLDivElement>(null)
   const innerRingRef = useRef<HTMLDivElement>(null)
 

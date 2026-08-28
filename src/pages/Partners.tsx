@@ -9,6 +9,7 @@ import { SectionHeader } from '../components/common/SectionHeader'
 import { AnimatedSection } from '../components/ui/AnimatedSection'
 
 import { partnerCategories } from '../data/site'
+import { useHeroVisualScroll } from '../hooks/useHeroVisualScroll'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { createAnimationVisibilityController } from '../utils/animationPerformance'
 
@@ -30,6 +31,7 @@ const partnerDescriptions: Record<string, string> = {
 
 export default function Partners() {
   const heroRef = useRef<HTMLDivElement>(null)
+  useHeroVisualScroll(heroRef)
   const outerOrbitRef = useRef<HTMLDivElement>(null)
   const innerOrbitRef = useRef<HTMLDivElement>(null)
 

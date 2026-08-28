@@ -10,6 +10,7 @@ import { ImageStory } from '../components/sections/ImageStory'
 import { AnimatedSection } from '../components/ui/AnimatedSection'
 
 import { buildGroups } from '../data/site'
+import { useHeroVisualScroll } from '../hooks/useHeroVisualScroll'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { createAnimationVisibilityController } from '../utils/animationPerformance'
 
@@ -29,6 +30,7 @@ const roadmap = [
 
 export default function About() {
   const heroRef = useRef<HTMLDivElement>(null)
+  useHeroVisualScroll(heroRef)
   const outerOrbitRef = useRef<HTMLDivElement>(null)
   const innerOrbitRef = useRef<HTMLDivElement>(null)
 

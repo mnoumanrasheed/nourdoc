@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode, type Ref } from 'react'
+import { useLayoutEffect, useRef, type ReactNode, type Ref } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, useInView, useReducedMotion } from 'framer-motion'
 import { gsap } from 'gsap'
 import {
-  Activity, ArrowLeft, ArrowRight, Check, CircleGauge, FileText, HeartPulse, LockKeyhole,
+  Activity, ArrowRight, Check, CircleGauge, FileText, HeartPulse, LockKeyhole,
   Mic2, Network, ShieldCheck, Sparkles, Stethoscope, Workflow,
 } from 'lucide-react'
 import {
@@ -13,6 +13,7 @@ import {
   whyNourDocImage as naturalCareImage,
   type ResponsiveImageAsset,
 } from '../../data/responsiveImages'
+import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { signalCriticalHeroReady } from '../../utils/criticalAssets'
 import { ResponsivePicture } from '../common/ResponsivePicture'
 
@@ -253,7 +254,7 @@ function VisualShell({ label, icon, children, className = '', livePulse = false,
 }
 
 function AmbientVisual({ active }: VisualProps) {
-  const reduced = false
+  const reduced = useReducedMotion()
   const rootRef = useRef<HTMLDivElement>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
   const initialActiveRef = useRef(active)
@@ -271,7 +272,7 @@ function AmbientVisual({ active }: VisualProps) {
           timeline.add(gsap.to(signal, {
             x: () => connector.clientWidth + 8,
             keyframes: { opacity: [0, 1, 1, 0] },
-            duration: 1.55,
+            duration: 1.35,
             delay: connectorIndex * .22 + signalIndex * .72,
             repeat: -1,
             repeatDelay: .25,
@@ -296,8 +297,8 @@ function AmbientVisual({ active }: VisualProps) {
 
       gsap.utils.toArray<HTMLElement>('.scene-waveform i', root).forEach((bar, index) => {
         timeline.add(gsap.fromTo(bar,
-          { scaleY: .28 + index % 3 * .08 },
-          { scaleY: 1.42, duration: .34 + index % 5 * .055, delay: index * .025, repeat: -1, yoyo: true, ease: 'sine.inOut' },
+          { scaleY: .22 + index % 3 * .08 },
+          { scaleY: 1.18 + index % 4 * .12, duration: .46 + index % 5 * .06, delay: index * .025, repeat: -1, yoyo: true, ease: 'sine.inOut' },
         ), 0)
       })
 
@@ -306,7 +307,7 @@ function AmbientVisual({ active }: VisualProps) {
       })
 
       gsap.utils.toArray<HTMLElement>('.ambient-stage', root).forEach((stage, index) => {
-        timeline.add(gsap.to(stage, { y: index % 2 ? 4 : -4, duration: 3.6 + index * .3, delay: index * .22, repeat: -1, yoyo: true, ease: 'sine.inOut' }), 0)
+        timeline.add(gsap.to(stage, { y: index % 2 ? 6 : -6, duration: 3.8 + index * .35, delay: index * .22, repeat: -1, yoyo: true, ease: 'sine.inOut' }), 0)
       })
     }, root)
 
@@ -325,7 +326,7 @@ function AmbientVisual({ active }: VisualProps) {
         <div className="ambient-data-particles" aria-hidden="true"><i /><i /><i /><i /><i /><i /></div>
         <div className="ambient-pipeline">
           <div className="ambient-stage ambient-stage-conversation">
-            <motion.div className="ambient-dialogue scene-glass-card" animate={!reduced && active ? { transform: ['translate3d(0,0,0)', 'translate3d(0,-2px,0)', 'translate3d(0,0,0)'] } : { transform: 'translate3d(0,0,0)' }} whileHover={reduced ? undefined : { y: -3, transition: { duration: .28, repeat: 0 } }} transition={{ duration: 6.8, repeat: active ? Infinity : 0, ease: 'easeInOut' }}>
+            <motion.div className="ambient-dialogue scene-glass-card" animate={!reduced && active ? { y: [0, -4, 0] } : { y: 0 }} whileHover={reduced ? undefined : { y: -5, transition: { duration: .28, repeat: 0 } }} transition={{ duration: 5.8, repeat: active ? Infinity : 0, ease: 'easeInOut' }}>
               <header><span>01</span><b>Conversation</b><Mic2 size={14} /></header>
               <div><i>DR</i><p><b>Doctor</b>How have you been feeling since your last visit?</p></div>
               <div><i>PT</i><p><b>Patient</b>The discomfort started three days ago.</p></div>
@@ -334,7 +335,7 @@ function AmbientVisual({ active }: VisualProps) {
           </div>
           <div className="ambient-connector ambient-connector-a" aria-hidden="true"><i /><i /></div>
           <div className="ambient-stage ambient-stage-ai">
-            <motion.div className="ambient-core scene-glass-card" animate={!reduced && active ? { transform: ['translate3d(0,0,0)', 'translate3d(0,1.5px,0)', 'translate3d(0,0,0)'] } : { transform: 'translate3d(0,0,0)' }} transition={{ duration: 7.4, repeat: active ? Infinity : 0, ease: 'easeInOut', delay: .7 }}>
+            <motion.div className="ambient-core scene-glass-card" animate={!reduced && active ? { y: [0, 3, 0] } : { y: 0 }} transition={{ duration: 6.2, repeat: active ? Infinity : 0, ease: 'easeInOut', delay: .7 }}>
               <i className="ambient-core-scan" aria-hidden="true" />
               <span><Sparkles size={13} /> AI understanding</span>
               <div className="scene-waveform" aria-hidden="true">{waveform.map((height, index) => <i key={`${height}-${index}`} style={{ height }} />)}</div>
@@ -343,7 +344,7 @@ function AmbientVisual({ active }: VisualProps) {
           </div>
           <div className="ambient-connector ambient-connector-b" aria-hidden="true"><i /><i /></div>
           <div className="ambient-stage ambient-stage-note">
-            <motion.div className="ambient-note scene-glass-card" animate={!reduced && active ? { transform: ['translate3d(0,0,0)', 'translate3d(0,-1.5px,0)', 'translate3d(0,0,0)'] } : { transform: 'translate3d(0,0,0)' }} whileHover={reduced ? undefined : { y: -3, transition: { duration: .28, repeat: 0 } }} transition={{ duration: 7.1, repeat: active ? Infinity : 0, ease: 'easeInOut', delay: 1.1 }}>
+            <motion.div className="ambient-note scene-glass-card" animate={!reduced && active ? { y: [0, -3.5, 0] } : { y: 0 }} whileHover={reduced ? undefined : { y: -5, transition: { duration: .28, repeat: 0 } }} transition={{ duration: 6, repeat: active ? Infinity : 0, ease: 'easeInOut', delay: 1.1 }}>
               <header><span>02</span><b>SOAP note</b><FileText size={14} /></header>
               {['Subjective', 'Objective', 'Assessment', 'Plan'].map((item, index) => <motion.div className="ambient-note-row" key={item} initial={reduced ? false : { opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.15 + index * .14, duration: .45 }}><i>{item[0]}</i><p><b>{item}</b><small>{index === 0 ? 'Symptoms began three days ago...' : 'Structured for clinician review...'}</small></p></motion.div>)}
               <small className="ambient-review"><Check size={11} /> Clinician review required</small>
@@ -356,7 +357,7 @@ function AmbientVisual({ active }: VisualProps) {
 }
 
 function ContextVisual({ active }: VisualProps) {
-  const reduced = false
+  const reduced = useReducedMotion()
   const rootRef = useRef<HTMLDivElement>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
   const initialActiveRef = useRef(active)
@@ -378,9 +379,9 @@ function ContextVisual({ active }: VisualProps) {
         timeline.add(gsap.to(path, { strokeDashoffset: -76, duration: 2.9 + index * .25, repeat: -1, ease: 'none' }), 0)
         if (packets[index]) timeline.add(pathTraveller(path, packets[index], 2.25 + index * .22, index * .24), 0)
       })
-      timeline.add(gsap.to(root.querySelector('.context-core'), { scale: 1.025, duration: 1.35, repeat: -1, yoyo: true, ease: 'sine.inOut' }), 0)
+      timeline.add(gsap.to(root.querySelector('.context-core'), { scale: 1.04, duration: 1.55, repeat: -1, yoyo: true, ease: 'sine.inOut' }), 0)
       gsap.utils.toArray<HTMLElement>('.context-card-float', root).forEach((card, index) => {
-        timeline.add(gsap.to(card, { y: index % 2 ? 4 : -4, duration: 3.3 + index * .25, delay: index * .28, repeat: -1, yoyo: true, ease: 'sine.inOut' }), 0)
+        timeline.add(gsap.to(card, { y: index % 2 ? 6 : -6, duration: 3.5 + index * .3, delay: index * .28, repeat: -1, yoyo: true, ease: 'sine.inOut' }), 0)
       })
     }, root)
     timelineRef.current = timeline
@@ -404,7 +405,7 @@ function ContextVisual({ active }: VisualProps) {
 }
 
 function ImpactVisual({ active }: VisualProps) {
-  const reduced = false
+  const reduced = useReducedMotion()
   const rootRef = useRef<HTMLDivElement>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
   const initialActiveRef = useRef(active)
@@ -512,7 +513,7 @@ function ImpactVisual({ active }: VisualProps) {
 
       gsap.utils.toArray<HTMLElement>('.impact-kpi-card', root).forEach((card, index) => {
         timeline.to(card, {
-          y: index % 2 ? 2.5 : -2.5,
+          y: index % 2 ? 4.5 : -4.5,
           duration: 3 + index * .25,
           delay: index * .2,
           repeat: -1,
@@ -719,7 +720,7 @@ function ImpactVisual({ active }: VisualProps) {
 }
 
 function SecurityVisual({ active }: VisualProps) {
-  const reduced = false
+  const reduced = useReducedMotion()
   const rootRef = useRef<HTMLDivElement>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
   const initialActiveRef = useRef(active)
@@ -793,7 +794,7 @@ function SecurityVisual({ active }: VisualProps) {
       const pulse = root.querySelector<HTMLElement>('.security-pulse')
       if (pulse) {
         timeline.to(pulse, {
-          scale: 1.025,
+          scale: 1.04,
           opacity: .9,
           duration: 1.25,
           repeat: -1,
@@ -804,7 +805,7 @@ function SecurityVisual({ active }: VisualProps) {
 
       gsap.utils.toArray<HTMLElement>('.security-node', root).forEach((node, index) => {
         timeline.to(node, {
-          y: index % 2 ? 4 : -4,
+          y: index % 2 ? 6 : -6,
           duration: 2.7 + index * .18,
           delay: index * .14,
           repeat: -1,
@@ -814,7 +815,7 @@ function SecurityVisual({ active }: VisualProps) {
       })
 
       timeline.to('.secure-record', {
-        y: -3,
+        y: -5,
         duration: 2.1,
         repeat: -1,
         yoyo: true,
@@ -940,327 +941,90 @@ function SecurityVisual({ active }: VisualProps) {
   )
 }
 
-type Scene = { eyebrow: string; shortLabel: string; title: string; description: string; image: ResponsiveImageAsset; position: string; visual: (active: boolean) => ReactNode }
-type SceneRequestPriority = 'high' | 'low'
+type StorySceneDefinition = {
+  eyebrow: string
+  title: string
+  description: string
+  image: ResponsiveImageAsset
+  position: string
+  visual: (active: boolean) => ReactNode
+}
 
-const scenes: Scene[] = [
-  { eyebrow: 'Ambient Intelligence', shortLabel: 'Ambient', title: 'Patient conversations, perfectly documented.', description: 'NourDoc listens to natural doctor-patient dialogue and creates structured clinical documentation, helping physicians reduce time spent on manual note-taking.', image: consultationImage, position: '52% center', visual: (active) => <AmbientVisual active={active} /> },
-  { eyebrow: 'Why NourDoc', shortLabel: 'Why NourDoc', title: 'Technology that stays out of the clinical conversation.', description: 'NourDoc works quietly around the encounter, helping clinicians stay present while ambient AI organizes the conversation into useful clinical context.', image: naturalCareImage, position: '62% center', visual: (active) => <ContextVisual active={active} /> },
-  { eyebrow: 'Healthcare Impact', shortLabel: 'Impact', title: 'Better documentation. Better clinical focus.', description: 'Reduce clerical friction around the encounter so more attention remains available for the patient, the clinical decision and the care that follows.', image: impactImage, position: '40% center', visual: (active) => <ImpactVisual active={active} /> },
-  { eyebrow: 'Security & Compliance', shortLabel: 'Security', title: 'Clinical intelligence built for trusted healthcare.', description: 'Patient information requires strong privacy, access-control and governance practices. NourDoc positions security and privacy as foundational requirements.', image: securityImage, position: '48% center', visual: (active) => <SecurityVisual active={active} /> },
+const storyScenes: StorySceneDefinition[] = [
+  { eyebrow: 'Ambient Intelligence', title: 'Patient conversations, perfectly documented.', description: 'NourDoc listens to natural doctor-patient dialogue and creates structured clinical documentation, helping physicians reduce time spent on manual note-taking.', image: consultationImage, position: '52% center', visual: (active) => <AmbientVisual active={active} /> },
+  { eyebrow: 'Why NourDoc', title: 'Technology that stays out of the clinical conversation.', description: 'NourDoc works quietly around the encounter, helping clinicians stay present while ambient AI organizes the conversation into useful clinical context.', image: naturalCareImage, position: '62% center', visual: (active) => <ContextVisual active={active} /> },
+  { eyebrow: 'Healthcare Impact', title: 'Better documentation. Better clinical focus.', description: 'Reduce clerical friction around the encounter so more attention remains available for the patient, the clinical decision and the care that follows.', image: impactImage, position: '40% center', visual: (active) => <ImpactVisual active={active} /> },
+  { eyebrow: 'Security & Compliance', title: 'Clinical intelligence built for trusted healthcare.', description: 'Patient information requires strong privacy, access-control and governance practices. NourDoc positions security and privacy as foundational requirements.', image: securityImage, position: '48% center', visual: (active) => <SecurityVisual active={active} /> },
 ]
 
-export function CinematicStory() {
-  const rootRef = useRef<HTMLElement>(null)
-  const activeRef = useRef(0)
-  const transitionRef = useRef<gsap.core.Timeline | null>(null)
-  const backgroundRef = useRef<gsap.core.Tween | null>(null)
-  const goToRef = useRef<(index: number) => void>(() => undefined)
-  const readyScenesRef = useRef(new Set<number>())
-  const pendingSceneRef = useRef<number | null>(null)
-  const preloadStartedRef = useRef(false)
-  const idleHandlesRef = useRef<number[]>([])
-  const pageReadyListenerRef = useRef<(() => void) | null>(null)
-  const [activeIndex, setActiveIndex] = useState(0)
-  const [requestedScenes, setRequestedScenes] = useState<Record<number, SceneRequestPriority>>({ 0: 'high' })
-  const reduced = false
-
-  const requestScene = useCallback((index: number, priority: SceneRequestPriority) => {
-    setRequestedScenes((current) => {
-      if (current[index] === 'high' || current[index] === priority) return current
-      return { ...current, [index]: priority }
-    })
-  }, [])
-
-  const scheduleIdleScenes = useCallback(() => {
-    if (preloadStartedRef.current) return
-    preloadStartedRef.current = true
-    const requestIdle = window.requestIdleCallback ?? ((callback: IdleRequestCallback) => window.setTimeout(() => callback({ didTimeout: false, timeRemaining: () => 16 }), 1))
-    idleHandlesRef.current.push(requestIdle(() => requestScene(2, 'low'), { timeout: 1800 }))
-    idleHandlesRef.current.push(requestIdle(() => requestScene(3, 'low'), { timeout: 2600 }))
-  }, [requestScene])
-
-  const handleSceneDecoded = useCallback((index: number) => {
-    if (readyScenesRef.current.has(index)) return
-    readyScenesRef.current.add(index)
-
-    if (index === 0) {
-      signalCriticalHeroReady()
-      requestScene(1, 'low')
-
-      if (document.body.hasAttribute('aria-busy')) {
-        const onPageReady = () => {
-          pageReadyListenerRef.current = null
-          scheduleIdleScenes()
-        }
-        pageReadyListenerRef.current = onPageReady
-        window.addEventListener('nourdoc:ready', onPageReady, { once: true })
-      } else {
-        scheduleIdleScenes()
-      }
-    }
-
-    if (pendingSceneRef.current === index) {
-      pendingSceneRef.current = null
-      window.requestAnimationFrame(() => goToRef.current(index))
-    }
-  }, [requestScene, scheduleIdleScenes])
-
-  useEffect(() => () => {
-    const cancelIdle = window.cancelIdleCallback ?? window.clearTimeout
-    idleHandlesRef.current.forEach((handle) => cancelIdle(handle))
-    if (pageReadyListenerRef.current) window.removeEventListener('nourdoc:ready', pageReadyListenerRef.current)
-    delete document.documentElement.dataset.heroReady
-  }, [])
-
-  useLayoutEffect(() => {
-    const root = rootRef.current
-    if (!root) return
-    const mobile = window.matchMedia('(max-width: 768px)').matches
-
-    const context = gsap.context(() => {
-      const sceneElements = gsap.utils.toArray<HTMLElement>('.rotating-scene', root)
-      const intensity = mobile ? .45 : 1
-
-      gsap.set(sceneElements, { autoAlpha: 0, zIndex: 0, transformPerspective: 1400, transformOrigin: 'center center' })
-      gsap.set(sceneElements[0], { autoAlpha: 1, zIndex: 2 })
-      let intro: gsap.core.Timeline | null = null
-
-      const stopBackground = () => {
-        backgroundRef.current?.kill(); backgroundRef.current = null
-      }
-
-      const startBackground = (scene: HTMLElement) => {
-        const image = scene.querySelector<HTMLElement>('.rotating-scene-image')
-        if (!image || document.hidden) return
-
-        backgroundRef.current?.kill()
-        gsap.set(image, { scale: reduced ? 1 : 1.025, x: 0, y: 0, willChange: reduced ? 'auto' : 'transform' })
-        if (!reduced) {
-          backgroundRef.current = gsap.to(image, {
-            scale: 1.07,
-            x: mobile ? -1 : -5,
-            y: mobile ? 1 : 3,
-            duration: 18,
-            ease: 'sine.inOut',
-            force3D: true,
-            overwrite: 'auto',
-          })
-        }
-      }
-
-      const goTo = (requested: number) => {
-        const next = (requested + sceneElements.length) % sceneElements.length
-        const current = activeRef.current
-        if (transitionRef.current?.isActive()) return
-        if (next === current) return
-        if (!readyScenesRef.current.has(next)) {
-          pendingSceneRef.current = next
-          requestScene(next, 'high')
-          return
-        }
-
-        intro?.kill(); intro = null
-        stopBackground()
-        const outgoing = sceneElements[current]
-        const incoming = sceneElements[next]
-        const incomingImage = incoming.querySelector('.rotating-scene-image')
-        const outgoingImage = outgoing.querySelector('.rotating-scene-image')
-        const incomingSequence = incoming.querySelectorAll<HTMLElement>('[data-scene-sequence]')
-        const incomingVisual = incoming.querySelector('.scene-visual-shell')
-        const sweep = incoming.querySelector('.scene-light-sweep')
-
-        gsap.set([outgoing, incoming], { willChange: 'transform,opacity' })
-        gsap.set([outgoingImage, incomingImage], { willChange: 'transform' })
-
-        activeRef.current = next
-        setActiveIndex(next)
-
-        const duration = reduced ? .26 : (mobile ? .48 : .95)
-        const timeline = gsap.timeline({
-          defaults: { ease: reduced ? 'power1.out' : 'power3.inOut' },
-          onComplete: () => {
-            gsap.set(outgoing, { autoAlpha: 0, zIndex: 0, clearProps: 'transform,willChange' })
-            gsap.set(outgoingImage, { clearProps: 'willChange' })
-            gsap.set(incoming, { autoAlpha: 1, zIndex: 2, clearProps: 'transform,willChange' })
-            gsap.set(incomingImage, { clearProps: 'willChange' })
-            transitionRef.current = null
-            startBackground(incoming)
-          },
-        })
-        transitionRef.current = timeline
-
-        timeline
-          .set(incoming, {
-            autoAlpha: 0,
-            zIndex: 3,
-            rotateY: (reduced || mobile) ? 0 : 2.6 * intensity,
-            rotateX: (reduced || mobile) ? 0 : -.45 * intensity,
-            scale: (reduced || mobile) ? 1 : .975,
-            z: (reduced || mobile) ? 0 : -38 * intensity,
-            force3D: true,
-          })
-          .set(incomingImage, {
-            scale: (reduced || mobile) ? 1 : 1.03,
-            x: (reduced || mobile) ? 0 : 8 * intensity,
-            y: (reduced || mobile) ? 0 : -4 * intensity,
-          })
-          .set(incomingSequence, { opacity: 0, y: reduced ? 0 : (mobile ? 10 : 24) })
-          .set(incomingVisual, {
-            opacity: 0,
-            x: (reduced || mobile) ? 0 : 34 * intensity,
-            scale: (reduced || mobile) ? 1 : .97,
-          })
-          .set(sweep, { opacity: 0, xPercent: -120 })
-          .to(outgoing, {
-            rotateY: (reduced || mobile) ? 0 : -2.6 * intensity,
-            rotateX: (reduced || mobile) ? 0 : .45 * intensity,
-            scale: (reduced || mobile) ? 1 : 1.025,
-            z: (reduced || mobile) ? 0 : 30 * intensity,
-            autoAlpha: 0,
-            duration,
-            force3D: true,
-          }, 0)
-          .to(outgoingImage, {
-            scale: (reduced || mobile) ? 1 : 1.075,
-            x: (reduced || mobile) ? 0 : -8 * intensity,
-            y: (reduced || mobile) ? 0 : 4 * intensity,
-            duration,
-          }, 0)
-          .to(incoming, { rotateY: 0, rotateX: 0, scale: 1, z: 0, autoAlpha: 1, duration, force3D: true }, 0)
-          .to(incomingImage, { scale: (reduced || mobile) ? 1 : 1.025, x: 0, y: 0, duration }, 0)
-          .to(incomingSequence, {
-            opacity: 1,
-            y: 0,
-            duration: reduced ? .22 : (mobile ? .35 : .58),
-            stagger: reduced ? 0 : (mobile ? .04 : .075),
-            ease: 'power3.out',
-            force3D: true,
-          }, reduced ? .04 : (mobile ? .12 : .34))
-          .to(incomingVisual, {
-            opacity: 1,
-            x: 0,
-            scale: 1,
-            duration: reduced ? .25 : (mobile ? .38 : .72),
-            ease: 'power3.out',
-          }, reduced ? .05 : (mobile ? .18 : .48))
-          .to(sweep, { opacity: (reduced || mobile) ? 0 : .32, xPercent: 120, duration: .9, ease: 'power2.inOut' }, .22)
-          .to(sweep, { opacity: 0, duration: .18, ease: 'power1.out' }, 1.12)
-      }
-
-      goToRef.current = goTo
-
-      const first = sceneElements[0]
-      const firstSequence = first.querySelectorAll<HTMLElement>('[data-scene-sequence]')
-      const firstVisual = first.querySelector('.scene-visual-shell')
-      if (reduced) {
-        gsap.set([firstSequence, firstVisual], { opacity: 1, clearProps: 'transform,filter' })
-        startBackground(first)
-      } else {
-        gsap.set(first.querySelector('.rotating-scene-image'), { willChange: 'transform' })
-        intro = gsap.timeline({ defaults: { ease: 'power3.out' }, onComplete: () => startBackground(first) })
-        intro.from(first.querySelector('.rotating-scene-image'), { scale: 1.03, x: 7, duration: 1.15 }, 0)
-          .from(firstSequence, { y: 12, duration: .45, stagger: .045, force3D: true }, 0)
-          .fromTo(firstVisual,
-            { opacity: .84, x: 16, scale: .985 },
-            { opacity: 1, x: 0, scale: 1, duration: .64, clearProps: 'opacity,transform' },
-            .04,
-          )
-      }
-
-      const onKeyDown = (event: KeyboardEvent) => {
-        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
-        if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return
-
-        const target = event.target as HTMLElement | null
-        if (target?.matches('input, textarea, select, [contenteditable="true"]')) return
-
-        const bounds = root.getBoundingClientRect()
-        if (bounds.bottom <= 0 || bounds.top >= window.innerHeight) return
-
-        event.preventDefault()
-        goTo(event.key === 'ArrowLeft' ? activeRef.current - 1 : activeRef.current + 1)
-      }
-
-      let pointerStart: { x: number; y: number; id: number } | null = null
-      const onPointerDown = (event: PointerEvent) => {
-        if (event.pointerType === 'mouse') return
-        pointerStart = { x: event.clientX, y: event.clientY, id: event.pointerId }
-      }
-      const onPointerUp = (event: PointerEvent) => {
-        if (!pointerStart || pointerStart.id !== event.pointerId) return
-        const deltaX = event.clientX - pointerStart.x
-        const deltaY = event.clientY - pointerStart.y
-        pointerStart = null
-        if (Math.abs(deltaX) < 48 || Math.abs(deltaX) <= Math.abs(deltaY)) return
-        goTo(deltaX > 0 ? activeRef.current - 1 : activeRef.current + 1)
-      }
-      const onPointerCancel = () => { pointerStart = null }
-
-      window.addEventListener('keydown', onKeyDown)
-      root.addEventListener('pointerdown', onPointerDown)
-      root.addEventListener('pointerup', onPointerUp)
-      root.addEventListener('pointercancel', onPointerCancel)
-      return () => {
-        window.removeEventListener('keydown', onKeyDown)
-        root.removeEventListener('pointerdown', onPointerDown)
-        root.removeEventListener('pointerup', onPointerUp)
-        root.removeEventListener('pointercancel', onPointerCancel)
-        intro?.kill(); stopBackground(); transitionRef.current?.kill()
-      }
-    }, root)
-
-    return () => context.revert()
-  }, [reduced, requestScene])
+function StoryScene({ scene, index, compact }: { scene: StorySceneDefinition; index: number; compact: boolean }) {
+  const sceneRef = useRef<HTMLElement>(null)
+  const reduced = useReducedMotion()
+  const active = useInView(sceneRef, { amount: .08, margin: '-4% 0px -4% 0px' })
 
   return (
-    <section ref={rootRef} className="rotating-hero" aria-label="NourDoc clinical intelligence overview">
-      <style>{HERO_VISUAL_TEXT_STYLES}</style>
-      <div className="rotating-hero-viewport">
-        {scenes.map((scene, index) => (
-          <article className={`rotating-scene rotating-scene-${index + 1}`} key={scene.eyebrow} aria-hidden={activeIndex !== index}>
-            <div className="rotating-scene-bg" aria-hidden="true">
-              {requestedScenes[index] && (
-                <ResponsivePicture
-                  asset={scene.image}
-                  sizes="100vw"
-                  pictureClassName="rotating-scene-picture"
-                  className="rotating-scene-image"
-                  alt=""
-                  loading="eager"
-                  fetchPriority={requestedScenes[index]}
-                  decoding="async"
-                  style={{ objectPosition: scene.position }}
-                  onDecoded={() => handleSceneDecoded(index)}
-                />
-              )}
-            </div>
-            <div className="rotating-scene-overlay" aria-hidden="true" /><div className="scene-atmosphere" aria-hidden="true" /><div className="scene-light-sweep" aria-hidden="true" />
-            <svg className="scene-data-lines" viewBox="0 0 1440 900" preserveAspectRatio="none" aria-hidden="true"><path d="M0 690 C300 650 400 510 685 520 S1080 690 1440 410" /><path d="M610 0 C610 230 820 290 955 370 S1230 420 1440 225" /><circle cx="685" cy="520" r="3" /><circle cx="955" cy="370" r="3" /><circle cx="1215" cy="535" r="3" /></svg>
-            <div className="scene-depth-nodes" aria-hidden="true"><i /><i /><i /><i /><i /><i /></div>
-            <div className="container rotating-scene-layout">
-              <div className="rotating-scene-copy">
-                <span className="eyebrow" data-scene-sequence><i />{scene.eyebrow}</span>
-                {index === 0 ? <h1 data-scene-sequence>{scene.title}</h1> : <h2 data-scene-sequence>{scene.title}</h2>}
-                <p data-scene-sequence>{scene.description}</p>
-                <div className="scene-actions" data-scene-sequence>
-                  <motion.div whileHover={{ y: -2 }} whileTap={{ scale: .985 }}><Link tabIndex={activeIndex === index ? 0 : -1} className="button scene-primary-action" to="/contact">Book a Demo<ArrowRight size={17} /></Link></motion.div>
-                  <motion.div whileHover={{ x: 3 }}><Link tabIndex={activeIndex === index ? 0 : -1} className="scene-secondary-action" to="/product">Explore the platform<ArrowRight size={16} /></Link></motion.div>
-                </div>
-              </div>
-              <div className="rotating-scene-visual">{scene.visual(activeIndex === index)}</div>
-            </div>
-          </article>
-        ))}
-        <div className="container rotation-controls">
-          <div className="rotation-indicators" aria-label="Choose hero scene">
-            {scenes.map((scene, index) => <button type="button" key={scene.eyebrow} className={`rotation-control ${activeIndex === index ? 'is-active' : ''}`} onClick={() => goToRef.current(index)} aria-current={activeIndex === index ? 'true' : undefined} aria-label={`Show scene ${index + 1}: ${scene.eyebrow}`}><span><b>0{index + 1}</b>{scene.shortLabel}</span><i><em className="rotation-progress-fill" /></i></button>)}
-          </div>
-          <div className="rotation-arrows" aria-label="Navigate hero scenes">
-            <button type="button" onClick={() => goToRef.current(activeRef.current - 1)} aria-label="Previous scene"><ArrowLeft aria-hidden="true" /><span>Previous Scene</span></button>
-            <button type="button" onClick={() => goToRef.current(activeRef.current + 1)} aria-label="Next scene"><ArrowRight aria-hidden="true" /><span>Next Scene</span></button>
+    <article ref={sceneRef} className={`rotating-scene scrolling-story-scene rotating-scene-${index + 1}`}>
+      <div className="rotating-scene-bg" aria-hidden="true">
+        <ResponsivePicture
+          asset={scene.image}
+          sizes="100vw"
+          pictureClassName="rotating-scene-picture"
+          className="rotating-scene-image"
+          alt=""
+          loading={index === 0 ? 'eager' : 'lazy'}
+          fetchPriority={index === 0 ? 'high' : 'auto'}
+          decoding="async"
+          style={{ objectPosition: scene.position }}
+          onDecoded={index === 0 ? signalCriticalHeroReady : undefined}
+        />
+      </div>
+      <div className="rotating-scene-overlay" aria-hidden="true" />
+      <div className="scene-atmosphere" aria-hidden="true" />
+      <div className="scene-light-sweep" aria-hidden="true" />
+      <svg className="scene-data-lines" viewBox="0 0 1440 900" preserveAspectRatio="none" aria-hidden="true"><path d="M0 690 C300 650 400 510 685 520 S1080 690 1440 410" /><path d="M610 0 C610 230 820 290 955 370 S1230 420 1440 225" /><circle cx="685" cy="520" r="3" /><circle cx="955" cy="370" r="3" /><circle cx="1215" cy="535" r="3" /></svg>
+      <div className="scene-depth-nodes" aria-hidden="true"><i /><i /><i /><i /><i /><i /></div>
+      <div className="container rotating-scene-layout">
+        <div className="rotating-scene-copy">
+          <span className="eyebrow"><i />{scene.eyebrow}</span>
+          {index === 0 ? <h1>{scene.title}</h1> : <h2>{scene.title}</h2>}
+          <p>{scene.description}</p>
+          <div className="scene-actions">
+            <motion.div whileHover={reduced ? undefined : { y: -2 }} whileTap={reduced ? undefined : { scale: .985 }}><Link className="button scene-primary-action" to="/contact">Book a Demo<ArrowRight size={17} /></Link></motion.div>
+            <motion.div whileHover={reduced ? undefined : { x: 3 }}><Link className="scene-secondary-action" to="/product">Explore the platform<ArrowRight size={16} /></Link></motion.div>
           </div>
         </div>
+        <motion.div
+          className="rotating-scene-visual"
+          initial={reduced ? false : { opacity: 0, y: 26, scale: .985 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, amount: .22 }}
+          transition={{ duration: .72, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <motion.div
+            className="scene-visual-float"
+            animate={!reduced && active ? {
+              x: [0, compact ? 1.5 : 3, 0],
+              y: [0, compact ? -6 : -11, 0],
+              scale: [1, compact ? 1.004 : 1.009, 1],
+            } : { x: 0, y: 0, scale: 1 }}
+            transition={{ duration: 4.8 + index * .3, repeat: active && !reduced ? Infinity : 0, ease: 'easeInOut' }}
+          >
+            {scene.visual(active)}
+          </motion.div>
+        </motion.div>
+      </div>
+    </article>
+  )
+}
+
+export function CinematicStory() {
+  const compact = useMediaQuery('(max-width: 768px)')
+
+  return (
+    <section className="rotating-hero scrolling-story" aria-label="NourDoc clinical intelligence overview">
+      <style>{HERO_VISUAL_TEXT_STYLES}</style>
+      <div className="rotating-hero-viewport">
+        {storyScenes.map((scene, index) => <StoryScene scene={scene} index={index} compact={compact} key={scene.eyebrow} />)}
       </div>
     </section>
   )

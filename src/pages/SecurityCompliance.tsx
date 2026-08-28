@@ -14,6 +14,7 @@ import { PageHero } from '../components/common/PageHero'
 import { SectionHeader } from '../components/common/SectionHeader'
 import { AnimatedSection } from '../components/ui/AnimatedSection'
 import { securityTopics } from '../data/site'
+import { useHeroVisualScroll } from '../hooks/useHeroVisualScroll'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { createAnimationVisibilityController } from '../utils/animationPerformance'
 
@@ -54,6 +55,7 @@ const additional = [
 
 export default function SecurityCompliance() {
   const heroRef = useRef<HTMLDivElement>(null)
+  useHeroVisualScroll(heroRef)
   const outerRingRef = useRef<HTMLDivElement>(null)
   const middleRingRef = useRef<HTMLDivElement>(null)
   const innerRingRef = useRef<HTMLDivElement>(null)

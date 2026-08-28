@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { ArrowUpRight, Menu, X } from 'lucide-react'
+import { ArrowUpRight, Menu, Play, X } from 'lucide-react'
 import { motion, useReducedMotion } from 'framer-motion'
 import logo from '../../assets/nourdoc-logo.png'
 import { navItems } from '../../data/site'
 import { preloadRoute } from '../../utils/routeLoaders'
+
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.m3hive.medicalai&pli=1'
 
 export function Navbar() {
   const [open, setOpen] = useState(false)
@@ -55,6 +57,11 @@ export function Navbar() {
         <div className="desktop-nav">
           {navItems.map(item => <NavLink key={item.path} to={item.path} onPointerEnter={() => preloadRoute(item.path)} onFocus={() => preloadRoute(item.path)} onTouchStart={() => preloadRoute(item.path)}>{({ isActive }) => <>{item.label}{isActive && <motion.span className="nav-active-indicator" layoutId="nav-active" transition={{ type: 'spring', stiffness: 360, damping: 30 }} />}</>}</NavLink>)}
         </div>
+        <motion.div className="nav-app-cta-wrap" whileHover={reduced ? undefined : { y: -2 }} whileTap={reduced ? undefined : { scale: .98 }}>
+          <a className="nav-app-cta" href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer">
+            <Play size={13} fill="currentColor" aria-hidden="true" />Try NourDoc
+          </a>
+        </motion.div>
         <motion.div className="nav-cta-wrap" whileHover={reduced ? undefined : { y: -2 }} whileTap={reduced ? undefined : { scale: .98 }}><Link to="/contact" className="button button-primary nav-cta" onPointerEnter={() => preloadRoute('/contact')} onFocus={() => preloadRoute('/contact')} onTouchStart={() => preloadRoute('/contact')} onClick={() => setOpen(false)}>Book a Demo<ArrowUpRight size={17} /></Link></motion.div>
         <motion.button whileTap={reduced ? undefined : { scale: .92 }} ref={menuButtonRef} className="menu-button" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="mobile-navigation" aria-label={open ? 'Close menu' : 'Open menu'}>
           {open ? <X /> : <Menu />}
@@ -112,6 +119,15 @@ export function Navbar() {
               <span className="mobile-nav-dot" aria-hidden="true" />
             </NavLink>
           </div>
+          <a
+            href={PLAY_STORE_URL}
+            className="button mobile-nav-app-cta"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setOpen(false)}
+          >
+            <Play size={14} fill="currentColor" aria-hidden="true" />Try NourDoc
+          </a>
           <Link
             to="/contact"
             className="button button-primary mobile-nav-cta"

@@ -13,6 +13,7 @@ import { AnimatedSection } from '../components/ui/AnimatedSection'
 import { WorkflowJourney } from '../components/sections/WorkflowJourney'
 
 import { workflow } from '../data/site'
+import { useHeroVisualScroll } from '../hooks/useHeroVisualScroll'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { createAnimationVisibilityController } from '../utils/animationPerformance'
 
@@ -48,6 +49,7 @@ const comparison = [
 
 export default function WhyNourDoc() {
   const heroWrapRef = useRef<HTMLDivElement>(null)
+  useHeroVisualScroll(heroWrapRef)
   const outerOrbitRef = useRef<HTMLDivElement>(null)
   const middleOrbitRef = useRef<HTMLDivElement>(null)
   const innerOrbitRef = useRef<HTMLDivElement>(null)
@@ -59,15 +61,6 @@ export default function WhyNourDoc() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Very subtle overall hero movement
-      gsap.to('.why-hero-motion', {
-        y: -3,
-        duration: 5,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-      })
-
       // Outer orbit clockwise
       gsap.to(outerOrbitRef.current, {
         rotation: 360,

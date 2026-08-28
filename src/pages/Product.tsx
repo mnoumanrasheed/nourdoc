@@ -21,6 +21,7 @@ import { CTASection } from '../components/common/CTASection'
 import { PageHero } from '../components/common/PageHero'
 import { SectionHeader } from '../components/common/SectionHeader'
 import { AnimatedSection } from '../components/ui/AnimatedSection'
+import { useHeroVisualScroll } from '../hooks/useHeroVisualScroll'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { createAnimationVisibilityController } from '../utils/animationPerformance'
 
@@ -88,6 +89,7 @@ const speakerRows = [
 
 export default function Product() {
   const heroRef = useRef<HTMLDivElement>(null)
+  useHeroVisualScroll(heroRef)
 
   usePageMeta(
     'Product',

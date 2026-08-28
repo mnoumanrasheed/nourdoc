@@ -15,6 +15,7 @@ import ReCAPTCHA from 'react-google-recaptcha'
 import { PageHero } from '../components/common/PageHero'
 import { SectionHeader } from '../components/common/SectionHeader'
 import { AnimatedSection } from '../components/ui/AnimatedSection'
+import { useHeroVisualScroll } from '../hooks/useHeroVisualScroll'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { createAnimationVisibilityController } from '../utils/animationPerformance'
 
@@ -68,6 +69,7 @@ export default function Contact() {
   const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY
 
   const heroRef = useRef<HTMLDivElement>(null)
+  useHeroVisualScroll(heroRef)
   const outerRingRef = useRef<HTMLDivElement>(null)
   const innerRingRef = useRef<HTMLDivElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
