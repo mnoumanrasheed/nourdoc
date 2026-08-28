@@ -73,7 +73,7 @@ function AmbientVisual({ active }: VisualProps) {
 
   useLayoutEffect(() => {
     const root = rootRef.current
-    if (!root || reduced) return
+    if (!root) return
     const timeline = gsap.timeline({ paused: !active })
     const context = gsap.context(() => {
       const connectors = gsap.utils.toArray<HTMLElement>('.ambient-connector', root)
@@ -113,7 +113,7 @@ function AmbientVisual({ active }: VisualProps) {
   }, [reduced])
 
   useLayoutEffect(() => {
-    if (!reduced && timelineRef.current) {
+    if (timelineRef.current) {
       setTimelineState(timelineRef.current, active)
     }
   }, [active, reduced])
@@ -166,7 +166,7 @@ function ContextVisual({ active }: VisualProps) {
 
   useLayoutEffect(() => {
     const root = rootRef.current
-    if (!root || reduced) return
+    if (!root) return
 
     const timeline = gsap.timeline({ paused: !active })
     const context = gsap.context(() => {
@@ -207,7 +207,7 @@ function ContextVisual({ active }: VisualProps) {
   }, [reduced])
 
   useLayoutEffect(() => {
-    if (!reduced && timelineRef.current) {
+    if (timelineRef.current) {
       setTimelineState(timelineRef.current, active)
     }
   }, [active, reduced])
@@ -249,7 +249,7 @@ function ImpactVisual({ active }: VisualProps) {
 
   useLayoutEffect(() => {
     const root = rootRef.current
-    if (!root || reduced) return
+    if (!root) return
 
     const timeline = gsap.timeline({ paused: !active })
     const context = gsap.context(() => {
@@ -354,7 +354,7 @@ function ImpactVisual({ active }: VisualProps) {
   }, [reduced])
 
   useLayoutEffect(() => {
-    if (!reduced && timelineRef.current) {
+    if (timelineRef.current) {
       setTimelineState(timelineRef.current, active)
     }
   }, [active, reduced])
@@ -549,7 +549,7 @@ function SecurityVisual({ active }: VisualProps) {
 
   useLayoutEffect(() => {
     const root = rootRef.current
-    if (!root || reduced) return
+    if (!root) return
 
     const timeline = gsap.timeline({ paused: !active })
     const context = gsap.context(() => {
@@ -618,7 +618,7 @@ function SecurityVisual({ active }: VisualProps) {
   }, [reduced])
 
   useLayoutEffect(() => {
-    if (!reduced && timelineRef.current) {
+    if (timelineRef.current) {
       setTimelineState(timelineRef.current, active)
     }
   }, [active, reduced])
@@ -774,7 +774,7 @@ function StoryScene({ scene, index, compact, layered, active, registerScene }: S
   const reducedMotionPref = useReducedMotion()
   const reduced = reducedMotionPref === true
   const inView = useInView(sceneRef, { amount: .12, margin: '-5% 0px -5% 0px' })
-  const visualActive = compact ? inView : active
+  const visualActive = layered ? active : inView
   const floatConfig = visualFloatConfigs[index]
   const setSceneRef = useCallback((node: HTMLElement | null) => {
     sceneRef.current = node
@@ -783,7 +783,7 @@ function StoryScene({ scene, index, compact, layered, active, registerScene }: S
 
   useLayoutEffect(() => {
     const float = floatRef.current
-    if (!float || reduced) return
+    if (!float) return
     const x = compact ? Math.min(floatConfig.x, 1.5) : floatConfig.x
     const y = compact ? Math.max(floatConfig.y, -5) : floatConfig.y
     const scale = compact ? Math.min(floatConfig.scale, 1.004) : floatConfig.scale
@@ -805,7 +805,7 @@ function StoryScene({ scene, index, compact, layered, active, registerScene }: S
       float.style.willChange = 'auto'
       context.revert()
     }
-  }, [compact, floatConfig, reduced])
+  }, [compact, floatConfig])
 
   return (
     <article
@@ -872,15 +872,13 @@ function StoryScene({ scene, index, compact, layered, active, registerScene }: S
 
 export function CinematicStory() {
   const compact = useMediaQuery('(max-width: 768px)')
-  const reducedMotionPref = useReducedMotion()
   const storyRef = useRef<HTMLElement>(null)
   const sceneRefs = useRef<Array<HTMLElement | null>>([])
   const [activeIndex, setActiveIndex] = useState(0)
   const activeSceneRef = useRef(0)
-  const reduced = reducedMotionPref === true
-  // Layered scroll is a layout/navigation behavior on desktop.
-  // Reduced motion only disables decorative/internal motion; it must not collapse the hero into vertical static sections.
-  const layered = !compact
+  // The four-scene stack is the Home hero architecture on every viewport.
+  // `compact` only tunes layout/scrub performance; it never disables layering.
+  const layered = true
 
   const registerScene = useCallback((index: number, node: HTMLElement | null) => {
     sceneRefs.current[index] = node
@@ -951,15 +949,16 @@ export function CinematicStory() {
           trigger: story,
           start: 'top top',
           end: 'bottom bottom',
-          scrub: 0.35,
+          scrub: compact ? 0.18 : 0.35,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
-            // Midpoint thresholds keep the visually dominant card active.
-            if (self.progress >= 5 / 6) {
+            // Start the incoming scene's internal animation as soon as that layer enters.
+            // This prevents a half-transition where the visible incoming card looks frozen.
+            if (self.progress >= 2 / 3) {
               setActiveScene(3)
-            } else if (self.progress >= 1 / 2) {
+            } else if (self.progress >= 1 / 3) {
               setActiveScene(2)
-            } else if (self.progress >= 1 / 6) {
+            } else if (self.progress > 0.012) {
               setActiveScene(1)
             } else {
               setActiveScene(0)
@@ -984,7 +983,7 @@ export function CinematicStory() {
       if (refreshFrame) window.cancelAnimationFrame(refreshFrame)
       context.revert()
     }
-  }, [layered])
+  }, [layered, compact])
 
   return (
     <section
