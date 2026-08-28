@@ -1,10 +1,11 @@
-import { useLayoutEffect, useRef, type ReactNode, type Ref } from 'react'
+import { useCallback, useLayoutEffect, useRef, useState, type ReactNode, type Ref } from 'react'
 import { Link } from 'react-router-dom'
-import { motion, useInView, useReducedMotion } from 'framer-motion'
+import { motion, useInView, useReducedMotion, type Variants } from 'framer-motion'
 import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import {
-  Activity, ArrowRight, Check, CircleGauge, FileText, HeartPulse, LockKeyhole,
-  Mic2, Network, ShieldCheck, Sparkles, Stethoscope, Workflow,
+  Activity, ArrowRight, ArrowUpRight, Check, CircleGauge, FileText, HeartPulse, LockKeyhole,
+  Mic2, Network, Play, ShieldCheck, Sparkles, Stethoscope, Workflow,
 } from 'lucide-react'
 import {
   healthcareImpactImage as impactImage,
@@ -13,9 +14,13 @@ import {
   whyNourDocImage as naturalCareImage,
   type ResponsiveImageAsset,
 } from '../../data/responsiveImages'
+import { PLAY_STORE_URL } from '../../data/site'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { signalCriticalHeroReady } from '../../utils/criticalAssets'
+import { motionEase } from '../../utils/motion'
 import { ResponsivePicture } from '../common/ResponsivePicture'
+
+gsap.registerPlugin(ScrollTrigger)
 
 const HERO_VISUAL_TEXT_STYLES = `
 .rotating-scene-visual .scene-shell-bar { font-size: 12.5px !important; }
@@ -281,33 +286,11 @@ function AmbientVisual({ active }: VisualProps) {
         })
       })
 
-      const particles = gsap.utils.toArray<HTMLElement>('.ambient-data-particles i', root)
-      particles.forEach((particle, index) => {
-        timeline.add(gsap.fromTo(particle,
-          { x: index % 2 ? -5 : 5, y: 10, opacity: .08, scale: .7 },
-          { x: index % 2 ? 12 : -10, y: -28, opacity: .72, scale: 1.25, duration: 3.4 + index * .28, delay: index * .68, repeat: -1, yoyo: true, ease: 'sine.inOut' },
-        ), 0)
-      })
-
-      const scan = root.querySelector('.ambient-core-scan')
-      if (scan) timeline.add(gsap.fromTo(scan,
-        { xPercent: -135, opacity: 0 },
-        { xPercent: 135, opacity: .88, duration: 2.25, repeat: -1, repeatDelay: .55, ease: 'power1.inOut' },
-      ), 0)
-
       gsap.utils.toArray<HTMLElement>('.scene-waveform i', root).forEach((bar, index) => {
         timeline.add(gsap.fromTo(bar,
           { scaleY: .22 + index % 3 * .08 },
           { scaleY: 1.18 + index % 4 * .12, duration: .46 + index % 5 * .06, delay: index * .025, repeat: -1, yoyo: true, ease: 'sine.inOut' },
         ), 0)
-      })
-
-      gsap.utils.toArray<HTMLElement>('.scene-shell-bar>i b, .ambient-status-dot, .ambient-core>small b', root).forEach((indicator, index) => {
-        timeline.add(gsap.to(indicator, { scale: 1.5, opacity: 1, duration: .82, delay: index * .3, repeat: -1, yoyo: true, ease: 'sine.inOut' }), 0)
-      })
-
-      gsap.utils.toArray<HTMLElement>('.ambient-stage', root).forEach((stage, index) => {
-        timeline.add(gsap.to(stage, { y: index % 2 ? 6 : -6, duration: 3.8 + index * .35, delay: index * .22, repeat: -1, yoyo: true, ease: 'sine.inOut' }), 0)
       })
     }, root)
 
@@ -323,10 +306,9 @@ function AmbientVisual({ active }: VisualProps) {
   return (
     <div className="ambient-float-wrap">
       <VisualShell rootRef={rootRef} label="Ambient encounter" icon={<Stethoscope size={14} />} className="ambient-visual" livePulse active={active} reduced={reduced}>
-        <div className="ambient-data-particles" aria-hidden="true"><i /><i /><i /><i /><i /><i /></div>
         <div className="ambient-pipeline">
           <div className="ambient-stage ambient-stage-conversation">
-            <motion.div className="ambient-dialogue scene-glass-card" animate={!reduced && active ? { y: [0, -4, 0] } : { y: 0 }} whileHover={reduced ? undefined : { y: -5, transition: { duration: .28, repeat: 0 } }} transition={{ duration: 5.8, repeat: active ? Infinity : 0, ease: 'easeInOut' }}>
+            <motion.div className="ambient-dialogue scene-glass-card" whileHover={reduced ? undefined : { y: -3 }} transition={{ duration: .28 }}>
               <header><span>01</span><b>Conversation</b><Mic2 size={14} /></header>
               <div><i>DR</i><p><b>Doctor</b>How have you been feeling since your last visit?</p></div>
               <div><i>PT</i><p><b>Patient</b>The discomfort started three days ago.</p></div>
@@ -335,8 +317,7 @@ function AmbientVisual({ active }: VisualProps) {
           </div>
           <div className="ambient-connector ambient-connector-a" aria-hidden="true"><i /><i /></div>
           <div className="ambient-stage ambient-stage-ai">
-            <motion.div className="ambient-core scene-glass-card" animate={!reduced && active ? { y: [0, 3, 0] } : { y: 0 }} transition={{ duration: 6.2, repeat: active ? Infinity : 0, ease: 'easeInOut', delay: .7 }}>
-              <i className="ambient-core-scan" aria-hidden="true" />
+            <motion.div className="ambient-core scene-glass-card">
               <span><Sparkles size={13} /> AI understanding</span>
               <div className="scene-waveform" aria-hidden="true">{waveform.map((height, index) => <i key={`${height}-${index}`} style={{ height }} />)}</div>
               <small>Speakers separated <b /> Medical context</small>
@@ -344,7 +325,7 @@ function AmbientVisual({ active }: VisualProps) {
           </div>
           <div className="ambient-connector ambient-connector-b" aria-hidden="true"><i /><i /></div>
           <div className="ambient-stage ambient-stage-note">
-            <motion.div className="ambient-note scene-glass-card" animate={!reduced && active ? { y: [0, -3.5, 0] } : { y: 0 }} whileHover={reduced ? undefined : { y: -5, transition: { duration: .28, repeat: 0 } }} transition={{ duration: 6, repeat: active ? Infinity : 0, ease: 'easeInOut', delay: 1.1 }}>
+            <motion.div className="ambient-note scene-glass-card" whileHover={reduced ? undefined : { y: -3 }} transition={{ duration: .28 }}>
               <header><span>02</span><b>SOAP note</b><FileText size={14} /></header>
               {['Subjective', 'Objective', 'Assessment', 'Plan'].map((item, index) => <motion.div className="ambient-note-row" key={item} initial={reduced ? false : { opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.15 + index * .14, duration: .45 }}><i>{item[0]}</i><p><b>{item}</b><small>{index === 0 ? 'Symptoms began three days ago...' : 'Structured for clinician review...'}</small></p></motion.div>)}
               <small className="ambient-review"><Check size={11} /> Clinician review required</small>
@@ -380,7 +361,7 @@ function ContextVisual({ active }: VisualProps) {
         if (packets[index]) timeline.add(pathTraveller(path, packets[index], 2.25 + index * .22, index * .24), 0)
       })
       timeline.add(gsap.to(root.querySelector('.context-core'), { scale: 1.04, duration: 1.55, repeat: -1, yoyo: true, ease: 'sine.inOut' }), 0)
-      gsap.utils.toArray<HTMLElement>('.context-card-float', root).forEach((card, index) => {
+      gsap.utils.toArray<HTMLElement>('.context-card-drift', root).forEach((card, index) => {
         timeline.add(gsap.to(card, { y: index % 2 ? 6 : -6, duration: 3.5 + index * .3, delay: index * .28, repeat: -1, yoyo: true, ease: 'sine.inOut' }), 0)
       })
     }, root)
@@ -398,7 +379,7 @@ function ContextVisual({ active }: VisualProps) {
       <svg className="context-connections" viewBox="0 0 600 430" aria-hidden="true"><path className="context-flow-path" d="M110 105 C235 105 205 215 300 215" /><path className="context-flow-path" d="M490 105 C365 105 395 215 300 215" /><path className="context-flow-path" d="M110 325 C235 325 205 215 300 215" /><path className="context-flow-path" d="M490 325 C365 325 395 215 300 215" /><circle className="context-packet" r="4" /><circle className="context-packet" r="4" /><circle className="context-packet" r="4" /><circle className="context-packet" r="4" /></svg>
       <div className="context-core"><Sparkles size={18} /><span>Clinical AI</span><i /></div>
       <div className="context-card-grid">
-        {cards.map(([title, text, Icon], index) => <div className="context-card-float" key={title}><motion.div className="context-card scene-glass-card" whileHover={reduced ? undefined : { y: -3 }} transition={{ type: 'spring', stiffness: 210, damping: 20 }}><span>0{index + 1}</span><Icon size={17} /><b>{title}</b><p>{text}</p></motion.div></div>)}
+        {cards.map(([title, text, Icon], index) => <div className={`context-card-float${index === 0 || index === 3 ? ' context-card-drift' : ''}`} key={title}><motion.div className="context-card scene-glass-card" whileHover={reduced ? undefined : { y: -3 }} transition={{ type: 'spring', stiffness: 210, damping: 20 }}><span>0{index + 1}</span><Icon size={17} /><b>{title}</b><p>{text}</p></motion.div></div>)}
       </div>
     </VisualShell>
   )
@@ -499,28 +480,6 @@ function ImpactVisual({ active }: VisualProps) {
         )
       }
 
-      gsap.utils.toArray<HTMLElement>('.impact-status-dot', root).forEach((indicator, index) => {
-        timeline.to(indicator, {
-          scale: 1.55,
-          opacity: 1,
-          duration: .8,
-          delay: index * .28,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-        }, 0)
-      })
-
-      gsap.utils.toArray<HTMLElement>('.impact-kpi-card', root).forEach((card, index) => {
-        timeline.to(card, {
-          y: index % 2 ? 4.5 : -4.5,
-          duration: 3 + index * .25,
-          delay: index * .2,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-        }, 0)
-      })
     }, root)
 
     timelineRef.current = timeline
@@ -763,18 +722,6 @@ function SecurityVisual({ active }: VisualProps) {
         }
       })
 
-      gsap.utils.toArray<HTMLElement>('.secure-record>p i', root).forEach((indicator, index) => {
-        timeline.to(indicator, {
-          scale: 1.75,
-          opacity: 1,
-          duration: .72,
-          delay: index * .28,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-        }, 0)
-      })
-
       const scan = root.querySelector<HTMLElement>('.secure-record-scan')
       if (scan) {
         timeline.fromTo(scan,
@@ -791,36 +738,6 @@ function SecurityVisual({ active }: VisualProps) {
         )
       }
 
-      const pulse = root.querySelector<HTMLElement>('.security-pulse')
-      if (pulse) {
-        timeline.to(pulse, {
-          scale: 1.04,
-          opacity: .9,
-          duration: 1.25,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-        }, 0)
-      }
-
-      gsap.utils.toArray<HTMLElement>('.security-node', root).forEach((node, index) => {
-        timeline.to(node, {
-          y: index % 2 ? 6 : -6,
-          duration: 2.7 + index * .18,
-          delay: index * .14,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-        }, 0)
-      })
-
-      timeline.to('.secure-record', {
-        y: -5,
-        duration: 2.1,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-      }, 0)
 
     }, root)
 
@@ -957,13 +874,77 @@ const storyScenes: StorySceneDefinition[] = [
   { eyebrow: 'Security & Compliance', title: 'Clinical intelligence built for trusted healthcare.', description: 'Patient information requires strong privacy, access-control and governance practices. NourDoc positions security and privacy as foundational requirements.', image: securityImage, position: '48% center', visual: (active) => <SecurityVisual active={active} /> },
 ]
 
-function StoryScene({ scene, index, compact }: { scene: StorySceneDefinition; index: number; compact: boolean }) {
+const copyVariants: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: .08, delayChildren: .06 } },
+}
+
+const copyItemVariants: Variants = {
+  hidden: { opacity: 0, y: 22 },
+  visible: { opacity: 1, y: 0, transition: { duration: .76, ease: motionEase } },
+}
+
+const visualFloatConfigs = [
+  { x: 0, y: -8, scale: 1.008, duration: 5.2 },
+  { x: 3, y: -7, scale: 1.008, duration: 6.1 },
+  { x: 1.5, y: -6, scale: 1.01, duration: 4.8 },
+  { x: 2, y: -9, scale: 1.008, duration: 6.6 },
+] as const
+
+type StorySceneProps = {
+  scene: StorySceneDefinition
+  index: number
+  compact: boolean
+  layered: boolean
+  active: boolean
+  registerScene: (index: number, node: HTMLElement | null) => void
+}
+
+function StoryScene({ scene, index, compact, layered, active, registerScene }: StorySceneProps) {
   const sceneRef = useRef<HTMLElement>(null)
+  const floatRef = useRef<HTMLDivElement>(null)
   const reduced = useReducedMotion()
-  const active = useInView(sceneRef, { amount: .08, margin: '-4% 0px -4% 0px' })
+  const inView = useInView(sceneRef, { amount: .12, margin: '-5% 0px -5% 0px' })
+  const visualActive = compact ? inView : active
+  const floatConfig = visualFloatConfigs[index]
+  const setSceneRef = useCallback((node: HTMLElement | null) => {
+    sceneRef.current = node
+    registerScene(index, node)
+  }, [index, registerScene])
+
+  useLayoutEffect(() => {
+    const float = floatRef.current
+    if (!float || reduced) return
+    const x = compact ? Math.min(floatConfig.x, 1.5) : floatConfig.x
+    const y = compact ? Math.max(floatConfig.y, -5) : floatConfig.y
+    const scale = compact ? Math.min(floatConfig.scale, 1.004) : floatConfig.scale
+    const context = gsap.context(() => {
+      gsap.to(float, {
+        x,
+        y,
+        scale,
+        duration: floatConfig.duration,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        force3D: true,
+      })
+      float.style.willChange = 'transform'
+    }, float)
+
+    return () => {
+      float.style.willChange = 'auto'
+      context.revert()
+    }
+  }, [compact, floatConfig, reduced])
 
   return (
-    <article ref={sceneRef} className={`rotating-scene scrolling-story-scene rotating-scene-${index + 1}`}>
+    <article
+      ref={setSceneRef}
+      className={`rotating-scene scrolling-story-scene hero-scene rotating-scene-${index + 1}`}
+      aria-hidden={layered && !active ? true : undefined}
+      inert={layered && !active ? true : undefined}
+    >
       <div className="rotating-scene-bg" aria-hidden="true">
         <ResponsivePicture
           asset={scene.image}
@@ -984,34 +965,37 @@ function StoryScene({ scene, index, compact }: { scene: StorySceneDefinition; in
       <svg className="scene-data-lines" viewBox="0 0 1440 900" preserveAspectRatio="none" aria-hidden="true"><path d="M0 690 C300 650 400 510 685 520 S1080 690 1440 410" /><path d="M610 0 C610 230 820 290 955 370 S1230 420 1440 225" /><circle cx="685" cy="520" r="3" /><circle cx="955" cy="370" r="3" /><circle cx="1215" cy="535" r="3" /></svg>
       <div className="scene-depth-nodes" aria-hidden="true"><i /><i /><i /><i /><i /><i /></div>
       <div className="container rotating-scene-layout">
-        <div className="rotating-scene-copy">
-          <span className="eyebrow"><i />{scene.eyebrow}</span>
-          {index === 0 ? <h1>{scene.title}</h1> : <h2>{scene.title}</h2>}
-          <p>{scene.description}</p>
-          <div className="scene-actions">
+        <motion.div className="rotating-scene-copy" initial={!layered && !reduced ? 'hidden' : false} whileInView={!layered && !reduced ? 'visible' : undefined} viewport={{ once: true, amount: .3 }} variants={copyVariants}>
+          <motion.span className="eyebrow" variants={copyItemVariants}><i />{scene.eyebrow}</motion.span>
+          {index === 0 ? <motion.h1 variants={copyItemVariants}>{scene.title}</motion.h1> : <motion.h2 variants={copyItemVariants}>{scene.title}</motion.h2>}
+          <motion.p variants={copyItemVariants}>{scene.description}</motion.p>
+          <motion.div className="scene-actions" variants={copyItemVariants}>
             <motion.div whileHover={reduced ? undefined : { y: -2 }} whileTap={reduced ? undefined : { scale: .985 }}><Link className="button scene-primary-action" to="/contact">Book a Demo<ArrowRight size={17} /></Link></motion.div>
             <motion.div whileHover={reduced ? undefined : { x: 3 }}><Link className="scene-secondary-action" to="/product">Explore the platform<ArrowRight size={16} /></Link></motion.div>
+          </motion.div>
+          {index === 0 && (
+            <motion.a
+              className="hero-app-access"
+              href={PLAY_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              variants={copyItemVariants}
+              aria-label="Try the NourDoc app on Google Play"
+            >
+              <span className="hero-app-access-icon"><Play size={14} fill="currentColor" aria-hidden="true" /></span>
+              <span className="hero-app-access-copy">
+                <strong>NourDoc App</strong>
+                <small>Trial available on Google Play</small>
+              </span>
+              <ArrowUpRight className="hero-app-access-arrow" size={15} aria-hidden="true" />
+            </motion.a>
+          )}
+        </motion.div>
+        <div className="rotating-scene-visual hero-visual-scroll">
+          <div ref={floatRef} className="hero-visual-float">
+            <div className="hero-visual-content">{scene.visual(visualActive)}</div>
           </div>
         </div>
-        <motion.div
-          className="rotating-scene-visual"
-          initial={reduced ? false : { opacity: 0, y: 26, scale: .985 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true, amount: .22 }}
-          transition={{ duration: .72, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <motion.div
-            className="scene-visual-float"
-            animate={!reduced && active ? {
-              x: [0, compact ? 1.5 : 3, 0],
-              y: [0, compact ? -6 : -11, 0],
-              scale: [1, compact ? 1.004 : 1.009, 1],
-            } : { x: 0, y: 0, scale: 1 }}
-            transition={{ duration: 4.8 + index * .3, repeat: active && !reduced ? Infinity : 0, ease: 'easeInOut' }}
-          >
-            {scene.visual(active)}
-          </motion.div>
-        </motion.div>
       </div>
     </article>
   )
@@ -1019,12 +1003,99 @@ function StoryScene({ scene, index, compact }: { scene: StorySceneDefinition; in
 
 export function CinematicStory() {
   const compact = useMediaQuery('(max-width: 768px)')
+  const reduced = useReducedMotion()
+  const storyRef = useRef<HTMLElement>(null)
+  const sceneRefs = useRef<Array<HTMLElement | null>>([])
+  const [activeIndex, setActiveIndex] = useState(0)
+  const layered = !compact && !reduced
+
+  const registerScene = useCallback((index: number, node: HTMLElement | null) => {
+    sceneRefs.current[index] = node
+  }, [])
+
+  useLayoutEffect(() => {
+    const story = storyRef.current
+    const scenes = sceneRefs.current.filter((scene): scene is HTMLElement => Boolean(scene))
+    if (!story || !layered || scenes.length !== storyScenes.length) return
+
+    let dominantScene = 0
+    const context = gsap.context(() => {
+      gsap.set(scenes, {
+        autoAlpha: 0,
+        yPercent: 10,
+        scale: .985,
+        pointerEvents: 'none',
+        transformOrigin: '50% 50%',
+      })
+      gsap.set(scenes[0], { autoAlpha: 1, yPercent: 0, scale: 1, pointerEvents: 'auto' })
+      scenes.forEach((scene, index) => gsap.set(scene, { zIndex: index + 1 }))
+
+      const timeline = gsap.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: {
+          trigger: story,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: .65,
+          invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            const nextScene = self.progress < .2 ? 0 : self.progress < .5 ? 1 : self.progress < .8 ? 2 : 3
+            if (nextScene === dominantScene) return
+            dominantScene = nextScene
+            setActiveIndex(nextScene)
+            scenes.forEach((scene, index) => { scene.style.pointerEvents = index === nextScene ? 'auto' : 'none' })
+          },
+        },
+      })
+
+      timeline.to(scenes[0], { autoAlpha: 1, yPercent: 0, scale: 1, duration: .18 })
+      for (let index = 1; index < scenes.length; index += 1) {
+        const label = `scene-${index + 1}`
+        const visual = scenes[index].querySelector<HTMLElement>('.hero-visual-scroll')
+        const outgoingForeground = scenes[index - 1].querySelectorAll<HTMLElement>('.rotating-scene-copy, .hero-visual-scroll')
+        timeline
+          .addLabel(label)
+          .to(scenes[index - 1], { autoAlpha: .64, scale: .98, duration: 1 }, label)
+          .to(outgoingForeground, { opacity: 0, duration: .42 }, label)
+          .fromTo(
+            scenes[index],
+            { autoAlpha: 0, yPercent: 10, scale: .985 },
+            { autoAlpha: 1, yPercent: 0, scale: 1, duration: 1 },
+            label,
+          )
+        if (index > 1) {
+          timeline.to(scenes[index - 2], { autoAlpha: 0, duration: .35 }, label)
+        }
+        if (visual) {
+          timeline.fromTo(
+            visual,
+            { yPercent: index % 2 ? -4 : 4 },
+            { yPercent: index % 2 ? 3 : -3, duration: 1 },
+            label,
+          )
+        }
+      }
+      timeline.to(scenes[scenes.length - 1], { autoAlpha: 1, yPercent: 0, scale: 1, duration: .18 })
+    }, story)
+
+    return () => context.revert()
+  }, [layered])
 
   return (
-    <section className="rotating-hero scrolling-story" aria-label="NourDoc clinical intelligence overview">
+    <section ref={storyRef} className={`rotating-hero scrolling-story hero-story${reduced ? ' scrolling-story-static' : ''}`} aria-label="NourDoc clinical intelligence overview">
       <style>{HERO_VISUAL_TEXT_STYLES}</style>
-      <div className="rotating-hero-viewport">
-        {storyScenes.map((scene, index) => <StoryScene scene={scene} index={index} compact={compact} key={scene.eyebrow} />)}
+      <div className="rotating-hero-viewport hero-stage">
+        {storyScenes.map((scene, index) => (
+          <StoryScene
+            scene={scene}
+            index={index}
+            compact={compact}
+            layered={layered}
+            active={activeIndex === index}
+            registerScene={registerScene}
+            key={scene.eyebrow}
+          />
+        ))}
       </div>
     </section>
   )

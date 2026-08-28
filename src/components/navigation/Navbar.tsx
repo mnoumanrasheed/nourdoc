@@ -3,10 +3,8 @@ import { Link, NavLink } from 'react-router-dom'
 import { ArrowUpRight, Menu, Play, X } from 'lucide-react'
 import { motion, useReducedMotion } from 'framer-motion'
 import logo from '../../assets/nourdoc-logo.png'
-import { navItems } from '../../data/site'
+import { navItems, PLAY_STORE_URL } from '../../data/site'
 import { preloadRoute } from '../../utils/routeLoaders'
-
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.m3hive.medicalai&pli=1'
 
 export function Navbar() {
   const [open, setOpen] = useState(false)

@@ -5,6 +5,8 @@ import {
   Stethoscope, Users, Waypoints,
 } from 'lucide-react'
 
+export const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.m3hive.medicalai&pli=1'
+
 export const navItems = [
   { label: 'Why NourDoc', path: '/why-nourdoc' },
   { label: 'Product', path: '/product' },

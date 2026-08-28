@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import {
   Activity,
+  ArrowUpRight,
   AudioLines,
   ClipboardCheck,
   Copy,
@@ -26,6 +27,7 @@ import { usePageMeta } from '../hooks/usePageMeta'
 import { createAnimationVisibilityController } from '../utils/animationPerformance'
 
 import { productWorkflowImage as heroImage } from '../data/responsiveImages'
+import { PLAY_STORE_URL } from '../data/site'
 
 const productSteps = [
   {
@@ -698,6 +700,25 @@ export default function Product() {
             </AnimatedSection>
           ))}
         </div>
+
+        <AnimatedSection className="product-app-trial" variant="section">
+          <span className="product-app-trial-icon" aria-hidden="true">
+            <Play size={19} fill="currentColor" />
+          </span>
+          <div className="product-app-trial-copy">
+            <strong>Experience NourDoc</strong>
+            <p>See the platform in action with the trial version available on Google Play.</p>
+          </div>
+          <a
+            className="button product-app-trial-link"
+            href={PLAY_STORE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Try NourDoc
+            <ArrowUpRight size={16} aria-hidden="true" />
+          </a>
+        </AnimatedSection>
       </section>
 
       {/* RECORDING CONTROLS */}

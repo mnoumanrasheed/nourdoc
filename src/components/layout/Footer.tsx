@@ -1,6 +1,7 @@
 import { ArrowUpRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import logo from '../../assets/nourdoc-logo.png'
+import { PLAY_STORE_URL } from '../../data/site'
 
 export function Footer() {
   return (
@@ -29,6 +30,9 @@ export function Footer() {
           <Link to="/product">Platform</Link>
           <Link to="/why-nourdoc">Why NourDoc</Link>
           <Link to="/healthcare-impact">Healthcare Impact</Link>
+          <a className="footer-app-link" href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer">
+            NourDoc on Google Play
+          </a>
         </div>
 
         <div>

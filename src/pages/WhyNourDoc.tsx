@@ -3,7 +3,10 @@ import { ArrowRight, Check, Minus } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import gsap from 'gsap'
 
-import { pakistaniConsultationImage as localImage, whyNourDocImage as heroImage } from '../data/responsiveImages'
+import {
+  pakistaniConsultationImage as localImage,
+  whyNourDocImage as heroImage,
+} from '../data/responsiveImages'
 
 import { CTASection } from '../components/common/CTASection'
 import { PageHero } from '../components/common/PageHero'
@@ -13,9 +16,7 @@ import { AnimatedSection } from '../components/ui/AnimatedSection'
 import { WorkflowJourney } from '../components/sections/WorkflowJourney'
 
 import { workflow } from '../data/site'
-import { useHeroVisualScroll } from '../hooks/useHeroVisualScroll'
 import { usePageMeta } from '../hooks/usePageMeta'
-import { createAnimationVisibilityController } from '../utils/animationPerformance'
 
 const comparison = [
   ['Speed', 'Separate documentation step', 'Conversation-to-draft workflow'],
@@ -47,12 +48,32 @@ const comparison = [
   ],
 ]
 
+const impactCards = [
+  {
+    number: '01',
+    label: 'Less Typing',
+    className: 'impact-card-tl',
+  },
+  {
+    number: '02',
+    label: 'Patient Focus',
+    className: 'impact-card-tr',
+  },
+  {
+    number: '03',
+    label: 'Structured Draft',
+    className: 'impact-card-br',
+  },
+  {
+    number: '04',
+    label: 'Clinician Control',
+    className: 'impact-card-bl',
+  },
+]
+
 export default function WhyNourDoc() {
   const heroWrapRef = useRef<HTMLDivElement>(null)
-  useHeroVisualScroll(heroWrapRef)
-  const outerOrbitRef = useRef<HTMLDivElement>(null)
-  const middleOrbitRef = useRef<HTMLDivElement>(null)
-  const innerOrbitRef = useRef<HTMLDivElement>(null)
+  const visualShellRef = useRef<HTMLDivElement>(null)
 
   usePageMeta(
     'Why NourDoc',
@@ -60,183 +81,40 @@ export default function WhyNourDoc() {
   )
 
   useEffect(() => {
+    const hero = heroWrapRef.current
+    const shell = visualShellRef.current
+
+    if (!hero || !shell) return
+
     const ctx = gsap.context(() => {
-      // Outer orbit clockwise
-      gsap.to(outerOrbitRef.current, {
-        rotation: 360,
-        duration: 19,
-        repeat: -1,
-        ease: 'none',
-        transformOrigin: '50% 50%',
-      })
-
-      // Middle orbit counter-clockwise
-      gsap.to(middleOrbitRef.current, {
-        rotation: -360,
-        duration: 14,
-        repeat: -1,
-        ease: 'none',
-        transformOrigin: '50% 50%',
-      })
-
-      // Inner orbit faster
-      gsap.to(innerOrbitRef.current, {
-        rotation: 360,
-        duration: 10,
-        repeat: -1,
-        ease: 'none',
-        transformOrigin: '50% 50%',
-      })
-
-      // Bright orbit nodes
-      gsap.to('.why-orbit-node', {
-        scale: 2,
-        opacity: 1,
-        duration: 1,
-        stagger: {
-          each: 0.2,
-          repeat: -1,
-          yoyo: true,
-        },
-        ease: 'sine.inOut',
-      })
-
-      // Center breathing effect
-      gsap.to('.why-orbit-core', {
-        scale: 1.6,
-        opacity: 1,
-        duration: 1.35,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-      })
-
-      // Radar pulse 1
       gsap.fromTo(
-        '.why-radar-pulse-one',
+        shell,
         {
-          scale: 0.45,
-          opacity: 0.85,
-        },
-        {
-          scale: 1.85,
           opacity: 0,
-          duration: 2.5,
-          repeat: -1,
-          ease: 'power1.out',
-        },
-      )
-
-      // Radar pulse 2
-      gsap.fromTo(
-        '.why-radar-pulse-two',
-        {
-          scale: 0.45,
-          opacity: 0.7,
+          y: 24,
+          scale: 0.97,
         },
         {
-          scale: 2.1,
-          opacity: 0,
-          duration: 2.5,
-          delay: 1.2,
-          repeat: -1,
-          ease: 'power1.out',
-        },
-      )
-
-      // Continuous scanner
-      gsap.fromTo(
-        '.why-scan-beam',
-        {
-          rotation: 0,
-        },
-        {
-          rotation: 360,
-          duration: 5,
-          repeat: -1,
-          ease: 'none',
-          transformOrigin: '0% 100%',
-        },
-      )
-
-      // Travelling particles
-      gsap.fromTo(
-        '.why-data-particle-one',
-        {
-          x: 0,
-          y: 0,
-          opacity: 0,
-          scale: 0.5,
-        },
-        {
-          x: -185,
-          y: -115,
           opacity: 1,
-          scale: 1.6,
-          duration: 3.7,
-          repeat: -1,
-          repeatDelay: 0.35,
-          ease: 'power1.inOut',
-        },
-      )
-
-      gsap.fromTo(
-        '.why-data-particle-two',
-        {
-          x: 0,
           y: 0,
-          opacity: 0,
-          scale: 0.5,
-        },
-        {
-          x: 165,
-          y: -125,
-          opacity: 1,
-          scale: 1.5,
-          duration: 4.3,
-          delay: 0.65,
-          repeat: -1,
-          repeatDelay: 0.3,
-          ease: 'power1.inOut',
+          scale: 1,
+          duration: 1,
+          delay: 0.15,
+          ease: 'power3.out',
         },
       )
+    }, hero)
 
-      gsap.fromTo(
-        '.why-data-particle-three',
-        {
-          x: 0,
-          y: 0,
-          opacity: 0,
-          scale: 0.5,
-        },
-        {
-          x: -130,
-          y: 110,
-          opacity: 1,
-          scale: 1.4,
-          duration: 4.8,
-          delay: 1.1,
-          repeat: -1,
-          repeatDelay: 0.25,
-          ease: 'power1.inOut',
-        },
-      )
-    }, heroWrapRef)
-
-    const stopVisibilityControl = createAnimationVisibilityController(heroWrapRef.current!)
-    return () => { stopVisibilityControl(); ctx.revert() }
+    return () => {
+      ctx.revert()
+    }
   }, [])
 
   return (
     <>
-      {/* HERO */}
       <div
         ref={heroWrapRef}
-        className="inner-page-hero inner-page-hero-why why-hero-motion"
-        style={{
-          position: 'relative',
-          overflow: 'hidden',
-        }}
+        className="inner-page-hero inner-page-hero-why why-impact-hero"
       >
         <PageHero
           variant="why"
@@ -248,320 +126,108 @@ export default function WhyNourDoc() {
           text="Manual note-taking, dictation and human scribing solve different parts of the documentation workflow. NourDoc uses ambient AI to simplify the journey from clinical conversation to structured documentation."
         />
 
-        {/* CLINICAL AI RADAR */}
         <div
-          className="inner-page-hero-visual"
+          ref={visualShellRef}
+          className="why-impact-shell"
           aria-hidden="true"
-          style={{
-            position: 'absolute',
-            right: '2.5%',
-            bottom: '4%',
-            width: '350px',
-            height: '350px',
-            zIndex: 4,
-            pointerEvents: 'none',
-          }}
         >
-          {/* Dark contrast halo — important for white/light image background */}
-          <div
-            style={{
-              position: 'absolute',
-              inset: '-8%',
-              borderRadius: '50%',
-              background:
-                'radial-gradient(circle, rgba(4,25,32,.74) 0%, rgba(5,38,47,.55) 34%, rgba(8,46,55,.23) 58%, transparent 78%)',
-              boxShadow:
-                '0 0 65px rgba(0,20,27,.42), inset 0 0 50px rgba(39,169,185,.1)',
-            }}
-          />
+          <div className="why-impact-float">
+            <div className="why-impact-ambient" />
+            <div className="why-impact-glass-disc" />
 
-          {/* Secondary cyan atmospheric glow */}
-          <div
-            style={{
-              position: 'absolute',
-              inset: '10%',
-              borderRadius: '50%',
-              background:
-                'radial-gradient(circle, rgba(58,216,226,.2) 0%, rgba(47,178,192,.09) 36%, transparent 70%)',
-              filter: 'blur(10px)',
-            }}
-          />
+            <svg
+              className="why-impact-connections"
+              viewBox="0 0 400 400"
+              fill="none"
+              preserveAspectRatio="xMidYMid meet"
+            >
+              <path
+                className="why-impact-flow"
+                d="M82 91 C128 52 164 58 200 101"
+              />
 
-          {/* RADAR PULSE 1 */}
-          <div
-            className="why-radar-pulse-one"
-            style={{
-              position: 'absolute',
-              left: '50%',
-              top: '50%',
-              width: '100px',
-              height: '100px',
-              marginLeft: '-50px',
-              marginTop: '-50px',
-              borderRadius: '50%',
-              border: '1.5px solid rgba(176,251,253,.92)',
-              boxShadow: '0 0 26px rgba(75,225,234,.42)',
-            }}
-          />
+              <path
+                className="why-impact-flow"
+                d="M200 101 C240 57 279 57 318 91"
+              />
 
-          {/* RADAR PULSE 2 */}
-          <div
-            className="why-radar-pulse-two"
-            style={{
-              position: 'absolute',
-              left: '50%',
-              top: '50%',
-              width: '100px',
-              height: '100px',
-              marginLeft: '-50px',
-              marginTop: '-50px',
-              borderRadius: '50%',
-              border: '1.5px solid rgba(93,228,237,.72)',
-            }}
-          />
+              <path
+                className="why-impact-flow"
+                d="M318 309 C280 344 240 341 200 301"
+              />
 
-          {/* OUTER ORBIT */}
-          <div
-            ref={outerOrbitRef}
-            style={{
-              position: 'absolute',
-              inset: '2%',
-              borderRadius: '50%',
-              border: '1.5px dashed rgba(134,246,250,.82)',
-              boxShadow:
-                '0 0 25px rgba(64,213,225,.32), inset 0 0 32px rgba(43,178,194,.08)',
-            }}
-          >
-            <span
-              className="why-orbit-node"
-              style={{
-                position: 'absolute',
-                left: '48%',
-                top: '-5px',
-                width: '10px',
-                height: '10px',
-                borderRadius: '50%',
-                background: '#E1FEFF',
-                opacity: 0.8,
-                boxShadow:
-                  '0 0 8px #E1FEFF, 0 0 20px rgba(79,229,236,.98), 0 0 36px rgba(25,180,198,.85)',
-              }}
-            />
+              <path
+                className="why-impact-flow"
+                d="M200 301 C160 341 119 341 82 307"
+              />
+            </svg>
 
-            <span
-              className="why-orbit-node"
-              style={{
-                position: 'absolute',
-                right: '4%',
-                top: '24%',
-                width: '9px',
-                height: '9px',
-                borderRadius: '50%',
-                background: '#91F1F5',
-                opacity: 0.8,
-                boxShadow:
-                  '0 0 8px #91F1F5, 0 0 20px rgba(72,218,229,.98)',
-              }}
-            />
+            <div className="why-impact-pulse why-impact-pulse-one" />
+            <div className="why-impact-pulse why-impact-pulse-two" />
 
-            <span
-              className="why-orbit-node"
-              style={{
-                position: 'absolute',
-                left: '8%',
-                bottom: '18%',
-                width: '9px',
-                height: '9px',
-                borderRadius: '50%',
-                background: '#54D7E1',
-                opacity: 0.85,
-                boxShadow:
-                  '0 0 8px #54D7E1, 0 0 20px rgba(37,190,204,.98)',
-              }}
-            />
+            <div className="why-impact-orbit why-impact-orbit-outer">
+              <span className="why-impact-node node-outer-one" />
+              <span className="why-impact-node node-outer-two" />
+              <span className="why-impact-node node-outer-three" />
+            </div>
+
+            <div className="why-impact-orbit why-impact-orbit-middle">
+              <span className="why-impact-node node-middle-one" />
+              <span className="why-impact-node node-middle-two" />
+            </div>
+
+            <div className="why-impact-orbit why-impact-orbit-inner">
+              <span className="why-impact-node node-inner-one" />
+            </div>
+
+            <div className="why-impact-center">
+              <div className="why-impact-core-glow" />
+
+              <div className="why-impact-core">
+                <strong>NourDoc</strong>
+                <span>WHY IT MATTERS</span>
+              </div>
+            </div>
+
+            {impactCards.map((card) => (
+              <div
+                key={card.number}
+                className={`why-impact-card ${card.className}`}
+              >
+                <span>{card.number}</span>
+                <strong>{card.label}</strong>
+              </div>
+            ))}
+
+            <span className="why-impact-particle why-impact-particle-a" />
+            <span className="why-impact-particle why-impact-particle-b" />
+            <span className="why-impact-particle why-impact-particle-c" />
           </div>
-
-          {/* MIDDLE ORBIT */}
-          <div
-            ref={middleOrbitRef}
-            style={{
-              position: 'absolute',
-              inset: '18%',
-              borderRadius: '50%',
-              border: '1.5px solid rgba(117,237,242,.72)',
-              boxShadow: '0 0 18px rgba(62,213,224,.16)',
-            }}
-          >
-            <span
-              className="why-orbit-node"
-              style={{
-                position: 'absolute',
-                right: '-6px',
-                top: '48%',
-                width: '11px',
-                height: '11px',
-                borderRadius: '50%',
-                background: '#F4FFFF',
-                opacity: 0.95,
-                boxShadow:
-                  '0 0 10px #F4FFFF, 0 0 25px rgba(74,228,236,1)',
-              }}
-            />
-
-            <span
-              className="why-orbit-node"
-              style={{
-                position: 'absolute',
-                left: '17%',
-                top: '4%',
-                width: '8px',
-                height: '8px',
-                borderRadius: '50%',
-                background: '#6FE5EB',
-                opacity: 0.85,
-                boxShadow:
-                  '0 0 8px #6FE5EB, 0 0 19px rgba(48,199,211,.95)',
-              }}
-            />
-          </div>
-
-          {/* INNER ORBIT */}
-          <div
-            ref={innerOrbitRef}
-            style={{
-              position: 'absolute',
-              inset: '33%',
-              borderRadius: '50%',
-              border: '1.5px dashed rgba(186,251,253,.86)',
-            }}
-          >
-            <span
-              className="why-orbit-node"
-              style={{
-                position: 'absolute',
-                left: '50%',
-                bottom: '-5px',
-                width: '10px',
-                height: '10px',
-                borderRadius: '50%',
-                background: '#F5FFFF',
-                opacity: 0.95,
-                boxShadow:
-                  '0 0 9px #F5FFFF, 0 0 22px rgba(85,229,237,.98)',
-              }}
-            />
-          </div>
-
-          {/* SCANNING BEAM */}
-          <div
-            className="why-scan-beam"
-            style={{
-              position: 'absolute',
-              left: '50%',
-              top: '9%',
-              width: '2px',
-              height: '41%',
-              background:
-                'linear-gradient(to top, rgba(215,255,255,1), rgba(81,225,234,.9), transparent)',
-              boxShadow: '0 0 12px rgba(86,231,239,.95)',
-              transformOrigin: 'bottom center',
-            }}
-          />
-
-          {/* CENTER CORE */}
-          <div
-            className="why-orbit-core"
-            style={{
-              position: 'absolute',
-              left: '50%',
-              top: '50%',
-              width: '20px',
-              height: '20px',
-              marginLeft: '-10px',
-              marginTop: '-10px',
-              borderRadius: '50%',
-              background: '#F5FFFF',
-              border: '2px solid rgba(143,244,248,.98)',
-              boxShadow:
-                '0 0 12px #F5FFFF, 0 0 30px rgba(73,227,235,1), 0 0 65px rgba(29,177,193,.95)',
-              zIndex: 6,
-            }}
-          />
-
-          {/* DATA PARTICLE 1 */}
-          <span
-            className="why-data-particle-one"
-            style={{
-              position: 'absolute',
-              left: '50%',
-              top: '50%',
-              width: '9px',
-              height: '9px',
-              borderRadius: '50%',
-              background: '#F0FFFF',
-              boxShadow:
-                '0 0 9px #F0FFFF, 0 0 21px rgba(69,219,228,.98)',
-              zIndex: 5,
-            }}
-          />
-
-          {/* DATA PARTICLE 2 */}
-          <span
-            className="why-data-particle-two"
-            style={{
-              position: 'absolute',
-              left: '50%',
-              top: '50%',
-              width: '8px',
-              height: '8px',
-              borderRadius: '50%',
-              background: '#69E1E8',
-              boxShadow:
-                '0 0 9px #69E1E8, 0 0 22px rgba(39,191,205,.98)',
-              zIndex: 5,
-            }}
-          />
-
-          {/* DATA PARTICLE 3 */}
-          <span
-            className="why-data-particle-three"
-            style={{
-              position: 'absolute',
-              left: '50%',
-              top: '50%',
-              width: '7px',
-              height: '7px',
-              borderRadius: '50%',
-              background: '#B7F8FA',
-              boxShadow:
-                '0 0 8px #B7F8FA, 0 0 19px rgba(69,219,228,.95)',
-              zIndex: 5,
-            }}
-          />
         </div>
       </div>
 
-      {/* DOCUMENTATION GAP */}
       <section className="section container problem-grid">
         <AnimatedSection>
-          <span className="eyebrow">The documentation gap</span>
+          <span className="eyebrow">
+            The documentation gap
+          </span>
+
           <h2>
-            Care happens in conversation. Records still demand a separate
-            workflow.
+            Care happens in conversation. Records still demand a
+            separate workflow.
           </h2>
         </AnimatedSection>
 
         <AnimatedSection className="large-copy">
           <p>
-            When documentation competes with the patient encounter, clinicians
-            must divide their attention or finish the work later. NourDoc is
-            designed around a simpler idea: let the natural conversation become
-            the starting point.
+            When documentation competes with the patient encounter,
+            clinicians must divide their attention or finish the work
+            later. NourDoc is designed around a simpler idea: let the
+            natural conversation become the starting point.
           </p>
         </AnimatedSection>
       </section>
 
-      {/* WORKFLOW */}
       <section className="section section-soft why-workflow-section">
         <div className="container">
           <AnimatedSection>
@@ -571,11 +237,13 @@ export default function WhyNourDoc() {
             />
           </AnimatedSection>
 
-          <WorkflowJourney steps={workflow} premium />
+          <WorkflowJourney
+            steps={workflow}
+            premium
+          />
         </div>
       </section>
 
-      {/* COMPARISON */}
       <section className="section container">
         <AnimatedSection>
           <SectionHeader
@@ -592,31 +260,37 @@ export default function WhyNourDoc() {
             <span>NourDoc approach</span>
           </div>
 
-          {comparison.map(([dimension, traditional, nourdoc]) => (
-            <div className="comparison-row" key={dimension}>
-              <strong>{dimension}</strong>
+          {comparison.map(
+            ([dimension, traditional, nourdoc]) => (
+              <div
+                className="comparison-row"
+                key={dimension}
+              >
+                <strong>{dimension}</strong>
 
-              <span>
-                <small className="comparison-mobile-label">
-                  Traditional workflow
-                </small>
-                <Minus />
-                {traditional}
-              </span>
+                <span>
+                  <small className="comparison-mobile-label">
+                    Traditional workflow
+                  </small>
 
-              <span>
-                <small className="comparison-mobile-label">
-                  NourDoc approach
-                </small>
-                <Check />
-                {nourdoc}
-              </span>
-            </div>
-          ))}
+                  <Minus />
+                  {traditional}
+                </span>
+
+                <span>
+                  <small className="comparison-mobile-label">
+                    NourDoc approach
+                  </small>
+
+                  <Check />
+                  {nourdoc}
+                </span>
+              </div>
+            ),
+          )}
         </AnimatedSection>
       </section>
 
-      {/* CLINICIAN CONTROL */}
       <ImageStory
         image={localImage}
         objectPosition="68% center"
@@ -631,15 +305,17 @@ export default function WhyNourDoc() {
         ]}
       />
 
-      {/* STATEMENT BAND */}
       <section className="section container statement-band">
         <AnimatedSection>
           <p>
-            Clinical intelligence should feel less like another system to
-            manage—and more like documentation quietly keeping pace.
+            Clinical intelligence should feel less like another system
+            to manage—and more like documentation quietly keeping pace.
           </p>
 
-          <Link to="/product" className="text-link">
+          <Link
+            to="/product"
+            className="text-link"
+          >
             See the product workflow
             <ArrowRight />
           </Link>
@@ -650,6 +326,844 @@ export default function WhyNourDoc() {
         title="See the difference in your own workflow."
         label="Book a Demo"
       />
+
+      <style>{`
+        .why-impact-hero {
+          position: relative;
+          overflow: hidden;
+        }
+
+        /* =========================================================
+           POSITION LIKE PRODUCT PAGE
+        ========================================================= */
+
+        .why-impact-shell {
+          position: absolute;
+
+          right: 2.3%;
+          bottom: 3%;
+
+          width: clamp(285px, 25vw, 350px);
+          aspect-ratio: 1;
+
+          z-index: 5;
+
+          pointer-events: none;
+
+          will-change: transform, opacity;
+        }
+
+        .why-impact-float {
+          position: absolute;
+          inset: 0;
+
+          animation:
+            whyImpactCornerFloat 5.5s ease-in-out infinite;
+
+          will-change: transform;
+        }
+
+        /* =========================================================
+           ATMOSPHERE
+        ========================================================= */
+
+        .why-impact-ambient {
+          position: absolute;
+
+          inset: -9%;
+
+          border-radius: 50%;
+
+          background:
+            radial-gradient(
+              circle,
+              rgba(67, 211, 222, .21) 0%,
+              rgba(38, 145, 160, .12) 34%,
+              rgba(5, 37, 47, .16) 58%,
+              transparent 76%
+            );
+
+          filter: blur(12px);
+        }
+
+        .why-impact-glass-disc {
+          position: absolute;
+
+          inset: 4%;
+
+          border-radius: 50%;
+
+          background:
+            radial-gradient(
+              circle at 42% 35%,
+              rgba(194, 250, 250, .11),
+              rgba(37, 130, 144, .14) 32%,
+              rgba(3, 31, 40, .26) 68%,
+              rgba(3, 22, 29, .38) 100%
+            );
+
+          border:
+            1px solid rgba(135, 230, 235, .14);
+
+          box-shadow:
+            inset 0 0 55px rgba(80, 218, 226, .08),
+            0 22px 62px rgba(0, 14, 20, .25);
+
+          backdrop-filter: blur(4px);
+        }
+
+        /* =========================================================
+           CONNECTION LINES
+        ========================================================= */
+
+        .why-impact-connections {
+          position: absolute;
+
+          inset: 0;
+
+          width: 100%;
+          height: 100%;
+
+          overflow: visible;
+        }
+
+        .why-impact-flow {
+          stroke:
+            rgba(103, 224, 232, .82);
+
+          stroke-width: 1.4;
+
+          stroke-dasharray: 4 8;
+
+          stroke-linecap: round;
+
+          filter:
+            drop-shadow(
+              0 0 4px rgba(91, 224, 232, .38)
+            );
+
+          animation:
+            whyFlow 2.8s linear infinite;
+        }
+
+        /* =========================================================
+           ORBITS
+        ========================================================= */
+
+        .why-impact-orbit {
+          position: absolute;
+
+          border-radius: 50%;
+
+          transform-origin: 50% 50%;
+
+          will-change: transform;
+        }
+
+        .why-impact-orbit-outer {
+          width: 66%;
+          height: 66%;
+
+          left: 17%;
+          top: 17%;
+
+          border:
+            1px dashed rgba(104, 226, 234, .82);
+
+          box-shadow:
+            0 0 24px rgba(55, 201, 213, .13),
+            inset 0 0 25px rgba(55, 201, 213, .07);
+
+          animation:
+            whyOuterOrbit 12s linear infinite !important;
+        }
+
+        .why-impact-orbit-middle {
+          width: 46%;
+          height: 46%;
+
+          left: 27%;
+          top: 27%;
+
+          border:
+            1px solid rgba(111, 227, 234, .68);
+
+          animation:
+            whyMiddleOrbit 8s linear infinite !important;
+        }
+
+        .why-impact-orbit-inner {
+          width: 29%;
+          height: 29%;
+
+          left: 35.5%;
+          top: 35.5%;
+
+          border:
+            1px dashed rgba(171, 245, 248, .86);
+
+          animation:
+            whyInnerOrbit 5.8s linear infinite !important;
+        }
+
+        /* =========================================================
+           ORBIT DOTS
+        ========================================================= */
+
+        .why-impact-node {
+          position: absolute;
+
+          width: 8px;
+          height: 8px;
+
+          border-radius: 50%;
+
+          background: #ebffff;
+
+          opacity: .8;
+
+          box-shadow:
+            0 0 8px rgba(234, 255, 255, 1),
+            0 0 18px rgba(72, 224, 233, .95),
+            0 0 28px rgba(72, 224, 233, .45);
+
+          animation:
+            whyOrbitNodePulse 1.45s ease-in-out infinite !important;
+        }
+
+        .node-outer-one {
+          top: -4px;
+          left: 48%;
+        }
+
+        .node-outer-two {
+          right: 8%;
+          bottom: 18%;
+          animation-delay: .3s !important;
+        }
+
+        .node-outer-three {
+          left: 2%;
+          top: 39%;
+          animation-delay: .65s !important;
+        }
+
+        .node-middle-one {
+          right: -4px;
+          top: 48%;
+          animation-delay: .22s !important;
+        }
+
+        .node-middle-two {
+          left: 13%;
+          top: 9%;
+          animation-delay: .55s !important;
+        }
+
+        .node-inner-one {
+          left: 48%;
+          bottom: -4px;
+          animation-delay: .8s !important;
+        }
+
+        /* =========================================================
+           CENTER
+        ========================================================= */
+
+        .why-impact-center {
+          position: absolute;
+
+          left: 50%;
+          top: 50%;
+
+          width: 92px;
+          height: 92px;
+
+          margin-left: -46px;
+          margin-top: -46px;
+
+          z-index: 8;
+
+          animation:
+            whyCenterFloat 3.4s ease-in-out infinite;
+
+          will-change: transform;
+        }
+
+        .why-impact-core-glow {
+          position: absolute;
+
+          inset: -18%;
+
+          border-radius: 50%;
+
+          background:
+            radial-gradient(
+              circle,
+              rgba(84, 231, 238, .24),
+              rgba(27, 141, 158, .12) 45%,
+              transparent 72%
+            );
+
+          border:
+            1px solid rgba(99, 230, 237, .25);
+
+          box-shadow:
+            0 0 28px rgba(71, 218, 228, .18);
+
+          animation:
+            whyCoreBreath 2s ease-in-out infinite;
+        }
+
+        .why-impact-core {
+          position: absolute;
+
+          inset: 0;
+
+          border-radius: 50%;
+
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+
+          background:
+            linear-gradient(
+              145deg,
+              rgba(5, 55, 67, .98),
+              rgba(3, 32, 42, .99)
+            );
+
+          border:
+            1.5px solid rgba(100, 238, 243, .9);
+
+          box-shadow:
+            inset 0 0 20px rgba(61, 215, 224, .1),
+            0 0 18px rgba(48, 203, 215, .22);
+
+          color: #f4ffff;
+        }
+
+        .why-impact-core strong {
+          font-size: 11px;
+          line-height: 1;
+
+          font-weight: 700;
+
+          letter-spacing: -.02em;
+        }
+
+        .why-impact-core span {
+          margin-top: 6px;
+
+          font-size: 5px;
+
+          font-weight: 700;
+
+          letter-spacing: .11em;
+
+          color: #68dbe3;
+        }
+
+        /* =========================================================
+           PULSES
+        ========================================================= */
+
+        .why-impact-pulse {
+          position: absolute;
+
+          left: 50%;
+          top: 50%;
+
+          width: 90px;
+          height: 90px;
+
+          margin-left: -45px;
+          margin-top: -45px;
+
+          border-radius: 50%;
+
+          border:
+            1px solid rgba(103, 229, 237, .52);
+
+          transform-origin: center;
+
+          will-change: transform, opacity;
+        }
+
+        .why-impact-pulse-one {
+          animation:
+            whyPulse 2.6s ease-out infinite;
+        }
+
+        .why-impact-pulse-two {
+          animation:
+            whyPulse 2.6s 1.3s ease-out infinite;
+        }
+
+        /* =========================================================
+           CARDS
+        ========================================================= */
+
+        .why-impact-card {
+          position: absolute;
+
+          z-index: 12;
+
+          width: 88px;
+          min-height: 52px;
+
+          padding: 9px 10px;
+
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+
+          border-radius: 10px;
+
+          background:
+            linear-gradient(
+              145deg,
+              rgba(8, 62, 74, .97),
+              rgba(3, 42, 52, .98)
+            );
+
+          border:
+            1px solid rgba(99, 222, 230, .28);
+
+          box-shadow:
+            0 12px 28px rgba(0, 16, 24, .32),
+            inset 0 1px 0 rgba(255, 255, 255, .05);
+
+          backdrop-filter: blur(12px);
+
+          color: #f3ffff;
+
+          will-change: transform;
+        }
+
+        .why-impact-card span {
+          color: #70e0e7;
+
+          font-size: 7px;
+
+          line-height: 1;
+
+          font-weight: 700;
+
+          letter-spacing: .08em;
+        }
+
+        .why-impact-card strong {
+          margin-top: 8px;
+
+          font-size: 8px;
+
+          line-height: 1.15;
+
+          font-weight: 650;
+
+          white-space: normal;
+        }
+
+        .impact-card-tl {
+          top: 8%;
+          left: 0;
+
+          animation:
+            whyCardTL 4.1s ease-in-out infinite;
+        }
+
+        .impact-card-tr {
+          top: 8%;
+          right: 0;
+
+          animation:
+            whyCardTR 4.8s ease-in-out infinite;
+        }
+
+        .impact-card-br {
+          right: 0;
+          bottom: 8%;
+
+          animation:
+            whyCardBR 4.4s ease-in-out infinite;
+        }
+
+        .impact-card-bl {
+          left: 0;
+          bottom: 8%;
+
+          animation:
+            whyCardBL 5.1s ease-in-out infinite;
+        }
+
+        /* =========================================================
+           PARTICLES
+        ========================================================= */
+
+        .why-impact-particle {
+          position: absolute;
+
+          border-radius: 50%;
+
+          background:
+            rgba(116, 232, 238, .92);
+
+          box-shadow:
+            0 0 8px rgba(107, 229, 236, .8);
+
+          z-index: 5;
+
+          will-change: transform, opacity;
+        }
+
+        .why-impact-particle-a {
+          width: 5px;
+          height: 5px;
+
+          left: 22%;
+          top: 44%;
+
+          animation:
+            whyParticleA 3.8s ease-in-out infinite;
+        }
+
+        .why-impact-particle-b {
+          width: 4px;
+          height: 4px;
+
+          right: 18%;
+          top: 34%;
+
+          animation:
+            whyParticleB 4.4s ease-in-out infinite;
+        }
+
+        .why-impact-particle-c {
+          width: 5px;
+          height: 5px;
+
+          right: 24%;
+          bottom: 25%;
+
+          animation:
+            whyParticleC 4s ease-in-out infinite;
+        }
+
+        /* =========================================================
+           ANIMATION KEYFRAMES
+        ========================================================= */
+
+        @keyframes whyImpactCornerFloat {
+          0%,
+          100% {
+            transform:
+              translate3d(0, 0, 0)
+              scale(1);
+          }
+
+          50% {
+            transform:
+              translate3d(3px, -8px, 0)
+              scale(1.008);
+          }
+        }
+
+        @keyframes whyOuterOrbit {
+          from {
+            transform: rotate(0deg);
+          }
+
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        @keyframes whyMiddleOrbit {
+          from {
+            transform: rotate(360deg);
+          }
+
+          to {
+            transform: rotate(0deg);
+          }
+        }
+
+        @keyframes whyInnerOrbit {
+          from {
+            transform: rotate(0deg);
+          }
+
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        @keyframes whyOrbitNodePulse {
+          0%,
+          100% {
+            transform: scale(.72);
+            opacity: .55;
+          }
+
+          50% {
+            transform: scale(1.65);
+            opacity: 1;
+          }
+        }
+
+        @keyframes whyCenterFloat {
+          0%,
+          100% {
+            transform:
+              translate3d(0, 0, 0)
+              scale(1);
+          }
+
+          50% {
+            transform:
+              translate3d(0, -4px, 0)
+              scale(1.025);
+          }
+        }
+
+        @keyframes whyCoreBreath {
+          0%,
+          100% {
+            transform: scale(1);
+            opacity: .72;
+          }
+
+          50% {
+            transform: scale(1.2);
+            opacity: 1;
+          }
+        }
+
+        @keyframes whyPulse {
+          0% {
+            transform: scale(.65);
+            opacity: .55;
+          }
+
+          100% {
+            transform: scale(1.85);
+            opacity: 0;
+          }
+        }
+
+        @keyframes whyFlow {
+          to {
+            stroke-dashoffset: -80;
+          }
+        }
+
+        @keyframes whyCardTL {
+          0%,
+          100% {
+            transform: translate3d(0, 0, 0);
+          }
+
+          50% {
+            transform: translate3d(-4px, -8px, 0);
+          }
+        }
+
+        @keyframes whyCardTR {
+          0%,
+          100% {
+            transform: translate3d(0, 0, 0);
+          }
+
+          50% {
+            transform: translate3d(4px, -7px, 0);
+          }
+        }
+
+        @keyframes whyCardBR {
+          0%,
+          100% {
+            transform: translate3d(0, 0, 0);
+          }
+
+          50% {
+            transform: translate3d(4px, 7px, 0);
+          }
+        }
+
+        @keyframes whyCardBL {
+          0%,
+          100% {
+            transform: translate3d(0, 0, 0);
+          }
+
+          50% {
+            transform: translate3d(-4px, 7px, 0);
+          }
+        }
+
+        @keyframes whyParticleA {
+          0%,
+          100% {
+            transform:
+              translate3d(0, 0, 0)
+              scale(.8);
+
+            opacity: .45;
+          }
+
+          50% {
+            transform:
+              translate3d(15px, -12px, 0)
+              scale(1.35);
+
+            opacity: 1;
+          }
+        }
+
+        @keyframes whyParticleB {
+          0%,
+          100% {
+            transform:
+              translate3d(0, 0, 0)
+              scale(.8);
+
+            opacity: .45;
+          }
+
+          50% {
+            transform:
+              translate3d(-12px, 15px, 0)
+              scale(1.25);
+
+            opacity: .9;
+          }
+        }
+
+        @keyframes whyParticleC {
+          0%,
+          100% {
+            transform:
+              translate3d(0, 0, 0)
+              scale(.8);
+
+            opacity: .45;
+          }
+
+          50% {
+            transform:
+              translate3d(11px, 12px, 0)
+              scale(1.3);
+
+            opacity: 1;
+          }
+        }
+
+        /* =========================================================
+           TABLET
+        ========================================================= */
+
+        @media (max-width: 1100px) {
+          .why-impact-shell {
+            right: 1.5%;
+            bottom: 4%;
+
+            width: clamp(270px, 27vw, 320px);
+          }
+        }
+
+        /* =========================================================
+           MOBILE
+        ========================================================= */
+
+        @media (max-width: 768px) {
+          .why-impact-shell {
+            position: relative;
+
+            right: auto;
+            bottom: auto;
+
+            width: min(86vw, 310px);
+
+            margin: 22px auto 8px;
+
+            z-index: 4;
+          }
+
+          .why-impact-float {
+            animation:
+              whyImpactMobileFloat 5.2s ease-in-out infinite;
+          }
+
+          .why-impact-card {
+            width: 74px;
+            min-height: 48px;
+
+            padding: 8px;
+
+            border-radius: 9px;
+          }
+
+          .why-impact-card strong {
+            font-size: 7.5px;
+          }
+
+          .why-impact-center {
+            width: 82px;
+            height: 82px;
+
+            margin-left: -41px;
+            margin-top: -41px;
+          }
+        }
+
+        @keyframes whyImpactMobileFloat {
+          0%,
+          100% {
+            transform: translate3d(0, 0, 0);
+          }
+
+          50% {
+            transform: translate3d(0, -4px, 0);
+          }
+        }
+
+        @media (max-width: 430px) {
+          .why-impact-shell {
+            width: min(90vw, 290px);
+          }
+
+          .why-impact-card {
+            width: 68px;
+            min-height: 45px;
+
+            padding: 7px;
+          }
+
+          .why-impact-card strong {
+            font-size: 7px;
+          }
+        }
+
+        /* =========================================================
+           REDUCED MOTION
+        ========================================================= */
+
+        @media (prefers-reduced-motion: reduce) {
+          .why-impact-float,
+          .why-impact-orbit,
+          .why-impact-center,
+          .why-impact-core-glow,
+          .why-impact-pulse,
+          .why-impact-card,
+          .why-impact-node,
+          .why-impact-particle,
+          .why-impact-flow {
+            animation: none !important;
+          }
+        }
+      `}</style>
     </>
   )
 }
