@@ -878,7 +878,9 @@ export function CinematicStory() {
   const [activeIndex, setActiveIndex] = useState(0)
   const activeSceneRef = useRef(0)
   const reduced = reducedMotionPref === true
-  const layered = !compact && !reduced
+  // Layered scroll is a layout/navigation behavior on desktop.
+  // Reduced motion only disables decorative/internal motion; it must not collapse the hero into vertical static sections.
+  const layered = !compact
 
   const registerScene = useCallback((index: number, node: HTMLElement | null) => {
     sceneRefs.current[index] = node

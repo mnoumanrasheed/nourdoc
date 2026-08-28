@@ -12788,23 +12788,19 @@ p {
    ------------------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
 
-  .hero-story,
-  .hero-story>.hero-stage,
-  .hero-story .hero-scene,
+  /* Keep desktop layer geometry intact. Only decorative/internal motion is reduced. */
   .hero-story .hero-visual-float,
   .hero-story .hero-visual-scroll,
   .hero-story .scene-visual-motion {
-    transform: none !important;
-  }
-
-  .hero-story .hero-scene {
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
-
-  .hero-story .scene-visual-motion {
     animation: none !important;
     will-change: auto !important;
+  }
+
+  /* Static mode is still used on compact/mobile layouts. */
+  .hero-story.is-static .hero-scene {
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
   }
 }
 
