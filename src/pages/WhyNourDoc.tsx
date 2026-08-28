@@ -86,13 +86,10 @@ export default function WhyNourDoc() {
 
     if (!hero || !shell) return
 
-    // Check for reduced-motion preference
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
     const loops: gsap.core.Tween[] = []
 
     const ctx = gsap.context(() => {
-      // ── Entrance animation (opacity/y/scale only — no transform that conflicts with children) ──
       gsap.fromTo(
         shell,
         { opacity: 0, y: 24 },
@@ -101,7 +98,7 @@ export default function WhyNourDoc() {
 
       if (reducedMotion) return
 
-      // ── Outer orbit: clockwise ──
+      // Outer orbit: clockwise
       const outerOrbit = shell.querySelector<HTMLElement>('.why-impact-orbit-outer')
       if (outerOrbit) {
         gsap.set(outerOrbit, { transformOrigin: '50% 50%', rotation: 0 })
@@ -113,7 +110,7 @@ export default function WhyNourDoc() {
         }))
       }
 
-      // ── Middle orbit: counter-clockwise ──
+      // Middle orbit: counter-clockwise
       const middleOrbit = shell.querySelector<HTMLElement>('.why-impact-orbit-middle')
       if (middleOrbit) {
         gsap.set(middleOrbit, { transformOrigin: '50% 50%', rotation: 0 })
@@ -125,7 +122,7 @@ export default function WhyNourDoc() {
         }))
       }
 
-      // ── Inner orbit: clockwise (faster) ──
+      // Inner orbit: clockwise
       const innerOrbit = shell.querySelector<HTMLElement>('.why-impact-orbit-inner')
       if (innerOrbit) {
         gsap.set(innerOrbit, { transformOrigin: '50% 50%', rotation: 0 })
@@ -137,7 +134,7 @@ export default function WhyNourDoc() {
         }))
       }
 
-      // ── Center hub float ──
+      // Center hub float
       const center = shell.querySelector<HTMLElement>('.why-impact-center')
       if (center) {
         loops.push(gsap.to(center, {
@@ -150,7 +147,7 @@ export default function WhyNourDoc() {
         }))
       }
 
-      // ── Core glow breathe ──
+      // Core glow breathe
       const coreGlow = shell.querySelector<HTMLElement>('.why-impact-core-glow')
       if (coreGlow) {
         loops.push(gsap.to(coreGlow, {
@@ -163,7 +160,7 @@ export default function WhyNourDoc() {
         }))
       }
 
-      // ── Outer container float ──
+      // Outer container float
       const floatEl = shell.querySelector<HTMLElement>('.why-impact-float')
       if (floatEl) {
         loops.push(gsap.to(floatEl, {
@@ -177,7 +174,7 @@ export default function WhyNourDoc() {
         }))
       }
 
-      // ── Orbit nodes pulse ──
+      // Orbit nodes pulse
       const nodes = gsap.utils.toArray<HTMLElement>('.why-impact-node', shell)
       nodes.forEach((node, i) => {
         loops.push(gsap.to(node, {
@@ -191,7 +188,7 @@ export default function WhyNourDoc() {
         }))
       })
 
-      // ── Pulse rings expand ──
+      // Pulse rings expand
       const pulseOne = shell.querySelector<HTMLElement>('.why-impact-pulse-one')
       const pulseTwo = shell.querySelector<HTMLElement>('.why-impact-pulse-two')
       if (pulseOne) {
@@ -207,7 +204,7 @@ export default function WhyNourDoc() {
         ))
       }
 
-      // ── SVG connection line dash flow ──
+      // SVG connection line dash flow
       const flowPaths = gsap.utils.toArray<SVGPathElement>('.why-impact-flow', shell)
       flowPaths.forEach((path) => {
         gsap.set(path, { strokeDashoffset: 0 })
@@ -219,7 +216,7 @@ export default function WhyNourDoc() {
         }))
       })
 
-      // ── Corner cards gentle float ──
+      // Corner cards gentle float
       const cardTL = shell.querySelector<HTMLElement>('.impact-card-tl')
       const cardTR = shell.querySelector<HTMLElement>('.impact-card-tr')
       const cardBR = shell.querySelector<HTMLElement>('.impact-card-br')
@@ -229,7 +226,7 @@ export default function WhyNourDoc() {
       if (cardBR) loops.push(gsap.to(cardBR, { x: 4, y: 7, duration: 4.4, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
       if (cardBL) loops.push(gsap.to(cardBL, { x: -4, y: 7, duration: 5.1, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
 
-      // ── Particles float ──
+      // Particles float
       const pA = shell.querySelector<HTMLElement>('.why-impact-particle-a')
       const pB = shell.querySelector<HTMLElement>('.why-impact-particle-b')
       const pC = shell.querySelector<HTMLElement>('.why-impact-particle-c')
@@ -239,14 +236,22 @@ export default function WhyNourDoc() {
 
     }, hero)
 
-    // Pause/resume when off-screen (saves CPU)
+    // Pause/resume when off-screen to conserve resources
     const observer = new IntersectionObserver(([entry]) => {
-      loops.forEach((loop) => entry.isIntersecting ? loop.resume() : loop.pause())
+      loops.forEach((loop) => {
+        if (entry.isIntersecting) {
+          gsap.ticker.wake()
+          loop.resume()
+        } else {
+          loop.pause()
+        }
+      })
     }, { threshold: 0.05 })
     observer.observe(shell)
 
     return () => {
       observer.disconnect()
+      loops.forEach((loop) => loop.kill())
       ctx.revert()
     }
   }, [])
@@ -917,214 +922,7 @@ export default function WhyNourDoc() {
           will-change: transform, opacity;
         }
 
-        /* =========================================================
-           ANIMATION KEYFRAMES
-        ========================================================= */
 
-        @keyframes whyImpactCornerFloat {
-          0%,
-          100% {
-            transform:
-              translate3d(0, 0, 0)
-              scale(1);
-          }
-
-          50% {
-            transform:
-              translate3d(3px, -8px, 0)
-              scale(1.008);
-          }
-        }
-
-        @keyframes whyOuterOrbit {
-          from {
-            transform: rotate(0deg);
-          }
-
-          to {
-            transform: rotate(360deg);
-          }
-        }
-
-        @keyframes whyMiddleOrbit {
-          from {
-            transform: rotate(360deg);
-          }
-
-          to {
-            transform: rotate(0deg);
-          }
-        }
-
-        @keyframes whyInnerOrbit {
-          from {
-            transform: rotate(0deg);
-          }
-
-          to {
-            transform: rotate(360deg);
-          }
-        }
-
-        @keyframes whyOrbitNodePulse {
-          0%,
-          100% {
-            transform: scale(.72);
-            opacity: .55;
-          }
-
-          50% {
-            transform: scale(1.65);
-            opacity: 1;
-          }
-        }
-
-        @keyframes whyCenterFloat {
-          0%,
-          100% {
-            transform:
-              translate3d(0, 0, 0)
-              scale(1);
-          }
-
-          50% {
-            transform:
-              translate3d(0, -4px, 0)
-              scale(1.025);
-          }
-        }
-
-        @keyframes whyCoreBreath {
-          0%,
-          100% {
-            transform: scale(1);
-            opacity: .72;
-          }
-
-          50% {
-            transform: scale(1.2);
-            opacity: 1;
-          }
-        }
-
-        @keyframes whyPulse {
-          0% {
-            transform: scale(.65);
-            opacity: .55;
-          }
-
-          100% {
-            transform: scale(1.85);
-            opacity: 0;
-          }
-        }
-
-        @keyframes whyFlow {
-          to {
-            stroke-dashoffset: -80;
-          }
-        }
-
-        @keyframes whyCardTL {
-          0%,
-          100% {
-            transform: translate3d(0, 0, 0);
-          }
-
-          50% {
-            transform: translate3d(-4px, -8px, 0);
-          }
-        }
-
-        @keyframes whyCardTR {
-          0%,
-          100% {
-            transform: translate3d(0, 0, 0);
-          }
-
-          50% {
-            transform: translate3d(4px, -7px, 0);
-          }
-        }
-
-        @keyframes whyCardBR {
-          0%,
-          100% {
-            transform: translate3d(0, 0, 0);
-          }
-
-          50% {
-            transform: translate3d(4px, 7px, 0);
-          }
-        }
-
-        @keyframes whyCardBL {
-          0%,
-          100% {
-            transform: translate3d(0, 0, 0);
-          }
-
-          50% {
-            transform: translate3d(-4px, 7px, 0);
-          }
-        }
-
-        @keyframes whyParticleA {
-          0%,
-          100% {
-            transform:
-              translate3d(0, 0, 0)
-              scale(.8);
-
-            opacity: .45;
-          }
-
-          50% {
-            transform:
-              translate3d(15px, -12px, 0)
-              scale(1.35);
-
-            opacity: 1;
-          }
-        }
-
-        @keyframes whyParticleB {
-          0%,
-          100% {
-            transform:
-              translate3d(0, 0, 0)
-              scale(.8);
-
-            opacity: .45;
-          }
-
-          50% {
-            transform:
-              translate3d(-12px, 15px, 0)
-              scale(1.25);
-
-            opacity: .9;
-          }
-        }
-
-        @keyframes whyParticleC {
-          0%,
-          100% {
-            transform:
-              translate3d(0, 0, 0)
-              scale(.8);
-
-            opacity: .45;
-          }
-
-          50% {
-            transform:
-              translate3d(11px, 12px, 0)
-              scale(1.3);
-
-            opacity: 1;
-          }
-        }
 
         /* =========================================================
            TABLET
