@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import gsap from 'gsap'
 
 import {
-  pakistaniConsultationImage as localImage,
+  clinicianControlImage,
   whyNourDocImage as heroImage,
 } from '../data/responsiveImages'
 
@@ -98,7 +98,6 @@ export default function WhyNourDoc() {
 
       if (reducedMotion) return
 
-      // Outer orbit: clockwise
       const outerOrbit = shell.querySelector<HTMLElement>('.why-impact-orbit-outer')
       if (outerOrbit) {
         gsap.set(outerOrbit, { transformOrigin: '50% 50%', rotation: 0 })
@@ -110,7 +109,6 @@ export default function WhyNourDoc() {
         }))
       }
 
-      // Middle orbit: counter-clockwise
       const middleOrbit = shell.querySelector<HTMLElement>('.why-impact-orbit-middle')
       if (middleOrbit) {
         gsap.set(middleOrbit, { transformOrigin: '50% 50%', rotation: 0 })
@@ -122,7 +120,6 @@ export default function WhyNourDoc() {
         }))
       }
 
-      // Inner orbit: clockwise
       const innerOrbit = shell.querySelector<HTMLElement>('.why-impact-orbit-inner')
       if (innerOrbit) {
         gsap.set(innerOrbit, { transformOrigin: '50% 50%', rotation: 0 })
@@ -134,7 +131,6 @@ export default function WhyNourDoc() {
         }))
       }
 
-      // Center hub float
       const center = shell.querySelector<HTMLElement>('.why-impact-center')
       if (center) {
         loops.push(gsap.to(center, {
@@ -147,7 +143,6 @@ export default function WhyNourDoc() {
         }))
       }
 
-      // Core glow breathe
       const coreGlow = shell.querySelector<HTMLElement>('.why-impact-core-glow')
       if (coreGlow) {
         loops.push(gsap.to(coreGlow, {
@@ -160,7 +155,6 @@ export default function WhyNourDoc() {
         }))
       }
 
-      // Outer container float
       const floatEl = shell.querySelector<HTMLElement>('.why-impact-float')
       if (floatEl) {
         loops.push(gsap.to(floatEl, {
@@ -174,7 +168,6 @@ export default function WhyNourDoc() {
         }))
       }
 
-      // Orbit nodes pulse
       const nodes = gsap.utils.toArray<HTMLElement>('.why-impact-node', shell)
       nodes.forEach((node, i) => {
         loops.push(gsap.to(node, {
@@ -188,7 +181,6 @@ export default function WhyNourDoc() {
         }))
       })
 
-      // Pulse rings expand
       const pulseOne = shell.querySelector<HTMLElement>('.why-impact-pulse-one')
       const pulseTwo = shell.querySelector<HTMLElement>('.why-impact-pulse-two')
       if (pulseOne) {
@@ -204,7 +196,6 @@ export default function WhyNourDoc() {
         ))
       }
 
-      // SVG connection line dash flow
       const flowPaths = gsap.utils.toArray<SVGPathElement>('.why-impact-flow', shell)
       flowPaths.forEach((path) => {
         gsap.set(path, { strokeDasharray: '8 14', strokeDashoffset: 0 })
@@ -216,7 +207,6 @@ export default function WhyNourDoc() {
         }))
       })
 
-      // Corner cards gentle float
       const cardTL = shell.querySelector<HTMLElement>('.impact-card-tl')
       const cardTR = shell.querySelector<HTMLElement>('.impact-card-tr')
       const cardBR = shell.querySelector<HTMLElement>('.impact-card-br')
@@ -226,20 +216,16 @@ export default function WhyNourDoc() {
       if (cardBR) loops.push(gsap.to(cardBR, { x: 4, y: 7, duration: 4.4, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
       if (cardBL) loops.push(gsap.to(cardBL, { x: -4, y: 7, duration: 5.1, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
 
-      // Particles float
       const pA = shell.querySelector<HTMLElement>('.why-impact-particle-a')
       const pB = shell.querySelector<HTMLElement>('.why-impact-particle-b')
       const pC = shell.querySelector<HTMLElement>('.why-impact-particle-c')
       if (pA) loops.push(gsap.to(pA, { x: 15, y: -12, scale: 1.35, opacity: 1, duration: 3.8, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
       if (pB) loops.push(gsap.to(pB, { x: -12, y: 15, scale: 1.25, opacity: 1, duration: 4.4, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 0.5 }))
       if (pC) loops.push(gsap.to(pC, { x: 11, y: 12, scale: 1.3, opacity: 1, duration: 4.0, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 1.0 }))
-
     }, hero)
 
-    // Start playing immediately (shell is visible on page load)
     gsap.ticker.wake()
 
-    // Pause when scrolled off-screen, resume when back in view
     const observer = new IntersectionObserver(([entry]) => {
       loops.forEach((loop) => {
         if (entry.isIntersecting) {
@@ -441,9 +427,10 @@ export default function WhyNourDoc() {
       </section>
 
       <ImageStory
-        image={localImage}
-        objectPosition="68% center"
-        alt="Pakistani clinician giving full attention to a patient"
+        editorial
+        image={clinicianControlImage}
+        objectPosition="50% 58%"
+        alt="Clinician reviewing healthcare documentation while remaining engaged in the consultation"
         eyebrow="Clinician control"
         title="AI drafts. Clinicians decide."
         text="NourDoc keeps the clinician responsible for reviewing, editing and approving the final record. The technology supports clinical work without replacing professional judgment."

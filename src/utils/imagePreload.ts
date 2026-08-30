@@ -4,7 +4,7 @@ const decodedImages = new Set<string>()
 const pendingImages = new Map<string, Promise<void>>()
 
 function imageKey(asset: ResponsiveImageAsset) {
-  return asset.avifSrcSet
+  return asset.webpSrcSet
 }
 
 export function isResponsiveImageDecoded(asset: ResponsiveImageAsset) {
@@ -26,13 +26,9 @@ export function preloadResponsiveImage(asset: ResponsiveImageAsset, sizes = '100
 
   const preload = new Promise<void>((resolve) => {
     const picture = document.createElement('picture')
-    const avif = document.createElement('source')
     const webp = document.createElement('source')
     const image = document.createElement('img')
 
-    avif.type = 'image/avif'
-    avif.srcset = asset.avifSrcSet
-    avif.sizes = sizes
     webp.type = 'image/webp'
     webp.srcset = asset.webpSrcSet
     webp.sizes = sizes
@@ -67,7 +63,7 @@ export function preloadResponsiveImage(asset: ResponsiveImageAsset, sizes = '100
     }, { once: true })
     image.addEventListener('error', finish, { once: true })
 
-    picture.append(avif, webp, image)
+    picture.append(webp, image)
     document.body.append(picture)
   })
 

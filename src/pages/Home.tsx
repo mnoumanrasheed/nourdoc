@@ -1,16 +1,22 @@
+import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowRight, CheckCircle2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { CTASection } from '../components/common/CTASection'
+import { ResponsivePicture } from '../components/common/ResponsivePicture'
 import { SectionHeader } from '../components/common/SectionHeader'
 import { ImageStory } from '../components/sections/ImageStory'
 import { CinematicStory } from '../components/sections/CinematicStory'
 import { WorkflowJourney } from '../components/sections/WorkflowJourney'
 import { AnimatedSection } from '../components/ui/AnimatedSection'
 import { capabilities, impactAreas, partnerCategories, securityTopics, workflow } from '../data/site'
-import { homeConsultationImage as localImage, internationalConsultationImage as globalImage } from '../data/responsiveImages'
+import {
+  globalHealthcareReadinessImage,
+  moreTimeForCareImage,
+} from '../data/responsiveImages'
 import { usePageMeta } from '../hooks/usePageMeta'
 
 export default function Home() {
+  const reducedMotion = useReducedMotion()
   usePageMeta('Ambient Clinical Intelligence', 'NourDoc turns natural doctor-patient conversations into structured clinical documentation for clinician review.')
   return (
     <>
@@ -27,7 +33,7 @@ export default function Home() {
         </div>
       </section>
 
-      <ImageStory image={localImage} objectPosition="48% center" alt="Physician speaking with a patient in a clinical consultation room" eyebrow="Healthcare impact" title="More time for care. Less time looking at screens." text="Documentation should support the clinical encounter rather than interrupt it. NourDoc is designed to reduce paperwork and allow clinicians to remain more focused on patients." points={['Less documentation burden', 'More patient attention', 'Clinician-controlled review']} />
+      <ImageStory editorial image={moreTimeForCareImage} objectPosition="50% center" alt="Physician checking a patient's blood pressure during an attentive consultation" eyebrow="Healthcare impact" title="More time for care. Less time looking at screens." text="Documentation should support the clinical encounter rather than interrupt it. NourDoc is designed to reduce paperwork and allow clinicians to remain more focused on patients." points={['Less documentation burden', 'More patient attention', 'Clinician-controlled review']} />
 
       <section className="section section-soft"><div className="container"><AnimatedSection><SectionHeader eyebrow="Outcomes, not exaggeration" title="Designed to support the whole healthcare encounter." text="NourDoc focuses on practical improvements across the areas healthcare organizations care about—without relying on unverified headline statistics." /></AnimatedSection><div className="impact-grid">{impactAreas.map(({ title, text, icon: Icon }, index) => <AnimatedSection className="impact-card" key={title} variant="card" interactive index={index}><Icon /><h3>{title}</h3><p>{text}</p></AnimatedSection>)}</div></div></section>
 
@@ -35,7 +41,48 @@ export default function Home() {
 
       <section className="section security-preview"><div className="container"><AnimatedSection><SectionHeader eyebrow="Trust at the foundation" title="Privacy and security designed for healthcare expectations." text="NourDoc is positioned for local and international healthcare environments with clear, carefully worded privacy and regulatory-readiness principles." /></AnimatedSection><div className="security-grid">{securityTopics.map(({ title, text, icon: Icon }, index) => <AnimatedSection className="security-card" key={title} variant="card" interactive index={index}><Icon /><h3>{title}</h3><p>{text}</p></AnimatedSection>)}</div><Link className="text-link light-link" to="/security-compliance">Explore security & compliance<ArrowRight /></Link></div></section>
 
-      <ImageStory reverse image={globalImage} objectPosition="38% center" alt="International physician in attentive conversation with a patient" eyebrow="Local relevance. Global readiness." title="Built around the expectations of modern healthcare." text="NourDoc brings Pakistani healthcare relevance together with the privacy, confidentiality and access-control priorities considered by U.S., U.K. and international organizations." />
+      <section className="section container global-readiness-section">
+        <div className="global-readiness-layout">
+          <AnimatedSection className="global-readiness-copy" variant="left">
+            <span className="eyebrow">Local relevance. Global readiness.</span>
+            <h2>Built around the expectations of modern healthcare.</h2>
+            <p>
+              NourDoc brings Pakistani healthcare relevance together with the
+              privacy, confidentiality and access-control priorities considered
+              by U.S., U.K. and international organizations.
+            </p>
+          </AnimatedSection>
+
+          <motion.div
+            className="global-readiness-visual"
+            initial={reducedMotion ? false : { opacity: 0, x: 24, scale: 0.98 }}
+            whileInView={reducedMotion ? undefined : { opacity: 1, x: 0, scale: 1 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.82, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <motion.div
+              className="global-readiness-frame"
+              initial={false}
+              whileInView={reducedMotion ? undefined : { y: [0, -3, 0] }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 8, ease: 'easeInOut', repeat: Infinity, delay: 0.8 }}
+            >
+              <ResponsivePicture
+                asset={globalHealthcareReadinessImage}
+                sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1200px) 46vw, 620px"
+                pictureClassName="global-readiness-picture"
+                alt="Healthcare professional using a connected clinical workflow in a modern care setting"
+                loading="lazy"
+                fetchPriority="auto"
+                decoding="async"
+                style={{ objectPosition: '55% center' }}
+              />
+              <span className="global-readiness-badge">Global-ready care</span>
+              <span className="global-readiness-sheen" aria-hidden="true" />
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
 
       <section className="section home-ecosystem-section">
         <div className="container">

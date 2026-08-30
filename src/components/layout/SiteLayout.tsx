@@ -8,7 +8,17 @@ export function SiteLayout() {
   const outlet = useOutlet()
 
   useLayoutEffect(() => {
-    window.scrollTo(0, 0)
+    const previousScrollRestoration = window.history.scrollRestoration
+    window.history.scrollRestoration = 'manual'
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto',
+    })
+
+    return () => {
+      window.history.scrollRestoration = previousScrollRestoration
+    }
   }, [pathname])
 
   return (

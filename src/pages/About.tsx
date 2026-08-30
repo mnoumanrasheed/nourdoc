@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 
-import { aboutDoctorImage as heroImage, pakistaniConsultationImage as storyImage } from '../data/responsiveImages'
+import { aboutDoctorImage as heroImage, humanMomentImage } from '../data/responsiveImages'
 
 import { CTASection } from '../components/common/CTASection'
 import { PageHero } from '../components/common/PageHero'
@@ -672,9 +672,10 @@ export default function About() {
 
       {/* ORIGIN STORY */}
       <ImageStory
-        image={storyImage}
-        objectPosition="68% center"
-        alt="Physician listening during a consultation"
+        editorial
+        image={humanMomentImage}
+        objectPosition="50% center"
+        alt="A clinician offering a calm, reassuring touch to a patient"
         eyebrow="Origin story"
         title="The best clinical technology makes room for the human moment."
         text="NourDoc began with a simple observation: the record matters, but so does the conversation that creates it. The platform is designed to make those two needs work together."

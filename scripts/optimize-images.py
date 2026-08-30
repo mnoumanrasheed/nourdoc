@@ -2,36 +2,32 @@ from pathlib import Path
 from PIL import Image
 
 
-SOURCE_DIR = Path("src/assets")
 OUTPUT_DIR = Path("public/images")
-SOURCES = [
-    "01-home-clinical-conversation.jpg",
-    "02-why-nourdoc-local-clinician-web.jpg",
-    "03-product-clinical-workflow.jpg",
-    "04-healthcare-impact-patient-care.jpg",
-    "05-security-clinical-data-workflow.jpg",
-    "06-partners-healthcare-collaboration.jpg",
-    "07-about-nourdoc-local-doctor-web.jpg",
-    "international-consultation.jpg",
-    "pakistani-consultation.jpg",
+TARGET_WIDTHS = (480, 960, 1600)
+RESPONSIVE_SOURCES = [
+    Path("src/assets/01-home-clinical-conversation.jpg"),
+    Path("src/assets/02-why-nourdoc-local-clinician-web.jpg"),
+    Path("src/assets/03-product-clinical-workflow.jpg"),
+    Path("src/assets/04-healthcare-impact-patient-care.jpg"),
+    Path("src/assets/05-security-clinical-data-workflow.jpg"),
+    Path("src/assets/06-partners-healthcare-collaboration.jpg"),
+    Path("src/assets/07-about-nourdoc-local-doctor-web.jpg"),
+    Path("src/assets/international-consultation.jpg"),
+    Path("src/assets/pakistani-consultation.jpg"),
+    Path("public/images/08_product-hero-ambient-listening.jpg"),
+    Path("public/images/09_clinical-attention-human-conversation.jpg"),
+    Path("public/images/11_global-healthcare-readiness.jpg"),
+    Path("public/images/12_book-demo-hero-background.jpg"),
 ]
 
 
 def target_widths(source_width: int) -> list[int]:
-    widths = [width for width in (480, 768, 1200, 1600) if width <= source_width]
-    if source_width >= 1920:
-        widths.append(1920)
-    elif source_width >= 1800:
-        widths.append(1800)
-    elif source_width < 1600:
-        widths.append(source_width)
-    return sorted(set(widths))
+    return [width for width in TARGET_WIDTHS if width <= source_width]
 
 
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-for source_name in SOURCES:
-    source_path = SOURCE_DIR / source_name
+for source_path in RESPONSIVE_SOURCES:
     slug = source_path.stem
 
     with Image.open(source_path) as source:
@@ -45,13 +41,7 @@ for source_name in SOURCES:
             resized.save(
                 OUTPUT_DIR / f"{slug}-{width}.webp",
                 "WEBP",
-                quality=76,
+                quality=78 if width == 1600 else 74,
                 method=6,
                 optimize=True,
-            )
-            resized.save(
-                OUTPUT_DIR / f"{slug}-{width}.avif",
-                "AVIF",
-                quality=48,
-                speed=6,
             )

@@ -752,6 +752,11 @@ p {
   gap: clamp(48px, 7vw, 100px);
 }
 
+.image-story-editorial {
+  grid-template-columns: minmax(0, 46fr) minmax(0, 54fr);
+  gap: clamp(40px, 6vw, 80px);
+}
+
 .image-story-reverse .image-story-media {
   order: 2;
 }
@@ -765,11 +770,60 @@ p {
   background: var(--mist);
 }
 
+.image-story-media.section-editorial-visual-entrance {
+  aspect-ratio: 5 / 4;
+  height: auto;
+  overflow: visible;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+.section-editorial-visual {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(19, 121, 139, .16);
+  border-radius: 28px;
+  background: var(--mist);
+  box-shadow: 0 28px 68px rgba(16, 47, 53, .11), 0 0 34px rgba(55, 204, 215, .08);
+}
+
+.section-editorial-visual::after {
+  content: '';
+  position: absolute;
+  top: 17px;
+  right: 17px;
+  width: 40px;
+  height: 40px;
+  pointer-events: none;
+  border-top: 1px solid rgba(134, 235, 239, .56);
+  border-right: 1px solid rgba(134, 235, 239, .56);
+  border-radius: 0 10px 0 0;
+}
+
 .image-story-media img {
   width: 100%;
   height: calc(100% + 40px);
   margin-top: -20px;
   object-fit: cover;
+}
+
+.image-story-media.section-editorial-visual-entrance img {
+  height: 100%;
+  margin-top: 0;
+  object-fit: cover;
+  filter: saturate(.94) contrast(1.02);
+}
+
+.image-story-error {
+  display: flex;
+  min-height: 100%;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  background: var(--mist);
 }
 
 .image-story-sheen {
@@ -779,6 +833,401 @@ p {
   background: linear-gradient(120deg, rgba(255, 255, 255, .18), transparent 35%, rgba(19, 121, 139, .06));
   opacity: .7;
   transition: opacity var(--motion-base) var(--motion-ease);
+}
+
+.image-story-editorial .image-story-sheen {
+  background: linear-gradient(125deg, rgba(255, 255, 255, .16), transparent 38%, rgba(55, 204, 215, .055));
+  opacity: .52;
+}
+
+.product-ambient-hero,
+.clinical-attention-layout {
+  display: grid;
+  align-items: center;
+  gap: clamp(36px, 6vw, 80px);
+}
+
+.product-ambient-hero {
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
+  margin-bottom: clamp(44px, 6vw, 72px);
+}
+
+.product-ambient-copy {
+  max-width: 620px;
+}
+
+.product-ambient-copy h2,
+.clinical-attention-copy h2 {
+  font-size: clamp(38px, 5vw, 64px);
+  margin: 16px 0 18px;
+}
+
+.product-ambient-copy p,
+.clinical-attention-copy p {
+  font-size: 18px;
+  max-width: 62ch;
+}
+
+.product-ambient-visual,
+.clinical-attention-visual {
+  position: relative;
+}
+
+.product-ambient-frame,
+.clinical-attention-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid rgba(19, 121, 139, .16);
+  background: var(--mist);
+  box-shadow: 0 28px 68px rgba(16, 47, 53, .11), 0 0 34px rgba(55, 204, 215, .09);
+}
+
+.product-ambient-frame::before,
+.clinical-attention-frame::before {
+  content: '';
+  position: absolute;
+  inset: -14px;
+  z-index: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 28% 24%, rgba(110, 229, 235, .18), transparent 56%);
+  pointer-events: none;
+}
+
+.product-ambient-frame::after,
+.clinical-attention-frame::after {
+  content: '';
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 42px;
+  height: 42px;
+  border-top: 1px solid rgba(134, 235, 239, .55);
+  border-right: 1px solid rgba(134, 235, 239, .55);
+  border-radius: 0 10px 0 0;
+  pointer-events: none;
+}
+
+.product-ambient-frame img,
+.product-ambient-picture>img,
+.clinical-attention-frame img,
+.clinical-attention-picture>img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  aspect-ratio: 5 / 4;
+  object-fit: cover;
+  filter: saturate(.95) contrast(1.02);
+}
+
+.product-ambient-frame img,
+.product-ambient-picture>img {
+  object-position: 58% center;
+}
+
+.clinical-attention-section {
+  padding-top: clamp(90px, 10vw, 120px);
+  padding-bottom: clamp(90px, 10vw, 118px);
+}
+
+.clinical-attention-layout {
+  grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
+}
+
+.clinical-attention-copy {
+  max-width: 560px;
+}
+
+.clinical-attention-frame img,
+.clinical-attention-picture>img {
+  aspect-ratio: 4 / 3;
+  object-position: 52% center;
+}
+
+.product-ambient-sheen,
+.clinical-attention-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(125deg, rgba(255, 255, 255, .16), transparent 38%, rgba(55, 204, 215, .055));
+  opacity: .55;
+}
+
+.clinical-attention-badge {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 14px;
+  border: 1px solid rgba(134, 235, 239, .45);
+  border-radius: 999px;
+  background: rgba(248, 252, 252, .84);
+  backdrop-filter: blur(10px);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.global-readiness-visual,
+.global-readiness-copy {
+  min-width: 0;
+}
+
+.global-readiness-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 30px;
+  border: 1px solid rgba(19, 121, 139, .16);
+  background: var(--mist);
+  box-shadow: 0 28px 72px rgba(16, 47, 53, .12), 0 0 36px rgba(55, 204, 215, .08);
+}
+
+.global-readiness-frame::before,
+.contact-hero-background::before {
+  content: '';
+  position: absolute;
+  inset: -14px;
+  border-radius: inherit;
+  background: radial-gradient(circle at 28% 24%, rgba(110, 229, 235, .16), transparent 58%);
+  pointer-events: none;
+}
+
+.global-readiness-frame::after {
+  content: '';
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 42px;
+  height: 42px;
+  border-top: 1px solid rgba(134, 235, 239, .55);
+  border-right: 1px solid rgba(134, 235, 239, .55);
+  border-radius: 0 10px 0 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.image-story-picture,
+.global-readiness-frame img {
+  display: block;
+  width: 100%;
+}
+
+.global-readiness-frame img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 5 / 4;
+  object-fit: cover;
+  filter: saturate(.96) contrast(1.02);
+}
+
+.global-readiness-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(125deg, rgba(255, 255, 255, .14), transparent 38%, rgba(55, 204, 215, .05));
+  opacity: .56;
+}
+
+.global-readiness-badge {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 14px;
+  border: 1px solid rgba(134, 235, 239, .42);
+  border-radius: 999px;
+  background: rgba(248, 252, 252, .84);
+  backdrop-filter: blur(10px);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.global-readiness-section {
+  padding-top: clamp(86px, 8vw, 116px);
+  padding-bottom: clamp(90px, 8vw, 120px);
+}
+
+.global-readiness-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, .98fr);
+  align-items: center;
+  gap: clamp(40px, 6vw, 82px);
+}
+
+.global-readiness-copy {
+  max-width: 590px;
+}
+
+.global-readiness-copy h2 {
+  margin: 16px 0 18px;
+  font-size: clamp(38px, 5vw, 62px);
+}
+
+.global-readiness-copy p {
+  margin: 0;
+  font-size: 18px;
+}
+
+.global-readiness-frame img,
+.global-readiness-picture>img {
+  aspect-ratio: 5 / 4;
+  object-position: 55% center;
+}
+
+.contact-hero-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(90deg, rgba(5, 38, 43, .82) 0%, rgba(5, 38, 43, .58) 42%, rgba(5, 38, 43, .34) 100%),
+    linear-gradient(180deg, rgba(4, 23, 30, .14), rgba(4, 23, 30, .08)),
+    url('/images/12_book-demo-hero-background-480.webp');
+  background-size: cover;
+  background-position: 52% center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  transform-origin: center;
+  filter: saturate(1.02) contrast(1.03);
+}
+
+.contact-hero-background::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 72% 24%, rgba(69, 198, 205, .11), transparent 28%),
+    radial-gradient(circle at 18% 20%, rgba(64, 177, 195, .09), transparent 32%);
+}
+
+@keyframes route-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(.995);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (min-width: 768px) {
+  .contact-hero-background {
+    background-image:
+      linear-gradient(90deg, rgba(5, 38, 43, .82) 0%, rgba(5, 38, 43, .58) 42%, rgba(5, 38, 43, .34) 100%),
+      linear-gradient(180deg, rgba(4, 23, 30, .14), rgba(4, 23, 30, .08)),
+      url('/images/12_book-demo-hero-background-960.webp');
+  }
+}
+
+@media (min-width: 1200px) {
+  .contact-hero-background {
+    background-image:
+      linear-gradient(90deg, rgba(5, 38, 43, .82) 0%, rgba(5, 38, 43, .58) 42%, rgba(5, 38, 43, .34) 100%),
+      linear-gradient(180deg, rgba(4, 23, 30, .14), rgba(4, 23, 30, .08)),
+      url('/images/12_book-demo-hero-background-1600.webp');
+  }
+}
+
+.inner-page-hero-contact>.page-hero,
+.inner-page-hero-contact>.page-hero-theme {
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 767px) {
+  .image-story-editorial {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 36px;
+  }
+
+  .image-story-media.section-editorial-visual-entrance {
+    aspect-ratio: 4 / 3;
+    width: 100%;
+  }
+
+  .section-editorial-visual {
+    border-radius: 20px;
+  }
+
+  .product-ambient-hero,
+  .clinical-attention-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .product-ambient-copy h2,
+  .clinical-attention-copy h2 {
+    margin-bottom: 16px;
+  }
+
+  .product-ambient-frame,
+  .clinical-attention-frame {
+    border-radius: 20px;
+  }
+
+  .product-ambient-frame img,
+  .product-ambient-picture>img,
+  .clinical-attention-frame img,
+  .clinical-attention-picture>img {
+    aspect-ratio: 4 / 3;
+  }
+
+  .clinical-attention-section {
+    padding-top: clamp(56px, 9vw, 72px);
+    padding-bottom: clamp(56px, 9vw, 72px);
+  }
+
+  .clinical-attention-badge {
+    left: 16px;
+    bottom: 16px;
+  }
+
+  .global-readiness-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .global-readiness-copy {
+    max-width: none;
+    justify-self: stretch;
+  }
+
+  .global-readiness-frame {
+    border-radius: 20px;
+  }
+
+  .global-readiness-frame img,
+  .global-readiness-picture>img {
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+  }
+
+  .global-readiness-badge {
+    left: 16px;
+    bottom: 16px;
+  }
+
+  .global-readiness-section {
+    padding-top: clamp(56px, 9vw, 72px);
+    padding-bottom: clamp(56px, 9vw, 72px);
+  }
+
+  .contact-hero-background {
+    background-position: 62% center;
+  }
 }
 
 .image-story-copy>p {
@@ -2886,6 +3335,8 @@ p {
   overflow-x: clip;
   background: #fbfdfc;
   color: #15363b;
+  animation: route-fade-in .3s ease-out;
+  transform-origin: top center;
 }
 
 .route-loading-shell {
@@ -6287,7 +6738,12 @@ p {
   --hero-muted: #cadce2;
   --hero-accent: #84d6df;
   --hero-line: rgba(132, 214, 223, .22);
-  background: radial-gradient(circle at 79% 18%, rgba(72, 154, 177, .22), transparent 31%), radial-gradient(circle at 64% 82%, rgba(47, 130, 138, .14), transparent 35%), linear-gradient(135deg, #0b202b, #0b3038 58%, #102d3d)
+  background:
+    radial-gradient(circle at 16% 28%, rgba(92, 208, 216, .18), transparent 30%),
+    radial-gradient(circle at 26% 66%, rgba(50, 151, 163, .14), transparent 34%),
+    radial-gradient(circle at 79% 18%, rgba(72, 154, 177, .16), transparent 31%),
+    radial-gradient(circle at 64% 82%, rgba(47, 130, 138, .1), transparent 35%),
+    transparent
 }
 
 .page-hero-theme .hero-media-image-plane>img {
@@ -6299,7 +6755,9 @@ p {
 }
 
 .page-hero-product-theme .hero-media-overlay {
-  background: linear-gradient(90deg, rgba(5, 27, 43, .96) 0%, rgba(5, 27, 43, .89) 39%, rgba(5, 27, 43, .61) 60%, rgba(5, 27, 43, .19) 81%, rgba(5, 27, 43, .045) 100%)
+  background:
+    linear-gradient(90deg, rgba(5, 27, 43, .9) 0%, rgba(5, 27, 43, .74) 38%, rgba(5, 27, 43, .46) 60%, rgba(5, 27, 43, .14) 81%, rgba(5, 27, 43, .03) 100%),
+    radial-gradient(circle at 78% 24%, rgba(93, 206, 215, .12), transparent 28%)
 }
 
 .page-hero-impact-theme .hero-media-overlay {

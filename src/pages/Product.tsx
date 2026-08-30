@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import {
   Activity,
   ArrowUpRight,
@@ -20,13 +21,17 @@ import gsap from 'gsap'
 
 import { CTASection } from '../components/common/CTASection'
 import { PageHero } from '../components/common/PageHero'
+import { ResponsivePicture } from '../components/common/ResponsivePicture'
 import { SectionHeader } from '../components/common/SectionHeader'
 import { AnimatedSection } from '../components/ui/AnimatedSection'
 import { useHeroVisualScroll } from '../hooks/useHeroVisualScroll'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { createAnimationVisibilityController } from '../utils/animationPerformance'
 
-import { productWorkflowImage as heroImage } from '../data/responsiveImages'
+import {
+  productAmbientListeningImage,
+  productWorkflowImage as heroImage,
+} from '../data/responsiveImages'
 import { PLAY_STORE_URL } from '../data/site'
 
 const productSteps = [
@@ -91,6 +96,7 @@ const speakerRows = [
 
 export default function Product() {
   const heroRef = useRef<HTMLDivElement>(null)
+  const reducedMotion = useReducedMotion()
   useHeroVisualScroll(heroRef)
 
   usePageMeta(
@@ -678,13 +684,45 @@ export default function Product() {
 
       {/* AMBIENT LISTENING */}
       <section className="section container">
-        <AnimatedSection>
-          <SectionHeader
-            eyebrow="Ambient listening"
-            title="Documentation that starts the moment the visit does."
-            text="Natural conversation becomes the input. Consent prompts and recording indicators help keep capture explicit, while desktop, tablet and mobile usage support the clinical setting."
-          />
-        </AnimatedSection>
+        <div className="product-ambient-hero">
+          <AnimatedSection className="product-ambient-copy" variant="left">
+            <span className="eyebrow">Ambient listening</span>
+            <h2>Documentation that starts the moment the visit does.</h2>
+            <p>
+              Natural conversation becomes the input. Consent prompts and
+              recording indicators help keep capture explicit, while desktop,
+              tablet and mobile usage support the clinical setting.
+            </p>
+          </AnimatedSection>
+
+          <motion.div
+            className="product-ambient-visual"
+            initial={reducedMotion ? false : { opacity: 0, x: 28, scale: 0.97 }}
+            whileInView={reducedMotion ? undefined : { opacity: 1, x: 0, scale: 1 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.84, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <motion.div
+              className="product-ambient-frame"
+              initial={false}
+              whileInView={reducedMotion ? undefined : { y: [0, -4, 0] }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 8, ease: 'easeInOut', repeat: Infinity, delay: 0.9 }}
+            >
+              <ResponsivePicture
+                asset={productAmbientListeningImage}
+                sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1200px) 42vw, 560px"
+                pictureClassName="product-ambient-picture"
+                alt="Doctor and patient in consultation with clinical documentation supported on a tablet"
+                loading="lazy"
+                fetchPriority="auto"
+                decoding="async"
+                style={{ objectPosition: '58% center' }}
+              />
+              <span className="product-ambient-sheen" aria-hidden="true" />
+            </motion.div>
+          </motion.div>
+        </div>
 
         <div className="story-rail">
           {productSteps.map((step, index) => (

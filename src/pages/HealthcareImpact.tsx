@@ -1,14 +1,17 @@
 import { useEffect, useRef } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import gsap from 'gsap'
 
 import {
+  clinicalAttentionImage,
+  evidenceAndTrustImage,
   healthcareImpactImage as heroImage,
-  internationalConsultationImage as patientExperienceImage,
-  pakistaniConsultationImage as localImage,
+  patientExperienceImage,
 } from '../data/responsiveImages'
 
 import { CTASection } from '../components/common/CTASection'
 import { PageHero } from '../components/common/PageHero'
+import { ResponsivePicture } from '../components/common/ResponsivePicture'
 import { SectionHeader } from '../components/common/SectionHeader'
 import { ImageStory } from '../components/sections/ImageStory'
 import { AnimatedSection } from '../components/ui/AnimatedSection'
@@ -20,6 +23,7 @@ import { createAnimationVisibilityController } from '../utils/animationPerforman
 
 export default function HealthcareImpact() {
   const heroRef = useRef<HTMLDivElement>(null)
+  const reducedMotion = useReducedMotion()
   useHeroVisualScroll(heroRef)
   const outerRingRef = useRef<HTMLDivElement>(null)
   const innerRingRef = useRef<HTMLDivElement>(null)
@@ -659,9 +663,10 @@ export default function HealthcareImpact() {
 
       {/* PATIENT EXPERIENCE */}
       <ImageStory
+        editorial
         image={patientExperienceImage}
         objectPosition="50% center"
-        alt="Physician listening attentively during a patient consultation"
+        alt="Physician maintaining eye contact while speaking with a patient"
         eyebrow="Patient experience"
         title="Visits that feel like conversations again."
         text="When physicians spend less time typing during consultations, more attention can remain on the patient interaction."
@@ -703,30 +708,59 @@ export default function HealthcareImpact() {
       </section>
 
       {/* CLINICAL ATTENTION */}
-      <ImageStory
-        reverse
-        image={localImage}
-        objectPosition="68% center"
-        alt="Pakistani doctor listening during a consultation"
-        eyebrow="Clinical attention"
-        title="Documentation should support the visit—not interrupt it."
-        text="NourDoc is designed to reduce the manual documentation surrounding care so the clinical team can keep more of its attention where it belongs."
-      />
+      <section className="section container clinical-attention-section">
+        <div className="clinical-attention-layout">
+          <AnimatedSection className="clinical-attention-copy" variant="left">
+            <span className="eyebrow">Clinical attention</span>
+            <h2>Documentation should support the visit—not interrupt it.</h2>
+            <p>
+              NourDoc is designed to reduce the manual documentation
+              surrounding care so the clinical team can keep more of its
+              attention where it belongs.
+            </p>
+          </AnimatedSection>
+
+          <motion.div
+            className="clinical-attention-visual"
+            initial={reducedMotion ? false : { opacity: 0, x: 30, scale: 0.98 }}
+            whileInView={reducedMotion ? undefined : { opacity: 1, x: 0, scale: 1 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.82, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <motion.div
+              className="clinical-attention-frame"
+              initial={false}
+              whileInView={reducedMotion ? undefined : { y: [0, -3, 0] }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 7.8, ease: 'easeInOut', repeat: Infinity, delay: 0.8 }}
+            >
+              <ResponsivePicture
+                asset={clinicalAttentionImage}
+                sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1200px) 48vw, 640px"
+                pictureClassName="clinical-attention-picture"
+                alt="Doctor maintaining attentive eye contact during a patient consultation"
+                loading="lazy"
+                fetchPriority="auto"
+                decoding="async"
+                style={{ objectPosition: '52% center' }}
+              />
+              <span className="clinical-attention-badge">More patient attention</span>
+              <span className="clinical-attention-sheen" aria-hidden="true" />
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
 
       {/* EVIDENCE STANDARD */}
-      <section className="section container">
-        <AnimatedSection className="principle-panel">
-          <span className="eyebrow">A clear evidence standard</span>
-
-          <h2>Claims should earn trust.</h2>
-
-          <p>
-            We do not publish legacy headline statistics until their source and
-            applicability are validated. NourDoc’s public story stays focused
-            on the product workflow and the outcomes it is designed to support.
-          </p>
-        </AnimatedSection>
-      </section>
+      <ImageStory
+        editorial
+        image={evidenceAndTrustImage}
+        objectPosition="46% center"
+        alt="Healthcare professionals reviewing clinical evidence on a tablet"
+        eyebrow="A clear evidence standard"
+        title="Claims should earn trust."
+        text="We do not publish legacy headline statistics until their source and applicability are validated. NourDoc’s public story stays focused on the product workflow and the outcomes it is designed to support."
+      />
 
       <CTASection />
     </>

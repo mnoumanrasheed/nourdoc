@@ -8,6 +8,7 @@ type ResponsivePictureProps = Omit<HTMLMotionProps<'img'>, 'height' | 'onLoad' |
   sizes: string
   pictureClassName?: string
   onDecoded?: (image: HTMLImageElement) => void
+  onError?: (event: SyntheticEvent<HTMLImageElement>) => void
 }
 
 export function ResponsivePicture({
@@ -16,6 +17,7 @@ export function ResponsivePicture({
   pictureClassName,
   className = '',
   onDecoded,
+  onError,
   ...imageProps
 }: ResponsivePictureProps) {
   const [decoded, setDecoded] = useState(() => isResponsiveImageDecoded(asset))
@@ -32,9 +34,17 @@ export function ResponsivePicture({
     onDecoded?.(image)
   }, [asset, onDecoded])
 
+  const handleError = useCallback((event: SyntheticEvent<HTMLImageElement>) => {
+    console.error('ResponsivePicture: Failed to load image', {
+      asset,
+      src: event.currentTarget.src,
+      error: event.type
+    })
+    onError?.(event)
+  }, [asset, onError])
+
   return (
     <picture className={pictureClassName}>
-      <source type="image/avif" srcSet={asset.avifSrcSet} sizes={sizes} />
       <source type="image/webp" srcSet={asset.webpSrcSet} sizes={sizes} />
       <motion.img
         {...imageProps}
@@ -44,6 +54,7 @@ export function ResponsivePicture({
         height={asset.height}
         sizes={sizes}
         onLoad={handleLoad}
+        onError={handleError}
       />
     </picture>
   )

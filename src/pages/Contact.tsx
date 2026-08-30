@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import {
   ArrowRight,
   ArrowUpRight,
@@ -67,6 +68,7 @@ export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY
+  const reducedMotion = useReducedMotion()
 
   const heroRef = useRef<HTMLDivElement>(null)
   useHeroVisualScroll(heroRef)
@@ -349,6 +351,13 @@ export default function Contact() {
           overflow: 'hidden',
         }}
       >
+        <motion.div
+          className="contact-hero-background"
+          aria-hidden="true"
+          initial={false}
+          animate={reducedMotion ? undefined : { scale: [1, 1.02, 1] }}
+          transition={reducedMotion ? undefined : { duration: 14, repeat: Infinity, ease: 'easeInOut' }}
+        />
         <PageHero
           variant="contact"
           eyebrow="Contact"

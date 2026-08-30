@@ -70,11 +70,12 @@ function AmbientVisual({ active }: VisualProps) {
   const reduced = reducedMotionPref === true
   const rootRef = useRef<HTMLDivElement>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
+  const activeRef = useRef(active)
 
   useLayoutEffect(() => {
     const root = rootRef.current
     if (!root) return
-    const timeline = gsap.timeline({ paused: !active })
+    const timeline = gsap.timeline({ paused: true })
     const context = gsap.context(() => {
       const connectors = gsap.utils.toArray<HTMLElement>('.ambient-connector', root)
       connectors.forEach((connector, connectorIndex) => {
@@ -102,17 +103,13 @@ function AmbientVisual({ active }: VisualProps) {
     }, root)
 
     timelineRef.current = timeline
-    if (active) {
-      gsap.ticker.wake()
-      timeline.play()
-    } else {
-      timeline.pause()
-    }
+    setTimelineState(timeline, activeRef.current)
 
     return () => { timelineRef.current = null; timeline.kill(); context.revert() }
   }, [reduced])
 
   useLayoutEffect(() => {
+    activeRef.current = active
     if (timelineRef.current) {
       setTimelineState(timelineRef.current, active)
     }
@@ -157,6 +154,7 @@ function ContextVisual({ active }: VisualProps) {
   const reduced = reducedMotionPref === true
   const rootRef = useRef<HTMLDivElement>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
+  const activeRef = useRef(active)
   const cards = [
     ['Conversation', 'Natural dialogue retained', Mic2],
     ['Clinical context', 'Meaning across the encounter', Stethoscope],
@@ -168,7 +166,7 @@ function ContextVisual({ active }: VisualProps) {
     const root = rootRef.current
     if (!root) return
 
-    const timeline = gsap.timeline({ paused: !active })
+    const timeline = gsap.timeline({ paused: true })
     const context = gsap.context(() => {
       const paths = gsap.utils.toArray<SVGPathElement>('.context-flow-path', root)
       const packets = gsap.utils.toArray<SVGCircleElement>('.context-packet', root)
@@ -192,12 +190,7 @@ function ContextVisual({ active }: VisualProps) {
     }, root)
 
     timelineRef.current = timeline
-    if (active) {
-      gsap.ticker.wake()
-      timeline.play()
-    } else {
-      timeline.pause()
-    }
+    setTimelineState(timeline, activeRef.current)
 
     return () => {
       timelineRef.current = null
@@ -207,6 +200,7 @@ function ContextVisual({ active }: VisualProps) {
   }, [reduced])
 
   useLayoutEffect(() => {
+    activeRef.current = active
     if (timelineRef.current) {
       setTimelineState(timelineRef.current, active)
     }
@@ -246,12 +240,13 @@ function ImpactVisual({ active }: VisualProps) {
   const reduced = reducedMotionPref === true
   const rootRef = useRef<HTMLDivElement>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
+  const activeRef = useRef(active)
 
   useLayoutEffect(() => {
     const root = rootRef.current
     if (!root) return
 
-    const timeline = gsap.timeline({ paused: !active })
+    const timeline = gsap.timeline({ paused: true })
     const context = gsap.context(() => {
       const ring = root.querySelector<SVGCircleElement>('.impact-ring-value')
       const ringHalo = root.querySelector<SVGCircleElement>('.impact-ring-halo')
@@ -339,12 +334,7 @@ function ImpactVisual({ active }: VisualProps) {
     }, root)
 
     timelineRef.current = timeline
-    if (active) {
-      gsap.ticker.wake()
-      timeline.play()
-    } else {
-      timeline.pause()
-    }
+    setTimelineState(timeline, activeRef.current)
 
     return () => {
       timelineRef.current = null
@@ -354,6 +344,7 @@ function ImpactVisual({ active }: VisualProps) {
   }, [reduced])
 
   useLayoutEffect(() => {
+    activeRef.current = active
     if (timelineRef.current) {
       setTimelineState(timelineRef.current, active)
     }
@@ -546,12 +537,13 @@ function SecurityVisual({ active }: VisualProps) {
   const reduced = reducedMotionPref === true
   const rootRef = useRef<HTMLDivElement>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
+  const activeRef = useRef(active)
 
   useLayoutEffect(() => {
     const root = rootRef.current
     if (!root) return
 
-    const timeline = gsap.timeline({ paused: !active })
+    const timeline = gsap.timeline({ paused: true })
     const context = gsap.context(() => {
       gsap.set([
         '.security-stage',
@@ -603,12 +595,7 @@ function SecurityVisual({ active }: VisualProps) {
     }, root)
 
     timelineRef.current = timeline
-    if (active) {
-      gsap.ticker.wake()
-      timeline.play()
-    } else {
-      timeline.pause()
-    }
+    setTimelineState(timeline, activeRef.current)
 
     return () => {
       timelineRef.current = null
@@ -618,6 +605,7 @@ function SecurityVisual({ active }: VisualProps) {
   }, [reduced])
 
   useLayoutEffect(() => {
+    activeRef.current = active
     if (timelineRef.current) {
       setTimelineState(timelineRef.current, active)
     }
