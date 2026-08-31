@@ -12,7 +12,9 @@ import {
 import gsap from 'gsap'
 // @ts-expect-error The installed package does not include TypeScript declarations.
 import ReCAPTCHA from 'react-google-recaptcha'
+import { useSearchParams } from 'react-router-dom'
 
+import { DemoBookingFlow } from '../components/contact/DemoBookingFlow'
 import { PageHero } from '../components/common/PageHero'
 import { SectionHeader } from '../components/common/SectionHeader'
 import { AnimatedSection } from '../components/ui/AnimatedSection'
@@ -69,6 +71,8 @@ export default function Contact() {
   const [submitError, setSubmitError] = useState<string | null>(null)
   const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY
   const reducedMotion = useReducedMotion()
+  const [searchParams] = useSearchParams()
+  const isDemoIntent = searchParams.get('intent') === 'demo'
 
   const heroRef = useRef<HTMLDivElement>(null)
   useHeroVisualScroll(heroRef)
@@ -78,8 +82,10 @@ export default function Contact() {
   const recaptchaRef = useRef<ReCaptchaHandle | null>(null)
 
   usePageMeta(
-    'Contact',
-    'Contact NourDoc for product demonstrations, trials, sales, support, partnerships or investment inquiries.',
+    isDemoIntent ? 'Book a Demo' : 'Contact',
+    isDemoIntent
+      ? 'Request a focused NourDoc demonstration shaped around your healthcare organisation and clinical workflow.'
+      : 'Contact NourDoc for product demonstrations, trials, sales, support, partnerships or investment inquiries.',
   )
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
@@ -360,9 +366,13 @@ export default function Contact() {
         />
         <PageHero
           variant="contact"
-          eyebrow="Contact"
-          title="Let’s talk about giving your physicians their time back."
-          text="Contact NourDoc for product demonstrations, trials, sales, support, partnerships or investment inquiries."
+          eyebrow={isDemoIntent ? 'Book a Demo' : 'Contact'}
+          title={isDemoIntent
+            ? 'See NourDoc in the context of your clinical workflow.'
+            : 'Let’s talk about giving your physicians their time back.'}
+          text={isDemoIntent
+            ? 'Tell us what matters to your organisation so our team can prepare a focused, relevant demonstration.'
+            : 'Contact NourDoc for product demonstrations, trials, sales, support, partnerships or investment inquiries.'}
         />
 
         {/* PREMIUM CONTACT ROUTING NETWORK */}
@@ -820,6 +830,10 @@ export default function Contact() {
         </div>
       </div>
 
+      {isDemoIntent ? (
+        <DemoBookingFlow />
+      ) : (
+        <>
       {/* CONTACT THE RIGHT TEAM */}
       <section
         className="section"
@@ -1160,6 +1174,8 @@ export default function Contact() {
           `}</style>
         </div>
       </section>
+        </>
+      )}
     </>
   )
 }

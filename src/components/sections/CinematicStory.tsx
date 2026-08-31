@@ -827,7 +827,7 @@ function StoryScene({ scene, index, compact, layered, active, registerScene }: S
           {index === 0 ? <motion.h1 variants={copyItemVariants}>{scene.title}</motion.h1> : <motion.h2 variants={copyItemVariants}>{scene.title}</motion.h2>}
           <motion.p variants={copyItemVariants}>{scene.description}</motion.p>
           <motion.div className="scene-actions" variants={copyItemVariants}>
-            <motion.div whileHover={reduced ? undefined : { y: -2 }} whileTap={reduced ? undefined : { scale: .985 }}><Link className="button scene-primary-action" to="/contact">Book a Demo<ArrowRight size={17} /></Link></motion.div>
+            <motion.div whileHover={reduced ? undefined : { y: -2 }} whileTap={reduced ? undefined : { scale: .985 }}><Link className="button scene-primary-action" to="/contact?intent=demo">Book a Demo<ArrowRight size={17} /></Link></motion.div>
             <motion.div whileHover={reduced ? undefined : { x: 3 }}><Link className="scene-secondary-action" to="/product">Explore the platform<ArrowRight size={16} /></Link></motion.div>
           </motion.div>
           {index === 0 && (

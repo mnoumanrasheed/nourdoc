@@ -60,7 +60,7 @@ export function Navbar() {
             <Play size={13} fill="currentColor" aria-hidden="true" />Try NourDoc
           </a>
         </motion.div>
-        <motion.div className="nav-cta-wrap" whileHover={reduced ? undefined : { y: -2 }} whileTap={reduced ? undefined : { scale: .98 }}><Link to="/contact" className="button button-primary nav-cta" onPointerEnter={() => preloadRoute('/contact')} onFocus={() => preloadRoute('/contact')} onTouchStart={() => preloadRoute('/contact')} onClick={() => setOpen(false)}>Book a Demo<ArrowUpRight size={17} /></Link></motion.div>
+        <motion.div className="nav-cta-wrap" whileHover={reduced ? undefined : { y: -2 }} whileTap={reduced ? undefined : { scale: .98 }}><Link to="/contact?intent=demo" className="button button-primary nav-cta" onPointerEnter={() => preloadRoute('/contact')} onFocus={() => preloadRoute('/contact')} onTouchStart={() => preloadRoute('/contact')} onClick={() => setOpen(false)}>Book a Demo<ArrowUpRight size={17} /></Link></motion.div>
         <motion.button whileTap={reduced ? undefined : { scale: .92 }} ref={menuButtonRef} className="menu-button" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="mobile-navigation" aria-label={open ? 'Close menu' : 'Open menu'}>
           {open ? <X /> : <Menu />}
         </motion.button>
@@ -127,7 +127,7 @@ export function Navbar() {
             <Play size={14} fill="currentColor" aria-hidden="true" />Try NourDoc
           </a>
           <Link
-            to="/contact"
+            to="/contact?intent=demo"
             className="button button-primary mobile-nav-cta"
             onPointerEnter={() => preloadRoute('/contact')}
             onTouchStart={() => preloadRoute('/contact')}

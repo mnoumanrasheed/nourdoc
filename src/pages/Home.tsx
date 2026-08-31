@@ -4,53 +4,121 @@ import { Link } from 'react-router-dom'
 import { CTASection } from '../components/common/CTASection'
 import { ResponsivePicture } from '../components/common/ResponsivePicture'
 import { SectionHeader } from '../components/common/SectionHeader'
-import { ImageStory } from '../components/sections/ImageStory'
 import { CinematicStory } from '../components/sections/CinematicStory'
+import { ImageStory } from '../components/sections/ImageStory'
 import { WorkflowJourney } from '../components/sections/WorkflowJourney'
 import { AnimatedSection } from '../components/ui/AnimatedSection'
-import { capabilities, impactAreas, partnerCategories, securityTopics, workflow } from '../data/site'
+import { partnerCategories, securityTopics, workflow } from '../data/site'
 import {
   globalHealthcareReadinessImage,
   moreTimeForCareImage,
 } from '../data/responsiveImages'
 import { usePageMeta } from '../hooks/usePageMeta'
 
+const whyNourDocHighlights = [
+  'Built for clinical conversations',
+  'Structured clinical documentation',
+  'Clinician-controlled review',
+]
+
+const homePartnerCategories = [
+  partnerCategories[0],
+  partnerCategories[1],
+  partnerCategories[10],
+]
+
 export default function Home() {
   const reducedMotion = useReducedMotion()
-  usePageMeta('Ambient Clinical Intelligence', 'NourDoc turns natural doctor-patient conversations into structured clinical documentation for clinician review.')
+
+  usePageMeta(
+    'Ambient Clinical Intelligence',
+    'NourDoc turns natural doctor-patient conversations into structured clinical documentation for clinician review.',
+  )
+
   return (
     <>
       <CinematicStory />
 
-      <section className="section container">
-        <AnimatedSection><SectionHeader eyebrow="The platform" title="Everything needed to turn conversation into a complete clinical record." text="NourDoc brings ambient capture, clinical intelligence, review and structured documentation into a clinician-controlled workflow." /></AnimatedSection>
-        <div className="feature-grid">{capabilities.map(({ title, text, icon: Icon }, index) => <AnimatedSection key={title} variant="card" interactive index={index} className={`feature-card capability-card capability-card-${index + 1} ${index === 0 ? 'feature-card-accent' : ''}`}><Icon /><span className="card-index">0{index + 1}</span><h3>{title}</h3><p>{text}</p><span className="card-detail-indicator" aria-hidden="true" /></AnimatedSection>)}</div>
-      </section>
-
       <section className="section workflow-section home-workflow-section">
-        <div className="container home-workflow-inner"><AnimatedSection><SectionHeader eyebrow="A clear clinical workflow" title="From visit to signed note in four clear steps." /></AnimatedSection>
+        <div className="container home-workflow-inner">
+          <AnimatedSection>
+            <SectionHeader
+              eyebrow="Product preview"
+              title="From clinical conversation to clinician-reviewed documentation."
+              text="A focused ambient workflow that helps clinicians listen, understand, draft and review."
+            />
+          </AnimatedSection>
           <WorkflowJourney steps={workflow} premium />
+          <AnimatedSection>
+            <Link className="text-link" style={{ marginTop: '32px' }} to="/product">
+              Explore the Product
+              <ArrowRight />
+            </Link>
+          </AnimatedSection>
         </div>
       </section>
 
-      <ImageStory editorial image={moreTimeForCareImage} objectPosition="50% center" alt="Physician checking a patient's blood pressure during an attentive consultation" eyebrow="Healthcare impact" title="More time for care. Less time looking at screens." text="Documentation should support the clinical encounter rather than interrupt it. NourDoc is designed to reduce paperwork and allow clinicians to remain more focused on patients." points={['Less documentation burden', 'More patient attention', 'Clinician-controlled review']} />
+      <ImageStory
+        editorial
+        image={moreTimeForCareImage}
+        objectPosition="50% center"
+        alt="Physician checking a patient's blood pressure during an attentive consultation"
+        eyebrow="Healthcare impact"
+        title="More time for care. Less time looking at screens."
+        text="NourDoc is designed to reduce documentation friction so clinicians can keep more attention on the patient encounter."
+        points={[
+          'Less documentation burden',
+          'More patient attention',
+          'A simpler path to reviewed notes',
+        ]}
+      />
 
-      <section className="section section-soft"><div className="container"><AnimatedSection><SectionHeader eyebrow="Outcomes, not exaggeration" title="Designed to support the whole healthcare encounter." text="NourDoc focuses on practical improvements across the areas healthcare organizations care about—without relying on unverified headline statistics." /></AnimatedSection><div className="impact-grid">{impactAreas.map(({ title, text, icon: Icon }, index) => <AnimatedSection className="impact-card" key={title} variant="card" interactive index={index}><Icon /><h3>{title}</h3><p>{text}</p></AnimatedSection>)}</div></div></section>
+      <section className="section container split-heading">
+        <AnimatedSection>
+          <SectionHeader
+            eyebrow="Why NourDoc"
+            title="Built for clinical work, not just transcription."
+            text="Purpose-built around the conversation, documentation structure and clinical oversight that care teams need."
+          />
+        </AnimatedSection>
+        <AnimatedSection>
+          <div className="differentiator-list">
+            {whyNourDocHighlights.map((highlight) => (
+              <div key={highlight}>
+                <CheckCircle2 />
+                {highlight}
+              </div>
+            ))}
+          </div>
+          <Link className="text-link" style={{ marginTop: '28px' }} to="/why-nourdoc">
+            Why NourDoc
+            <ArrowRight />
+          </Link>
+        </AnimatedSection>
+      </section>
 
-      <section className="section container split-heading"><AnimatedSection><SectionHeader eyebrow="Why NourDoc" title="Built for clinical work, not just transcription." /></AnimatedSection><AnimatedSection className="differentiator-list">{['Natural clinical conversation', 'Structured SOAP documentation', 'Clinician-controlled review', 'Medical terminology support', 'Speaker separation', 'Security and privacy focus', 'Integration-oriented architecture'].map(x => <div key={x}><CheckCircle2 />{x}</div>)}</AnimatedSection></section>
-
-      <section className="section security-preview"><div className="container"><AnimatedSection><SectionHeader eyebrow="Trust at the foundation" title="Privacy and security designed for healthcare expectations." text="NourDoc is positioned for local and international healthcare environments with clear, carefully worded privacy and regulatory-readiness principles." /></AnimatedSection><div className="security-grid">{securityTopics.map(({ title, text, icon: Icon }, index) => <AnimatedSection className="security-card" key={title} variant="card" interactive index={index}><Icon /><h3>{title}</h3><p>{text}</p></AnimatedSection>)}</div><Link className="text-link light-link" to="/security-compliance">Explore security & compliance<ArrowRight /></Link></div></section>
-
-      <section className="section container global-readiness-section">
-        <div className="global-readiness-layout">
+      <section className="section security-preview global-readiness-section">
+        <div className="container global-readiness-layout">
           <AnimatedSection className="global-readiness-copy" variant="left">
-            <span className="eyebrow">Local relevance. Global readiness.</span>
-            <h2>Built around the expectations of modern healthcare.</h2>
+            <span className="eyebrow eyebrow-light">Trust at the foundation. Global readiness.</span>
+            <h2>Healthcare trust, from local relevance to global readiness.</h2>
             <p>
               NourDoc brings Pakistani healthcare relevance together with the
               privacy, confidentiality and access-control priorities considered
               by U.S., U.K. and international organizations.
             </p>
+            <div className="differentiator-list" style={{ marginTop: '24px' }}>
+              {securityTopics.slice(0, 3).map(({ title, icon: Icon }) => (
+                <div key={title}>
+                  <Icon />
+                  {title}
+                </div>
+              ))}
+            </div>
+            <Link className="text-link light-link" to="/security-compliance">
+              Explore Security
+              <ArrowRight />
+            </Link>
           </AnimatedSection>
 
           <motion.div
@@ -86,20 +154,36 @@ export default function Home() {
 
       <section className="section home-ecosystem-section">
         <div className="container">
-          <AnimatedSection><SectionHeader eyebrow="Healthcare ecosystem" title="Designed to work alongside the organizations that deliver care." text="We present partner categories—not invented customer logos—because meaningful healthcare transformation is built through real collaboration." /></AnimatedSection>
+          <AnimatedSection>
+            <SectionHeader
+              eyebrow="Healthcare ecosystem"
+              title="A focused preview of the organizations NourDoc is built to work alongside."
+              text="From care delivery to enabling technology, partnership keeps clinical workflows connected."
+            />
+          </AnimatedSection>
           <div className="partner-strip home-partner-strip">
-            {partnerCategories.slice(0, 6).map(({ title, icon: Icon }, index) => (
+            {homePartnerCategories.map(({ title, icon: Icon }, index) => (
               <AnimatedSection key={title} variant="card" interactive index={index}>
                 <span className="home-partner-index">0{index + 1}</span>
-                <span className="home-partner-icon"><Icon /></span>
+                <span className="home-partner-icon">
+                  <Icon />
+                </span>
                 <strong>{title}</strong>
-                <span className="home-partner-network" aria-hidden="true"><i /><i /><i /></span>
+                <span className="home-partner-network" aria-hidden="true">
+                  <i />
+                  <i />
+                  <i />
+                </span>
               </AnimatedSection>
             ))}
           </div>
-          <Link to="/partners" className="text-link home-ecosystem-link">Explore partnerships<ArrowRight /></Link>
+          <Link to="/partners" className="text-link home-ecosystem-link">
+            Explore Partnerships
+            <ArrowRight />
+          </Link>
         </div>
       </section>
+
       <CTASection />
     </>
   )
