@@ -20,6 +20,11 @@ import { SectionHeader } from '../components/common/SectionHeader'
 import { AnimatedSection } from '../components/ui/AnimatedSection'
 import { useHeroVisualScroll } from '../hooks/useHeroVisualScroll'
 import { usePageMeta } from '../hooks/usePageMeta'
+import {
+  getContactEmailMeta,
+  getDefaultInterestForIntent,
+  resolveContactIntent,
+} from '../utils/contactIntent'
 import { createAnimationVisibilityController } from '../utils/animationPerformance'
 
 const departmentContacts = [
@@ -72,7 +77,9 @@ export default function Contact() {
   const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY
   const reducedMotion = useReducedMotion()
   const [searchParams] = useSearchParams()
-  const isDemoIntent = searchParams.get('intent') === 'demo'
+  const intent = resolveContactIntent(searchParams.get('intent'))
+  const isDemoIntent = intent === 'demo'
+  const defaultInterest = getDefaultInterestForIntent(intent)
 
   const heroRef = useRef<HTMLDivElement>(null)
   useHeroVisualScroll(heroRef)
@@ -104,13 +111,20 @@ export default function Contact() {
     setIsSubmitting(true)
 
     const formData = new FormData(event.currentTarget)
+    const organization = String(formData.get('organization') ?? '').trim()
+    const emailMeta = getContactEmailMeta(intent, organization)
     const payload = {
       name: String(formData.get('name') ?? '').trim(),
       email: String(formData.get('email') ?? '').trim(),
-      organization: String(formData.get('organization') ?? '').trim(),
+      organization,
+      intent,
       interest: String(formData.get('interest') ?? '').trim(),
       message: String(formData.get('message') ?? '').trim(),
       recaptchaToken: token,
+      emailSubject: emailMeta.subject,
+      emailHeading: emailMeta.heading,
+      submissionType: emailMeta.submissionType,
+      replyTo: String(formData.get('email') ?? '').trim(),
     }
 
     try {
@@ -956,7 +970,7 @@ export default function Contact() {
 
                 <label>
                   Interest
-                  <select name="interest" required defaultValue="">
+                  <select name="interest" required defaultValue={defaultInterest}>
                     <option value="" disabled>
                       Select an interest
                     </option>

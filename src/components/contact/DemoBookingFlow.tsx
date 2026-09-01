@@ -21,6 +21,7 @@ import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'r
 // @ts-expect-error The installed package does not include TypeScript declarations.
 import ReCAPTCHA from 'react-google-recaptcha'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { getContactEmailMeta, resolveContactIntent } from '../../utils/contactIntent'
 
 type DemoData = {
   organisationType: string
@@ -92,12 +93,20 @@ const initialData: DemoData = {
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
+function getInitialStep(searchParams: URLSearchParams) {
+  const requestedStep = Number(searchParams.get('step') ?? 1)
+  return Number.isInteger(requestedStep) && requestedStep >= 1 && requestedStep <= 4
+    ? requestedStep
+    : 1
+}
+
 export function DemoBookingFlow() {
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
   const reducedMotion = useReducedMotion()
-  const [step, setStep] = useState(1)
-  const [highestStep, setHighestStep] = useState(1)
+  const intent = resolveContactIntent(searchParams.get('intent'))
+  const [step, setStep] = useState(() => getInitialStep(searchParams))
+  const [highestStep, setHighestStep] = useState(() => getInitialStep(searchParams))
   const [data, setData] = useState<DemoData>(initialData)
   const [errors, setErrors] = useState<DemoErrors>({})
   const [submitted, setSubmitted] = useState(false)
@@ -226,6 +235,7 @@ export function DemoBookingFlow() {
     setSubmitError(null)
 
     const requirements = data.message.trim()
+    const emailMeta = getContactEmailMeta(intent, data.organisation)
     const structuredMessage = [
       `Organisation type: ${data.organisationType}`,
       `Demo interests: ${data.interests.join(', ')}`,
@@ -239,9 +249,14 @@ export function DemoBookingFlow() {
       name: data.fullName.trim(),
       email: data.email.trim(),
       organization: data.organisation.trim(),
+      intent,
       interest: 'Book a Demo',
       message: structuredMessage,
       recaptchaToken,
+      emailSubject: emailMeta.subject,
+      emailHeading: emailMeta.heading,
+      submissionType: emailMeta.submissionType,
+      replyTo: data.email.trim(),
       organisationType: data.organisationType,
       demoInterests: data.interests,
       phone: data.phone.trim(),
@@ -303,6 +318,34 @@ export function DemoBookingFlow() {
   return (
     <section className="section demo-booking-section" aria-labelledby="demo-booking-title">
       <div className="container demo-booking-shell">
+        <motion.div
+          className="demo-transition-bridge"
+          initial={reducedMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.8 }}
+          transition={reducedMotion ? undefined : { duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <motion.span
+            className="demo-transition-line"
+            aria-hidden="true"
+            initial={reducedMotion ? false : { scaleX: 0, opacity: 0.3 }}
+            whileInView={reducedMotion ? undefined : { scaleX: 1, opacity: 1 }}
+            viewport={{ once: true, amount: 0.8 }}
+            transition={reducedMotion ? undefined : { duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+          />
+          <div className="demo-transition-copy">
+            <span className="demo-transition-dot" aria-hidden="true" />
+            <p>A better conversation starts with the right context.</p>
+          </div>
+          <motion.span
+            className="demo-transition-line"
+            aria-hidden="true"
+            initial={reducedMotion ? false : { scaleX: 0, opacity: 0.3 }}
+            whileInView={reducedMotion ? undefined : { scaleX: 1, opacity: 1 }}
+            viewport={{ once: true, amount: 0.8 }}
+            transition={reducedMotion ? undefined : { duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+          />
+        </motion.div>
         <div className="demo-progress" aria-label={`Demo request progress: step ${step} of 4`}>
           {progressSteps.map(([number, label], index) => {
             const position = index + 1
@@ -320,13 +363,20 @@ export function DemoBookingFlow() {
         </div>
 
         <div className="demo-booking-layout">
-  <aside className="demo-booking-context">
+          <aside className="demo-booking-context">
             <span className="eyebrow">A more relevant conversation</span>
-            <h2 id="demo-booking-title">A demonstration shaped around your workflow.</h2>
+            <h2 id="demo-booking-title">
+              <span>Let&apos;s see if NourDoc</span>
+              <span>is the right fit for</span>
+              <span>your team.</span>
+            </h2>
             <p>
-              Four focused steps help our team understand your care environment
-              before the conversation begins.
+              Share a few details so our founders can understand your workflow
+              and respond with real relevance.
             </p>
+            <div className="demo-context-rule" aria-hidden="true">
+              <span>Built around your workflow</span>
+            </div>
             <div className="demo-context-highlights" aria-label="Demo request highlights">
               <span>
                 <CalendarClock aria-hidden="true" />
@@ -342,9 +392,9 @@ export function DemoBookingFlow() {
               </span>
             </div>
             <div className="demo-context-note">
-              <ShieldCheck aria-hidden="true" />
+              <CalendarClock aria-hidden="true" />
               <div>
-                <strong>Handled with care</strong>
+                <strong>Takes around 2 minutes.</strong>
                 <span>Please do not include patient-identifiable information.</span>
               </div>
             </div>

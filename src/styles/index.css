@@ -2184,6 +2184,7 @@ p {
 .demo-booking-section {
   position: relative;
   overflow: hidden;
+  padding-block: clamp(44px, 5.2vw, 78px) clamp(84px, 8vw, 118px);
   background:
     linear-gradient(115deg, rgba(7, 44, 48, .055), transparent 28%),
     radial-gradient(circle at 12% 8%, rgba(53, 181, 189, .12), transparent 30%),
@@ -2210,6 +2211,47 @@ p {
   z-index: 1;
   max-width: 1180px;
   margin-inline: auto
+}
+
+.demo-transition-bridge {
+  margin: 0 auto 30px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(14px, 2vw, 26px)
+}
+
+.demo-transition-line {
+  height: 1px;
+  background: linear-gradient(90deg, rgba(19, 121, 139, 0), rgba(19, 121, 139, .18) 18%, rgba(19, 121, 139, .32) 50%, rgba(19, 121, 139, .18) 82%, rgba(19, 121, 139, 0));
+  transform-origin: center
+}
+
+.demo-transition-copy {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  min-width: 0;
+  text-align: center
+}
+
+.demo-transition-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #78dfe2, #1f9eae);
+  box-shadow: 0 0 0 6px rgba(83, 194, 201, .08)
+}
+
+.demo-transition-copy p {
+  max-width: 30ch;
+  margin: 0;
+  color: #123f49;
+  font-size: clamp(20px, 2.1vw, 28px);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -.02em;
+  text-wrap: balance
 }
 
 .demo-progress {
@@ -2333,13 +2375,17 @@ p {
 .demo-booking-context h2 {
   position: relative;
   z-index: 1;
-  max-width: 13ch;
-  margin: 16px 0 14px;
+  max-width: 18ch;
+  margin: 14px 0 12px;
   color: white;
   font-size: clamp(26px, 2.4vw, 36px);
-  line-height: 1.05;
+  line-height: .98;
   overflow-wrap: anywhere;
   text-wrap: balance
+}
+
+.demo-booking-context h2 span {
+  display: block
 }
 
 .demo-booking-context>p {
@@ -2347,31 +2393,65 @@ p {
   z-index: 1;
   max-width: 30ch;
   margin: 0;
-  color: rgba(218, 235, 236, .72);
-  font-size: 13px
+  color: rgba(222, 239, 239, .78);
+  font-size: 13px;
+  line-height: 1.65
+}
+
+.demo-context-rule {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: clamp(18px, 2.3vw, 26px);
+  color: #83e2e2;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .13em;
+  line-height: 1.2;
+  text-transform: uppercase
+}
+
+.demo-context-rule::before,
+.demo-context-rule::after {
+  content: '';
+  height: 1px;
+  background: rgba(133, 224, 226, .27)
+}
+
+.demo-context-rule::before {
+  width: 22px
+}
+
+.demo-context-rule::after {
+  width: 100%;
+  max-width: 68px;
+  background: linear-gradient(90deg, rgba(133, 224, 226, .27), transparent)
 }
 
 .demo-context-highlights {
   position: relative;
   z-index: 1;
-  margin-top: clamp(18px, 2.5vw, 28px);
+  margin-top: clamp(14px, 2vw, 20px);
   display: grid;
-  gap: 8px
+  gap: 7px
 }
 
 .demo-context-highlights span {
-  min-height: 42px;
-  padding: 11px 12px;
+  min-height: 40px;
+  padding: 10px 12px;
   display: flex;
   align-items: center;
   gap: 10px;
-  border: 1px solid rgba(133, 224, 226, .13);
-  border-radius: 12px;
-  color: rgba(239, 252, 252, .88);
-  background: linear-gradient(135deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .035));
-  font-size: 11px;
+  border: 1px solid rgba(133, 224, 226, .14);
+  border-radius: 11px;
+  color: rgba(242, 252, 252, .9);
+  background: rgba(255, 255, 255, .045);
+  font-size: 10.5px;
   font-weight: 700;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+  letter-spacing: -.01em;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07);
   animation: demoFloatIn .55s both
 }
 
@@ -2393,14 +2473,14 @@ p {
 .demo-context-note {
   position: relative;
   z-index: 1;
-  margin-top: clamp(18px, 3vw, 28px);
-  padding: 14px;
+  margin-top: clamp(16px, 2.4vw, 24px);
+  padding: 13px 14px;
   display: flex;
   align-items: flex-start;
   gap: 12px;
   border: 1px solid rgba(133, 224, 226, .16);
-  border-radius: 14px;
-  background: rgba(220, 249, 249, .055)
+  border-radius: 13px;
+  background: rgba(220, 249, 249, .06)
 }
 
 .demo-context-note>svg {
@@ -2907,6 +2987,15 @@ p {
 }
 
 @media (max-width: 900px) {
+  .demo-transition-bridge {
+    margin-bottom: 24px;
+    gap: 16px
+  }
+
+  .demo-transition-copy p {
+    font-size: clamp(20px, 3.5vw, 26px)
+  }
+
   .demo-booking-layout {
     grid-template-columns: 1fr
   }
@@ -2916,7 +3005,7 @@ p {
   }
 
   .demo-booking-context h2 {
-    max-width: 15ch
+    max-width: 18ch
   }
 
   .demo-booking-context>p {
@@ -2944,7 +3033,27 @@ p {
 
 @media (max-width: 640px) {
   .demo-booking-section {
-    padding-block: 72px
+    padding-block: 48px 72px
+  }
+
+  .demo-transition-bridge {
+    margin-bottom: 20px;
+    grid-template-columns: 1fr;
+    gap: 12px
+  }
+
+  .demo-transition-line {
+    max-width: 88px;
+    width: 100%;
+    justify-self: center
+  }
+
+  .demo-transition-copy {
+    gap: 8px
+  }
+
+  .demo-transition-copy p {
+    font-size: clamp(18px, 6vw, 23px)
   }
 
   .demo-progress {
@@ -2976,7 +3085,7 @@ p {
   }
 
   .demo-booking-context h2 {
-    max-width: 13ch;
+    max-width: 18ch;
     font-size: clamp(26px, 8.6vw, 34px)
   }
 
@@ -3058,6 +3167,10 @@ p {
 }
 
 @media (max-width: 360px) {
+  .demo-transition-line {
+    display: none
+  }
+
   .demo-progress-item strong {
     font-size: 10px
   }
