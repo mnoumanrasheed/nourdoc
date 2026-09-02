@@ -1,8 +1,7 @@
-import { useCallback, useLayoutEffect, useRef, useState, type ReactNode, type Ref } from 'react'
+import { useLayoutEffect, useRef, type ReactNode, type Ref } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useInView, useReducedMotion, type Variants } from 'framer-motion'
 import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import {
   Activity, ArrowRight, ArrowUpRight, Check, CircleGauge, FileText, HeartPulse, LockKeyhole,
   Mic2, Network, Play, ShieldCheck, Sparkles, Stethoscope, Workflow,
@@ -19,8 +18,6 @@ import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { signalCriticalHeroReady } from '../../utils/criticalAssets'
 import { motionEase } from '../../utils/motion'
 import { ResponsivePicture } from '../common/ResponsivePicture'
-
-gsap.registerPlugin(ScrollTrigger)
 
 const waveform = [18, 29, 44, 24, 52, 34, 63, 40, 57, 28, 48, 62, 36, 22, 43, 55, 31]
 
@@ -75,6 +72,7 @@ function AmbientVisual({ active }: VisualProps) {
   useLayoutEffect(() => {
     const root = rootRef.current
     if (!root) return
+
     const timeline = gsap.timeline({ paused: true })
     const context = gsap.context(() => {
       const connectors = gsap.utils.toArray<HTMLElement>('.ambient-connector', root)
@@ -105,7 +103,11 @@ function AmbientVisual({ active }: VisualProps) {
     timelineRef.current = timeline
     setTimelineState(timeline, activeRef.current)
 
-    return () => { timelineRef.current = null; timeline.kill(); context.revert() }
+    return () => {
+      timelineRef.current = null
+      timeline.kill()
+      context.revert()
+    }
   }, [reduced])
 
   useLayoutEffect(() => {
@@ -330,7 +332,6 @@ function ImpactVisual({ active }: VisualProps) {
           0,
         )
       }
-
     }, root)
 
     timelineRef.current = timeline
@@ -351,15 +352,7 @@ function ImpactVisual({ active }: VisualProps) {
   }, [active, reduced])
 
   return (
-    <VisualShell
-      rootRef={rootRef}
-      label="Encounter outcomes"
-      icon={<Activity size={14} />}
-      className="impact-visual"
-      livePulse
-      active={active}
-      reduced={reduced}
-    >
+    <VisualShell rootRef={rootRef} label="Encounter outcomes" icon={<Activity size={14} />} className="impact-visual" livePulse active={active} reduced={reduced}>
       <div
         className="impact-dashboard"
         style={{
@@ -371,31 +364,14 @@ function ImpactVisual({ active }: VisualProps) {
           padding: 16,
         }}
       >
-        <div
-          className="impact-score scene-glass-card impact-kpi-card"
-          style={{
-            position: 'relative',
-            padding: 16,
-            overflow: 'hidden',
-            minHeight: 0,
-          }}
-        >
+        <div className="impact-score scene-glass-card impact-kpi-card" style={{ position: 'relative', padding: 16, overflow: 'hidden', minHeight: 0 }}>
           <span style={{ display: 'block', fontSize: 13, opacity: .82, marginBottom: 8 }}>Documentation flow</span>
 
           <div className="impact-ring" style={{ position: 'relative', width: 104, height: 104, margin: '8px auto 10px' }}>
             <svg viewBox="0 0 120 120" style={{ width: '100%', height: '100%' }}>
               <circle cx="60" cy="60" r="48" />
               <circle className="impact-ring-value" cx="60" cy="60" r="48" />
-              <circle
-                className="impact-ring-halo"
-                cx="60"
-                cy="60"
-                r="48"
-                fill="none"
-                stroke="rgba(164,248,250,.95)"
-                strokeWidth="4"
-                strokeLinecap="round"
-              />
+              <circle className="impact-ring-halo" cx="60" cy="60" r="48" fill="none" stroke="rgba(164,248,250,.95)" strokeWidth="4" strokeLinecap="round" />
             </svg>
             <b style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', fontSize: 28 }}>
               86<small style={{ fontSize: 11, marginLeft: 2 }}>%</small>
@@ -407,31 +383,10 @@ function ImpactVisual({ active }: VisualProps) {
             Workflow signal improving
           </p>
 
-          <i
-            className="impact-bridge-packet"
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              right: 14,
-              top: '48%',
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              background: '#9cf5f7',
-              boxShadow: '0 0 16px rgba(108,228,234,.9)',
-            }}
-          />
+          <i className="impact-bridge-packet" aria-hidden="true" style={{ position: 'absolute', right: 14, top: '48%', width: 8, height: 8, borderRadius: '50%', background: '#9cf5f7', boxShadow: '0 0 16px rgba(108,228,234,.9)' }} />
         </div>
 
-        <div
-          className="impact-chart scene-glass-card impact-kpi-card"
-          style={{
-            position: 'relative',
-            overflow: 'hidden',
-            padding: 16,
-            minHeight: 0,
-          }}
-        >
+        <div className="impact-chart scene-glass-card impact-kpi-card" style={{ position: 'relative', overflow: 'hidden', padding: 16, minHeight: 0 }}>
           <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
             <span style={{ fontSize: 14, fontWeight: 700 }}>Clinical focus</span>
             <b style={{ fontSize: 11, color: '#7fd7c6', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -451,33 +406,12 @@ function ImpactVisual({ active }: VisualProps) {
               {[26, 52, 78, 104].map((y) => (
                 <line key={y} x1="0" x2="320" y1={y} y2={y} stroke="rgba(158,224,229,.08)" strokeWidth="1" />
               ))}
-              <path
-                className="chart-area"
-                d="M0 112 C45 104 64 91 104 94 S166 64 202 69 S257 36 320 25 L320 130 L0 130Z"
-                fill="url(#impactAreaFill)"
-              />
-              <path
-                className="chart-line"
-                d="M0 112 C45 104 64 91 104 94 S166 64 202 69 S257 36 320 25"
-                fill="none"
-                stroke="#6fd5e2"
-                strokeWidth="2.2"
-              />
+              <path className="chart-area" d="M0 112 C45 104 64 91 104 94 S166 64 202 69 S257 36 320 25 L320 130 L0 130Z" fill="url(#impactAreaFill)" />
+              <path className="chart-line" d="M0 112 C45 104 64 91 104 94 S166 64 202 69 S257 36 320 25" fill="none" stroke="#6fd5e2" strokeWidth="2.2" />
               <circle className="impact-chart-point" r="4.2" fill="#c9ffff" />
             </svg>
 
-            <i
-              className="impact-chart-scan"
-              aria-hidden="true"
-              style={{
-                position: 'absolute',
-                inset: '-10% auto -10% -12%',
-                width: '18%',
-                transform: 'skewX(-14deg)',
-                background: 'linear-gradient(90deg, transparent, rgba(123,238,244,.17), transparent)',
-                filter: 'blur(1px)',
-              }}
-            />
+            <i className="impact-chart-scan" aria-hidden="true" style={{ position: 'absolute', inset: '-10% auto -10% -12%', width: '18%', transform: 'skewX(-14deg)', background: 'linear-gradient(90deg, transparent, rgba(123,238,244,.17), transparent)', filter: 'blur(1px)' }} />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 6, marginTop: 8, fontSize: 10, opacity: .7 }}>
@@ -488,15 +422,7 @@ function ImpactVisual({ active }: VisualProps) {
           </div>
         </div>
 
-        <div
-          className="impact-metrics"
-          style={{
-            gridColumn: '1 / -1',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3,1fr)',
-            gap: 10,
-          }}
-        >
+        <div className="impact-metrics" style={{ gridColumn: '1 / -1', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
           {[
             [HeartPulse, 'Clinical focus', 'Active'],
             [CircleGauge, 'Workflow progress', '4 stages'],
@@ -504,18 +430,7 @@ function ImpactVisual({ active }: VisualProps) {
           ].map(([Icon, title, text]) => {
             const MetricIcon = Icon as typeof HeartPulse
             return (
-              <div
-                className="scene-glass-card impact-kpi-card"
-                key={String(title)}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '24px minmax(0, 1fr)',
-                  alignItems: 'center',
-                  gap: 7,
-                  minHeight: 42,
-                  padding: '6px 8px',
-                }}
-              >
+              <div className="scene-glass-card impact-kpi-card" key={String(title)} style={{ display: 'grid', gridTemplateColumns: '24px minmax(0, 1fr)', alignItems: 'center', gap: 7, minHeight: 42, padding: '6px 8px' }}>
                 <span style={{ width: 24, height: 24, borderRadius: 7, display: 'grid', placeItems: 'center', background: 'rgba(83,171,193,.12)' }}>
                   <MetricIcon size={13} />
                 </span>
@@ -612,30 +527,9 @@ function SecurityVisual({ active }: VisualProps) {
   }, [active, reduced])
 
   return (
-    <VisualShell
-      rootRef={rootRef}
-      label="Protected clinical record"
-      icon={<ShieldCheck size={14} />}
-      className="security-visual"
-      livePulse
-      active={active}
-      reduced={reduced}
-    >
-      <div
-        className="security-stage"
-        style={{
-          opacity: 1,
-          visibility: 'visible',
-          position: 'relative',
-          minHeight: 0,
-        }}
-      >
-        <svg
-          className="security-connections"
-          viewBox="0 0 600 430"
-          aria-hidden="true"
-          style={{ opacity: 1, visibility: 'visible' }}
-        >
+    <VisualShell rootRef={rootRef} label="Protected clinical record" icon={<ShieldCheck size={14} />} className="security-visual" livePulse active={active} reduced={reduced}>
+      <div className="security-stage" style={{ opacity: 1, visibility: 'visible', position: 'relative', minHeight: 0 }}>
+        <svg className="security-connections" viewBox="0 0 600 430" aria-hidden="true" style={{ opacity: 1, visibility: 'visible' }}>
           <path className="security-flow-path" d="M65 120 C178 120 188 210 300 210" />
           <path className="security-flow-path" d="M535 120 C422 120 412 210 300 210" />
           <path className="security-flow-path" d="M85 350 C180 350 200 250 300 230" />
@@ -666,24 +560,11 @@ function SecurityVisual({ active }: VisualProps) {
           <span>Verified</span>
         </div>
 
-        <motion.div
-          className="secure-record-stack"
-          style={{
-            opacity: 1,
-            visibility: 'visible',
-          }}
-        >
+        <motion.div className="secure-record-stack" style={{ opacity: 1, visibility: 'visible' }}>
           <i className="secure-layer secure-layer-back" />
           <i className="secure-layer secure-layer-mid" />
 
-          <div
-            className="secure-record scene-glass-card"
-            style={{
-              opacity: 1,
-              visibility: 'visible',
-              overflow: 'hidden',
-            }}
-          >
+          <div className="secure-record scene-glass-card" style={{ opacity: 1, visibility: 'visible', overflow: 'hidden' }}>
             <i className="secure-record-scan" aria-hidden="true" />
 
             <div>
@@ -720,11 +601,13 @@ type StorySceneDefinition = {
   description: string
   image: ResponsiveImageAsset
   position: string
+  showPrimaryActions?: boolean
+  showAppAccess?: boolean
   visual: (active: boolean) => ReactNode
 }
 
 const storyScenes: StorySceneDefinition[] = [
-  { eyebrow: 'Ambient Intelligence', title: 'Patient conversations, perfectly documented.', description: 'NourDoc listens to natural doctor-patient dialogue and creates structured clinical documentation, helping physicians reduce time spent on manual note-taking.', image: consultationImage, position: '52% center', visual: (active) => <AmbientVisual active={active} /> },
+  { eyebrow: 'Ambient Intelligence', title: 'Patient conversations, perfectly documented.', description: 'NourDoc listens to natural doctor-patient dialogue and creates structured clinical documentation, helping physicians reduce time spent on manual note-taking.', image: consultationImage, position: '52% center', showPrimaryActions: true, showAppAccess: true, visual: (active) => <AmbientVisual active={active} /> },
   { eyebrow: 'Why NourDoc', title: 'Technology that stays out of the clinical conversation.', description: 'NourDoc works quietly around the encounter, helping clinicians stay present while ambient AI organizes the conversation into useful clinical context.', image: naturalCareImage, position: '62% center', visual: (active) => <ContextVisual active={active} /> },
   { eyebrow: 'Healthcare Impact', title: 'Better documentation. Better clinical focus.', description: 'Reduce clerical friction around the encounter so more attention remains available for the patient, the clinical decision and the care that follows.', image: impactImage, position: '40% center', visual: (active) => <ImpactVisual active={active} /> },
   { eyebrow: 'Security & Compliance', title: 'Clinical intelligence built for trusted healthcare.', description: 'Patient information requires strong privacy, access-control and governance practices. NourDoc positions security and privacy as foundational requirements.', image: securityImage, position: '48% center', visual: (active) => <SecurityVisual active={active} /> },
@@ -751,27 +634,21 @@ type StorySceneProps = {
   scene: StorySceneDefinition
   index: number
   compact: boolean
-  layered: boolean
-  active: boolean
-  registerScene: (index: number, node: HTMLElement | null) => void
 }
 
-function StoryScene({ scene, index, compact, layered, active, registerScene }: StorySceneProps) {
+function StoryScene({ scene, index, compact }: StorySceneProps) {
   const sceneRef = useRef<HTMLElement>(null)
   const floatRef = useRef<HTMLDivElement>(null)
   const reducedMotionPref = useReducedMotion()
   const reduced = reducedMotionPref === true
-  const inView = useInView(sceneRef, { amount: .12, margin: '-5% 0px -5% 0px' })
-  const visualActive = layered ? active : inView
+  const inView = useInView(sceneRef, { amount: compact ? .14 : .22, margin: '-10% 0px -10% 0px' })
+  const visualActive = reduced ? true : inView
   const floatConfig = visualFloatConfigs[index]
-  const setSceneRef = useCallback((node: HTMLElement | null) => {
-    sceneRef.current = node
-    registerScene(index, node)
-  }, [index, registerScene])
 
   useLayoutEffect(() => {
     const float = floatRef.current
-    if (!float) return
+    if (!float || reduced) return
+
     const x = compact ? Math.min(floatConfig.x, 1.5) : floatConfig.x
     const y = compact ? Math.max(floatConfig.y, -5) : floatConfig.y
     const scale = compact ? Math.min(floatConfig.scale, 1.004) : floatConfig.scale
@@ -793,14 +670,16 @@ function StoryScene({ scene, index, compact, layered, active, registerScene }: S
       float.style.willChange = 'auto'
       context.revert()
     }
-  }, [compact, floatConfig])
+  }, [compact, floatConfig, reduced])
 
   return (
-    <article
-      ref={setSceneRef}
-      className={`hero-scene rotating-scene scrolling-story-scene rotating-scene-${index + 1}`}
-      aria-hidden={layered && !active ? true : undefined}
-      inert={layered && !active ? true : undefined}
+    <motion.section
+      ref={sceneRef}
+      className={`hero-scene rotating-scene scrolling-story-scene rotating-scene-${index + 1}${index === 0 ? ' scene-is-main' : ' scene-is-secondary'}`}
+      initial={reduced ? false : { opacity: 0, y: 28 }}
+      whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: compact ? .16 : .24 }}
+      transition={{ duration: .82, ease: motionEase }}
     >
       <div className="rotating-scene-bg" aria-hidden="true">
         <ResponsivePicture
@@ -822,15 +701,17 @@ function StoryScene({ scene, index, compact, layered, active, registerScene }: S
       <svg className="scene-data-lines" viewBox="0 0 1440 900" preserveAspectRatio="none" aria-hidden="true"><path d="M0 690 C300 650 400 510 685 520 S1080 690 1440 410" /><path d="M610 0 C610 230 820 290 955 370 S1230 420 1440 225" /><circle cx="685" cy="520" r="3" /><circle cx="955" cy="370" r="3" /><circle cx="1215" cy="535" r="3" /></svg>
       <div className="scene-depth-nodes" aria-hidden="true"><i /><i /><i /><i /><i /><i /></div>
       <div className="container rotating-scene-layout">
-        <motion.div className="rotating-scene-copy" initial={!layered && !reduced ? 'hidden' : false} whileInView={!layered && !reduced ? 'visible' : undefined} viewport={{ once: true, amount: .3 }} variants={copyVariants}>
+        <motion.div className="rotating-scene-copy" initial={reduced ? false : 'hidden'} whileInView={reduced ? undefined : 'visible'} viewport={{ once: true, amount: .3 }} variants={copyVariants}>
           <motion.span className="eyebrow" variants={copyItemVariants}><i />{scene.eyebrow}</motion.span>
           {index === 0 ? <motion.h1 variants={copyItemVariants}>{scene.title}</motion.h1> : <motion.h2 variants={copyItemVariants}>{scene.title}</motion.h2>}
           <motion.p variants={copyItemVariants}>{scene.description}</motion.p>
-          <motion.div className="scene-actions" variants={copyItemVariants}>
-            <motion.div whileHover={reduced ? undefined : { y: -2 }} whileTap={reduced ? undefined : { scale: .985 }}><Link className="button scene-primary-action" to="/contact?intent=demo">Book a Demo<ArrowRight size={17} /></Link></motion.div>
-            <motion.div whileHover={reduced ? undefined : { x: 3 }}><Link className="scene-secondary-action" to="/product">Explore the platform<ArrowRight size={16} /></Link></motion.div>
-          </motion.div>
-          {index === 0 && (
+          {scene.showPrimaryActions && (
+            <motion.div className="scene-actions" variants={copyItemVariants}>
+              <motion.div whileHover={reduced ? undefined : { y: -2 }} whileTap={reduced ? undefined : { scale: .985 }}><Link className="button scene-primary-action" to="/contact?intent=demo">Book a Demo<ArrowRight size={17} /></Link></motion.div>
+              <motion.div whileHover={reduced ? undefined : { x: 3 }}><Link className="scene-secondary-action" to="/product">Explore the platform<ArrowRight size={16} /></Link></motion.div>
+            </motion.div>
+          )}
+          {scene.showAppAccess && (
             <motion.a
               className="hero-app-access"
               href={PLAY_STORE_URL}
@@ -854,142 +735,18 @@ function StoryScene({ scene, index, compact, layered, active, registerScene }: S
           </div>
         </div>
       </div>
-    </article>
+    </motion.section>
   )
 }
 
 export function CinematicStory() {
   const compact = useMediaQuery('(max-width: 768px)')
-  const storyRef = useRef<HTMLElement>(null)
-  const sceneRefs = useRef<Array<HTMLElement | null>>([])
-  const [activeIndex, setActiveIndex] = useState(0)
-  const activeSceneRef = useRef(0)
-  // The four-scene stack is the Home hero architecture on every viewport.
-  // `compact` only tunes layout/scrub performance; it never disables layering.
-  const layered = true
-
-  const registerScene = useCallback((index: number, node: HTMLElement | null) => {
-    sceneRefs.current[index] = node
-  }, [])
-
-  useLayoutEffect(() => {
-    const story = storyRef.current
-    const scenes = sceneRefs.current.filter((scene): scene is HTMLElement => Boolean(scene))
-
-    if (!story || !layered || scenes.length !== storyScenes.length) {
-      activeSceneRef.current = 0
-      setActiveIndex(0)
-      return
-    }
-
-    activeSceneRef.current = 0
-    setActiveIndex(0)
-    let refreshFrame = 0
-
-    const context = gsap.context(() => {
-      /*
-       * GSAP is the ONLY owner of scene transforms in layered mode.
-       * CSS positions the four cards on the same sticky stage but does not
-       * pre-translate Scenes 2–4. This prevents a CSS translateY(100%) from
-       * being parsed as pixel `y` and then combined with GSAP `yPercent: 100`.
-       */
-      gsap.set(scenes, {
-        x: 0,
-        y: 0,
-        xPercent: 0,
-        yPercent: 0,
-        scale: 1,
-        rotation: 0,
-        autoAlpha: 1,
-        pointerEvents: 'none',
-        transformOrigin: '50% 50%',
-        force3D: true,
-      })
-
-      gsap.set(scenes[0], {
-        yPercent: 0,
-        pointerEvents: 'auto',
-        zIndex: 1,
-      })
-
-      gsap.set(scenes.slice(1), {
-        yPercent: 100,
-      })
-
-      scenes.slice(1).forEach((scene, index) => {
-        gsap.set(scene, { zIndex: index + 2 })
-      })
-
-      const setActiveScene = (nextIndex: number) => {
-        if (nextIndex === activeSceneRef.current) return
-
-        activeSceneRef.current = nextIndex
-        setActiveIndex(nextIndex)
-
-        scenes.forEach((scene, index) => {
-          scene.style.pointerEvents = index === nextIndex ? 'auto' : 'none'
-        })
-      }
-
-      const timeline = gsap.timeline({
-        defaults: { ease: 'none' },
-        scrollTrigger: {
-          trigger: story,
-          start: 'top top',
-          end: 'bottom bottom',
-          scrub: compact ? 0.18 : 0.35,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            // Start the incoming scene's internal animation as soon as that layer enters.
-            // This prevents a half-transition where the visible incoming card looks frozen.
-            if (self.progress >= 2 / 3) {
-              setActiveScene(3)
-            } else if (self.progress >= 1 / 3) {
-              setActiveScene(2)
-            } else if (self.progress > 0.012) {
-              setActiveScene(1)
-            } else {
-              setActiveScene(0)
-            }
-          },
-        },
-      })
-
-      // True layered scroll: the previous card stays in place while the next
-      // card physically rises from below and covers it.
-      timeline
-        .to(scenes[1], { yPercent: 0, duration: 1 }, 0)
-        .to(scenes[2], { yPercent: 0, duration: 1 }, 1)
-        .to(scenes[3], { yPercent: 0, duration: 1 }, 2)
-
-      refreshFrame = window.requestAnimationFrame(() => {
-        ScrollTrigger.refresh()
-      })
-    }, story)
-
-    return () => {
-      if (refreshFrame) window.cancelAnimationFrame(refreshFrame)
-      context.revert()
-    }
-  }, [layered, compact])
 
   return (
-    <section
-      ref={storyRef}
-      className={`hero-story rotating-hero scrolling-story ${layered ? 'is-layered' : 'is-static'}`}
-      aria-label="NourDoc clinical intelligence overview"
-    >
+    <section className="hero-story rotating-hero scrolling-story" aria-label="NourDoc clinical intelligence overview">
       <div className="hero-stage rotating-hero-viewport">
         {storyScenes.map((scene, index) => (
-          <StoryScene
-            scene={scene}
-            index={index}
-            compact={compact}
-            layered={layered}
-            active={activeIndex === index}
-            registerScene={registerScene}
-            key={scene.eyebrow}
-          />
+          <StoryScene scene={scene} index={index} compact={compact} key={scene.eyebrow} />
         ))}
       </div>
     </section>
