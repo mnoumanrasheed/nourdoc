@@ -76,7 +76,7 @@ const progressSteps = [
   ['01', 'Organisation'],
   ['02', 'Interests'],
   ['03', 'Details'],
-  ['04', 'Request'],
+  ['04', 'Submit'],
 ]
 
 const initialData: DemoData = {

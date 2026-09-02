@@ -389,6 +389,15 @@ export default function Contact() {
             : 'Contact NourDoc for product demonstrations, trials, sales, support, partnerships or investment inquiries.'}
         />
 
+        {isDemoIntent && (
+          <a className="contact-demo-scroll-cue" href="#demo-booking-title" aria-label="Scroll to begin the demo booking flow">
+            <span>Scroll to begin</span>
+            <i aria-hidden="true">
+              <b />
+            </i>
+          </a>
+        )}
+
         {/* PREMIUM CONTACT ROUTING NETWORK */}
         <div
           className="inner-page-hero-visual contact-network"
