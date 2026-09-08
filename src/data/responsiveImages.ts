@@ -16,7 +16,7 @@ function responsiveImage(
     .join(', ')
 
   return {
-    src: `/images/${name}-1600.webp`,
+    src: `/images/${name}-1600.jpg`,
     webpSrcSet,
     width,
     height,

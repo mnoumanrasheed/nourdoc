@@ -10,8 +10,10 @@ import { AnimatedSection } from '../components/ui/AnimatedSection'
 
 import { partnerCategories } from '../data/site'
 import { useHeroVisualScroll } from '../hooks/useHeroVisualScroll'
+import { useMediaQuery } from '../hooks/useMediaQuery'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { createAnimationVisibilityController } from '../utils/animationPerformance'
+import { createSafeGsapContext } from '../utils/animationSafety'
 
 import { partnersImage as heroImage } from '../data/responsiveImages'
 
@@ -31,6 +33,7 @@ const partnerDescriptions: Record<string, string> = {
 
 export default function Partners() {
   const heroRef = useRef<HTMLDivElement>(null)
+  const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
   useHeroVisualScroll(heroRef)
   const outerOrbitRef = useRef<HTMLDivElement>(null)
   const innerOrbitRef = useRef<HTMLDivElement>(null)
@@ -41,7 +44,9 @@ export default function Partners() {
   )
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
+    const root = heroRef.current
+    if (!root || reducedMotion) return
+    const ctx = createSafeGsapContext(root, () => {
       // Subtle floating motion
       gsap.to('.partners-network', {
         y: -5,
@@ -210,11 +215,11 @@ export default function Partners() {
           ease: 'power1.out',
         },
       )
-    }, heroRef)
+    }, 'Partners hero animation')
 
-    const stopVisibilityControl = createAnimationVisibilityController(heroRef.current!)
-    return () => { stopVisibilityControl(); ctx.revert() }
-  }, [])
+    const stopVisibilityControl = createAnimationVisibilityController(root)
+    return () => { stopVisibilityControl(); ctx?.revert() }
+  }, [reducedMotion])
 
   return (
     <>
@@ -485,6 +490,7 @@ export default function Partners() {
               border: '1px solid rgba(137,238,242,.38)',
               background: 'rgba(4,31,39,.82)',
               backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
               boxShadow: '0 12px 30px rgba(0,15,22,.22)',
             }}
           >
@@ -523,6 +529,7 @@ export default function Partners() {
               border: '1px solid rgba(137,238,242,.38)',
               background: 'rgba(4,31,39,.82)',
               backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
               boxShadow: '0 12px 30px rgba(0,15,22,.22)',
             }}
           >
@@ -561,6 +568,7 @@ export default function Partners() {
               border: '1px solid rgba(137,238,242,.38)',
               background: 'rgba(4,31,39,.82)',
               backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
               boxShadow: '0 12px 30px rgba(0,15,22,.22)',
             }}
           >
@@ -599,6 +607,7 @@ export default function Partners() {
               border: '1px solid rgba(137,238,242,.38)',
               background: 'rgba(4,31,39,.82)',
               backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
               boxShadow: '0 12px 30px rgba(0,15,22,.22)',
             }}
           >

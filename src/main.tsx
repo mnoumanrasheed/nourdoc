@@ -3,7 +3,10 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { InitialLoader } from './components/layout/InitialLoader'
+import { ensureBrowserCompatibility } from './utils/browserCompatibility'
 import './styles/index.css'
+
+ensureBrowserCompatibility()
 
 createRoot(document.getElementById('root')!).render(
   <>

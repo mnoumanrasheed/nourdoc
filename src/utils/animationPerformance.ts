@@ -1,4 +1,5 @@
 import { gsap } from 'gsap'
+import { observeElementVisibility } from './browserCompatibility'
 
 export function createAnimationVisibilityController(root: HTMLElement) {
   const targets: Element[] = [root, ...root.querySelectorAll('*')]
@@ -12,20 +13,19 @@ export function createAnimationVisibilityController(root: HTMLElement) {
     gsap.getTweensOf(targets).forEach((animation) => animation.paused(paused))
   }
 
-  const observer = new IntersectionObserver(([entry]) => {
-    inViewport = entry.isIntersecting
+  const stopObserving = observeElementVisibility(root, (isVisible) => {
+    inViewport = isVisible
     update()
   }, { rootMargin: '120px 0px', threshold: 0.01 })
 
   const onVisibilityChange = () => update()
 
-  observer.observe(root)
   document.addEventListener('visibilitychange', onVisibilityChange)
   update()
 
   return () => {
     disposed = true
-    observer.disconnect()
+    stopObserving()
     document.removeEventListener('visibilitychange', onVisibilityChange)
     root.classList.remove('animations-paused')
   }

@@ -15,8 +15,10 @@ import { SectionHeader } from '../components/common/SectionHeader'
 import { AnimatedSection } from '../components/ui/AnimatedSection'
 import { securityTopics } from '../data/site'
 import { useHeroVisualScroll } from '../hooks/useHeroVisualScroll'
+import { useMediaQuery } from '../hooks/useMediaQuery'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { createAnimationVisibilityController } from '../utils/animationPerformance'
+import { createSafeGsapContext } from '../utils/animationSafety'
 
 import { securityWorkflowImage as heroImage } from '../data/responsiveImages'
 
@@ -55,6 +57,7 @@ const additional = [
 
 export default function SecurityCompliance() {
   const heroRef = useRef<HTMLDivElement>(null)
+  const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
   useHeroVisualScroll(heroRef)
   const outerRingRef = useRef<HTMLDivElement>(null)
   const middleRingRef = useRef<HTMLDivElement>(null)
@@ -66,7 +69,9 @@ export default function SecurityCompliance() {
   )
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
+    const root = heroRef.current
+    if (!root || reducedMotion) return
+    const ctx = createSafeGsapContext(root, () => {
       // Entire security visual subtle float
       gsap.to('.security-hero-visual', {
         y: -5,
@@ -265,11 +270,11 @@ export default function SecurityCompliance() {
           ease: 'power1.inOut',
         },
       )
-    }, heroRef)
+    }, 'Security hero animation')
 
-    const stopVisibilityControl = createAnimationVisibilityController(heroRef.current!)
-    return () => { stopVisibilityControl(); ctx.revert() }
-  }, [])
+    const stopVisibilityControl = createAnimationVisibilityController(root)
+    return () => { stopVisibilityControl(); ctx?.revert() }
+  }, [reducedMotion])
 
   return (
     <>
@@ -581,6 +586,7 @@ export default function SecurityCompliance() {
               border: '1px solid rgba(137,238,242,.38)',
               background: 'rgba(3,29,37,.82)',
               backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
               boxShadow: '0 12px 30px rgba(0,14,21,.22)',
             }}
           >
@@ -613,6 +619,7 @@ export default function SecurityCompliance() {
               border: '1px solid rgba(137,238,242,.38)',
               background: 'rgba(3,29,37,.82)',
               backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
               boxShadow: '0 12px 30px rgba(0,14,21,.22)',
             }}
           >
@@ -645,6 +652,7 @@ export default function SecurityCompliance() {
               border: '1px solid rgba(137,238,242,.38)',
               background: 'rgba(3,29,37,.82)',
               backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
               boxShadow: '0 12px 30px rgba(0,14,21,.22)',
             }}
           >
@@ -677,6 +685,7 @@ export default function SecurityCompliance() {
               border: '1px solid rgba(137,238,242,.38)',
               background: 'rgba(3,29,37,.82)',
               backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
               boxShadow: '0 12px 30px rgba(0,14,21,.22)',
             }}
           >

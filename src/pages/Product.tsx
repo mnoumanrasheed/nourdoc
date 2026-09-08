@@ -27,6 +27,7 @@ import { AnimatedSection } from '../components/ui/AnimatedSection'
 import { useHeroVisualScroll } from '../hooks/useHeroVisualScroll'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { createAnimationVisibilityController } from '../utils/animationPerformance'
+import { createSafeGsapContext } from '../utils/animationSafety'
 
 import {
   productAmbientListeningImage,
@@ -105,7 +106,9 @@ export default function Product() {
   )
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
+    const root = heroRef.current
+    if (!root || reducedMotion) return
+    const ctx = createSafeGsapContext(root, () => {
       // Whole visualization subtle float
       gsap.to('.product-ai-visual', {
         y: -5,
@@ -252,11 +255,11 @@ export default function Product() {
           ease: 'power1.inOut',
         },
       )
-    }, heroRef)
+    }, 'Product hero animation')
 
-    const stopVisibilityControl = createAnimationVisibilityController(heroRef.current!)
-    return () => { stopVisibilityControl(); ctx.revert() }
-  }, [])
+    const stopVisibilityControl = createAnimationVisibilityController(root)
+    return () => { stopVisibilityControl(); ctx?.revert() }
+  }, [reducedMotion])
 
   return (
     <>
@@ -499,6 +502,7 @@ export default function Product() {
               border: '1px solid rgba(133,235,240,.35)',
               background: 'rgba(5,31,39,.72)',
               backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
               boxShadow: '0 12px 30px rgba(0,15,22,.18)',
             }}
           >
@@ -547,6 +551,7 @@ export default function Product() {
               border: '1px solid rgba(133,235,240,.35)',
               background: 'rgba(5,31,39,.72)',
               backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
               boxShadow: '0 12px 30px rgba(0,15,22,.18)',
             }}
           >
@@ -595,6 +600,7 @@ export default function Product() {
               border: '1px solid rgba(133,235,240,.35)',
               background: 'rgba(5,31,39,.72)',
               backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
               boxShadow: '0 12px 30px rgba(0,15,22,.18)',
             }}
           >

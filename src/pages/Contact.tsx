@@ -26,6 +26,7 @@ import {
   resolveContactIntent,
 } from '../utils/contactIntent'
 import { createAnimationVisibilityController } from '../utils/animationPerformance'
+import { createSafeGsapContext } from '../utils/animationSafety'
 
 const departmentContacts = [
   {
@@ -169,7 +170,9 @@ export default function Contact() {
   }
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
+    const root = heroRef.current
+    if (!root || reducedMotion) return
+    const ctx = createSafeGsapContext(root, () => {
       // Overall hero visual float
       gsap.to('.contact-network', {
         y: -5,
@@ -354,11 +357,11 @@ export default function Contact() {
           ease: 'power1.inOut',
         },
       )
-    }, heroRef)
+    }, 'Contact hero animation')
 
-    const stopVisibilityControl = createAnimationVisibilityController(heroRef.current!)
-    return () => { stopVisibilityControl(); ctx.revert() }
-  }, [])
+    const stopVisibilityControl = createAnimationVisibilityController(root)
+    return () => { stopVisibilityControl(); ctx?.revert() }
+  }, [reducedMotion])
 
   return (
     <>
@@ -667,6 +670,7 @@ export default function Contact() {
               border: '1px solid rgba(137,238,242,.38)',
               background: 'rgba(4,31,39,.84)',
               backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
               boxShadow: '0 12px 30px rgba(0,15,22,.22)',
             }}
           >
@@ -700,6 +704,7 @@ export default function Contact() {
               border: '1px solid rgba(137,238,242,.38)',
               background: 'rgba(4,31,39,.84)',
               backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
               boxShadow: '0 12px 30px rgba(0,15,22,.22)',
             }}
           >
@@ -733,6 +738,7 @@ export default function Contact() {
               border: '1px solid rgba(137,238,242,.38)',
               background: 'rgba(4,31,39,.84)',
               backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
               boxShadow: '0 12px 30px rgba(0,15,22,.22)',
             }}
           >
@@ -766,6 +772,7 @@ export default function Contact() {
               border: '1px solid rgba(137,238,242,.38)',
               background: 'rgba(4,31,39,.84)',
               backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
               boxShadow: '0 12px 30px rgba(0,15,22,.22)',
             }}
           >

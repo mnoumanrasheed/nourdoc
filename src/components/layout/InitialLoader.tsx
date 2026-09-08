@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import logo from '../../assets/nourdoc-logo.png'
+import { createSafeGsapContext } from '../../utils/animationSafety'
 
 const MIN_LOADER_SECONDS = 1.8
 const MAX_LOADER_SECONDS = 4
@@ -23,6 +24,7 @@ export function InitialLoader() {
     let heroReady = document.documentElement.dataset.heroReady === 'true'
     let mainTimeline: gsap.core.Timeline | null = null
     let exitTimeline: gsap.core.Timeline | null = null
+    let fallbackTimer = 0
 
     document.body.setAttribute('aria-busy', 'true')
     window.addEventListener('wheel', preventScroll, { passive: false })
@@ -47,9 +49,12 @@ export function InitialLoader() {
     const finish = () => {
       if (finished) return
       finished = true
+      window.clearTimeout(fallbackTimer)
       unlockPage()
       setVisible(false)
     }
+
+    fallbackTimer = window.setTimeout(finish, (MAX_LOADER_SECONDS + 1) * 1000)
 
     const completeEarly = () => {
       if (!minimumElapsed || !heroReady || finished || !mainTimeline) return
@@ -72,7 +77,7 @@ export function InitialLoader() {
     }
     window.addEventListener('nourdoc:hero-ready', onHeroReady)
 
-    const context = gsap.context(() => {
+    const context = createSafeGsapContext(root, () => {
       const timeline = gsap.timeline({ defaults: { ease: 'power2.out' } })
       mainTimeline = timeline
 
@@ -128,7 +133,7 @@ export function InitialLoader() {
         .to('.initial-loader-canvas', { opacity: .48, duration: .4, ease: 'power3.inOut' }, 3.5)
         .to(root, { opacity: 0, duration: .4, ease: 'power3.inOut' }, 3.6)
         .call(finish, [], MAX_LOADER_SECONDS)
-    }, root)
+    }, 'Initial loader animation')
 
     const minimumTimer = window.setTimeout(() => {
       minimumElapsed = true
@@ -137,9 +142,10 @@ export function InitialLoader() {
 
     return () => {
       window.clearTimeout(minimumTimer)
+      window.clearTimeout(fallbackTimer)
       window.removeEventListener('nourdoc:hero-ready', onHeroReady)
       exitTimeline?.kill()
-      context.revert()
+      context?.revert()
       unlockPage()
     }
   }, [])

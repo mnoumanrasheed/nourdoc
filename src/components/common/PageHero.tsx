@@ -6,6 +6,8 @@ import { useMediaQuery } from '../../hooks/useMediaQuery'
 import type { ResponsiveImageAsset } from '../../data/responsiveImages'
 import { motionEase, motionEaseSoft } from '../../utils/motion'
 import { signalCriticalHeroReady } from '../../utils/criticalAssets'
+import { createSafeGsapContext } from '../../utils/animationSafety'
+import { observeElementVisibility } from '../../utils/browserCompatibility'
 import type { HeroVariant } from '../sections/HeroMotif'
 import { ResponsivePicture } from './ResponsivePicture'
 
@@ -27,7 +29,7 @@ function HeroSignal({ variant, reduced }: { variant: HeroVariant; reduced: boole
     const root = signalRef.current
     if (!root || reduced) return
     const loops: gsap.core.Animation[] = []
-    const context = gsap.context(() => {
+    const context = createSafeGsapContext(root, () => {
       const pathElements = gsap.utils.toArray<SVGPathElement>('.page-hero-signal-path', root)
       const travellers = gsap.utils.toArray<SVGCircleElement>('.page-hero-traveller', root)
 
@@ -52,14 +54,13 @@ function HeroSignal({ variant, reduced }: { variant: HeroVariant; reduced: boole
       loops.push(gsap.to('.page-hero-orbit-inner', { rotation: -360, duration: 31, repeat: -1, ease: 'none', transformOrigin: '50% 50%' }))
       loops.push(gsap.to('.page-hero-signal-node', { scale: 1.55, opacity: .95, duration: 2.1, stagger: { each: .34, repeat: -1, yoyo: true }, ease: 'sine.inOut' }))
       loops.push(gsap.fromTo('.page-hero-scan', { xPercent: -145, opacity: 0 }, { xPercent: 145, opacity: .42, duration: 4.2, repeat: -1, repeatDelay: 2.2, ease: 'power1.inOut' }))
-    }, root)
+    }, 'Hero signal animation')
 
-    const observer = new IntersectionObserver(([entry]) => {
-      loops.forEach((loop) => entry.isIntersecting ? loop.resume() : loop.pause())
+    const stopObserving = observeElementVisibility(root, (isVisible) => {
+      loops.forEach((loop) => isVisible ? loop.resume() : loop.pause())
     }, { threshold: .08 })
-    observer.observe(root)
 
-    return () => { observer.disconnect(); context.revert() }
+    return () => { stopObserving(); context?.revert() }
   }, [paths, reduced])
 
   return (
@@ -95,20 +96,19 @@ export function PageHero({ eyebrow, title, text, variant, image, imageAlt, image
     }
     if (reduced) return
     let drift: gsap.core.Tween | null = null
-    const context = gsap.context(() => {
+    const context = createSafeGsapContext(root, () => {
       const plane = root.querySelector('.hero-media-image-plane')
       if (!plane) return
       gsap.set(plane, { scale: 1.03, x: 0, y: 0 })
       drift = gsap.to(plane, { scale: 1.075, x: compact ? -2 : -5, y: compact ? 1.5 : 3, duration: 14, repeat: -1, yoyo: true, ease: 'sine.inOut' })
-    }, root)
+    }, 'Hero image drift animation')
 
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) drift?.resume()
+    const stopObserving = observeElementVisibility(root, (isVisible) => {
+      if (isVisible) drift?.resume()
       else drift?.pause()
     }, { threshold: .05 })
-    observer.observe(root)
 
-    return () => { observer.disconnect(); context.revert() }
+    return () => { stopObserving(); context?.revert() }
   }, [compact, image, reduced])
 
   return (

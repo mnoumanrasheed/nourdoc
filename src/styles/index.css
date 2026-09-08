@@ -1093,7 +1093,7 @@ p {
   background:
     linear-gradient(90deg, rgba(5, 38, 43, .82) 0%, rgba(5, 38, 43, .58) 42%, rgba(5, 38, 43, .34) 100%),
     linear-gradient(180deg, rgba(4, 23, 30, .14), rgba(4, 23, 30, .08)),
-    url('/images/12_book-demo-hero-background-480.webp');
+    url('/images/12_book-demo-hero-background-480.jpg');
   background-size: cover;
   background-position: 52% center;
   background-repeat: no-repeat;
@@ -1128,7 +1128,7 @@ p {
     background-image:
       linear-gradient(90deg, rgba(5, 38, 43, .82) 0%, rgba(5, 38, 43, .58) 42%, rgba(5, 38, 43, .34) 100%),
       linear-gradient(180deg, rgba(4, 23, 30, .14), rgba(4, 23, 30, .08)),
-      url('/images/12_book-demo-hero-background-960.webp');
+      url('/images/12_book-demo-hero-background-960.jpg');
   }
 }
 
@@ -1137,7 +1137,7 @@ p {
     background-image:
       linear-gradient(90deg, rgba(5, 38, 43, .82) 0%, rgba(5, 38, 43, .58) 42%, rgba(5, 38, 43, .34) 100%),
       linear-gradient(180deg, rgba(4, 23, 30, .14), rgba(4, 23, 30, .08)),
-      url('/images/12_book-demo-hero-background-1600.webp');
+      url('/images/12_book-demo-hero-background-1600.jpg');
   }
 }
 
@@ -3971,11 +3971,13 @@ p {
   .cinematic-scene:first-child {
     position: relative !important;
     inset: auto !important;
+    min-height: 100vh;
     min-height: 100svh;
     transform: none !important
   }
 
   .cinematic-scene-inner {
+    min-height: 100vh;
     min-height: 100svh;
     height: auto
   }
@@ -4320,7 +4322,9 @@ p {
 
 @media (max-width:600px) {
   .cinematic-story-viewport {
+    height: max(calc(100vh - var(--navbar-height)), 650px);
     height: max(calc(100svh - var(--navbar-height)), 650px);
+    min-height: max(calc(100vh - var(--navbar-height)), 650px);
     min-height: max(calc(100svh - var(--navbar-height)), 650px)
   }
 
@@ -4458,12 +4462,14 @@ p {
 /* Shared cinematic motion and interaction language */
 #main-content {
   min-width: 0;
+  overflow-x: hidden;
   overflow-x: clip;
   background: #fbfdfc;
 }
 
 .page-transition {
   min-width: 0;
+  overflow-x: hidden;
   overflow-x: clip;
   background: #fbfdfc;
   color: #15363b;
@@ -4472,6 +4478,7 @@ p {
 }
 
 .route-loading-shell {
+  min-height: 100vh;
   min-height: 100svh;
   background: #06131a
 }
@@ -5325,6 +5332,7 @@ p {
 
   .hero-grid {
     height: auto;
+    min-height: calc(100vh - var(--navbar-height));
     min-height: calc(100svh - var(--navbar-height));
     grid-template-columns: minmax(0, 1fr);
     padding-top: 30px;
@@ -5338,6 +5346,7 @@ p {
 
   .home-hero {
     height: auto;
+    min-height: 100vh;
     min-height: 100svh;
     padding-bottom: 0
   }
@@ -5410,6 +5419,7 @@ p {
 
   .home-hero {
     height: auto;
+    min-height: 100vh;
     min-height: 100svh;
     padding-top: var(--navbar-height)
   }
@@ -5989,12 +5999,14 @@ p {
 
   .home-hero {
     height: auto;
+    min-height: 100vh;
     min-height: 100svh;
     padding-top: var(--navbar-height)
   }
 
   .hero-grid {
     height: auto;
+    min-height: calc(100vh - var(--navbar-height));
     min-height: calc(100svh - var(--navbar-height))
   }
 }
@@ -7619,6 +7631,7 @@ p {
   .page-hero-theme .page-hero-inner,
   .page-hero-impact,
   .page-hero-about {
+    min-height: 100vh;
     min-height: 100svh;
     padding-top: 102px !important;
     padding-bottom: 48px !important;
@@ -8440,6 +8453,7 @@ p {
 }
 
 .home-cinematic-grid {
+  min-height: calc(100vh - 170px);
   min-height: calc(100svh - 170px);
   display: grid;
   grid-template-columns: minmax(0, .86fr) minmax(540px, 1.14fr);
@@ -9039,6 +9053,7 @@ p {
     right: 12px;
     bottom: auto;
     height: auto;
+    max-height: calc(100vh - var(--navbar-height, 72px) - 24px);
     max-height: calc(100svh - var(--navbar-height, 72px) - 24px);
     max-width: 440px;
     margin: 0 auto;
@@ -14151,6 +14166,7 @@ p {
    ======================================================================== */
 
 .hero-story {
+  overflow-x: hidden;
   overflow-x: clip;
 }
 
@@ -14160,11 +14176,14 @@ p {
 }
 
 .hero-story .hero-scene {
+  min-height: 100vh;
   min-height: 100svh;
+  overflow: hidden;
   overflow: clip;
 }
 
 .hero-story .scene-is-main {
+  min-height: max(100vh, 760px);
   min-height: max(100svh, 760px);
 }
 
@@ -14185,6 +14204,7 @@ p {
 
 .hero-story .rotating-scene-layout {
   width: min(calc(100% - 48px), 1380px);
+  min-height: 100vh;
   min-height: 100svh;
   margin-inline: auto;
   padding-top: clamp(104px, calc(var(--navbar-height, 84px) + 28px), 148px);

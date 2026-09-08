@@ -17,6 +17,8 @@ import { WorkflowJourney } from '../components/sections/WorkflowJourney'
 
 import { workflow } from '../data/site'
 import { usePageMeta } from '../hooks/usePageMeta'
+import { createSafeGsapContext } from '../utils/animationSafety'
+import { observeElementVisibility } from '../utils/browserCompatibility'
 
 const comparison = [
   ['Speed', 'Separate documentation step', 'Conversation-to-draft workflow'],
@@ -87,16 +89,15 @@ export default function WhyNourDoc() {
     if (!hero || !shell) return
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reducedMotion) return
     const loops: gsap.core.Tween[] = []
 
-    const ctx = gsap.context(() => {
+    const ctx = createSafeGsapContext(hero, () => {
       gsap.fromTo(
         shell,
         { opacity: 0, y: 24 },
         { opacity: 1, y: 0, duration: 1, delay: 0.15, ease: 'power3.out' },
       )
-
-      if (reducedMotion) return
 
       const outerOrbit = shell.querySelector<HTMLElement>('.why-impact-orbit-outer')
       if (outerOrbit) {
@@ -222,13 +223,13 @@ export default function WhyNourDoc() {
       if (pA) loops.push(gsap.to(pA, { x: 15, y: -12, scale: 1.35, opacity: 1, duration: 3.8, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
       if (pB) loops.push(gsap.to(pB, { x: -12, y: 15, scale: 1.25, opacity: 1, duration: 4.4, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 0.5 }))
       if (pC) loops.push(gsap.to(pC, { x: 11, y: 12, scale: 1.3, opacity: 1, duration: 4.0, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 1.0 }))
-    }, hero)
+    }, 'Why NourDoc hero animation')
 
     gsap.ticker.wake()
 
-    const observer = new IntersectionObserver(([entry]) => {
+    const stopObserving = observeElementVisibility(shell, (isVisible) => {
       loops.forEach((loop) => {
-        if (entry.isIntersecting) {
+        if (isVisible) {
           gsap.ticker.wake()
           loop.resume()
         } else {
@@ -236,12 +237,11 @@ export default function WhyNourDoc() {
         }
       })
     }, { threshold: 0.05 })
-    observer.observe(shell)
 
     return () => {
-      observer.disconnect()
+      stopObserving()
       loops.forEach((loop) => loop.kill())
-      ctx.revert()
+      ctx?.revert()
     }
   }, [])
 

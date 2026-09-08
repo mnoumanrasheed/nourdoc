@@ -16,6 +16,7 @@ import {
 import { PLAY_STORE_URL } from '../../data/site'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { signalCriticalHeroReady } from '../../utils/criticalAssets'
+import { createSafeGsapContext } from '../../utils/animationSafety'
 import { motionEase } from '../../utils/motion'
 import { ResponsivePicture } from '../common/ResponsivePicture'
 
@@ -71,10 +72,10 @@ function AmbientVisual({ active }: VisualProps) {
 
   useLayoutEffect(() => {
     const root = rootRef.current
-    if (!root) return
+    if (!root || reduced) return
 
     const timeline = gsap.timeline({ paused: true })
-    const context = gsap.context(() => {
+    const context = createSafeGsapContext(root, () => {
       const connectors = gsap.utils.toArray<HTMLElement>('.ambient-connector', root)
       connectors.forEach((connector, connectorIndex) => {
         const signals = gsap.utils.toArray<HTMLElement>('i', connector)
@@ -98,7 +99,7 @@ function AmbientVisual({ active }: VisualProps) {
           { scaleY: 1.18 + index % 4 * .12, duration: .46 + index % 5 * .06, delay: index * .025, repeat: -1, yoyo: true, ease: 'sine.inOut' },
         ), 0)
       })
-    }, root)
+    }, 'Ambient scene animation')
 
     timelineRef.current = timeline
     setTimelineState(timeline, activeRef.current)
@@ -106,7 +107,7 @@ function AmbientVisual({ active }: VisualProps) {
     return () => {
       timelineRef.current = null
       timeline.kill()
-      context.revert()
+      context?.revert()
     }
   }, [reduced])
 
@@ -140,7 +141,7 @@ function AmbientVisual({ active }: VisualProps) {
           <div className="ambient-connector ambient-connector-b" aria-hidden="true"><i /><i /></div>
           <div className="ambient-stage ambient-stage-note">
             <motion.div className="ambient-note scene-glass-card" whileHover={reduced ? undefined : { y: -3 }} transition={{ duration: .28 }}>
-              <header><span>02</span><b>SOAP note</b><FileText size={14} /></header>
+              <header><span>02</span><b>AI Clinical Notes</b><FileText size={14} /></header>
               {['Subjective', 'Objective', 'Assessment', 'Plan'].map((item, index) => <motion.div className="ambient-note-row" key={item} initial={reduced ? false : { opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.15 + index * .14, duration: .45 }}><i>{item[0]}</i><p><b>{item}</b><small>{index === 0 ? 'Symptoms began three days ago...' : 'Structured for clinician review...'}</small></p></motion.div>)}
               <small className="ambient-review"><Check size={11} /> Clinician review required</small>
             </motion.div>
@@ -166,10 +167,10 @@ function ContextVisual({ active }: VisualProps) {
 
   useLayoutEffect(() => {
     const root = rootRef.current
-    if (!root) return
+    if (!root || reduced) return
 
     const timeline = gsap.timeline({ paused: true })
-    const context = gsap.context(() => {
+    const context = createSafeGsapContext(root, () => {
       const paths = gsap.utils.toArray<SVGPathElement>('.context-flow-path', root)
       const packets = gsap.utils.toArray<SVGCircleElement>('.context-packet', root)
 
@@ -189,7 +190,7 @@ function ContextVisual({ active }: VisualProps) {
       gsap.utils.toArray<HTMLElement>('.context-card-drift', root).forEach((card, index) => {
         timeline.add(gsap.to(card, { y: index % 2 ? 6 : -6, duration: 3.5 + index * .3, delay: index * .28, repeat: -1, yoyo: true, ease: 'sine.inOut' }), 0)
       })
-    }, root)
+    }, 'Context scene animation')
 
     timelineRef.current = timeline
     setTimelineState(timeline, activeRef.current)
@@ -197,7 +198,7 @@ function ContextVisual({ active }: VisualProps) {
     return () => {
       timelineRef.current = null
       timeline.kill()
-      context.revert()
+      context?.revert()
     }
   }, [reduced])
 
@@ -246,10 +247,10 @@ function ImpactVisual({ active }: VisualProps) {
 
   useLayoutEffect(() => {
     const root = rootRef.current
-    if (!root) return
+    if (!root || reduced) return
 
     const timeline = gsap.timeline({ paused: true })
-    const context = gsap.context(() => {
+    const context = createSafeGsapContext(root, () => {
       const ring = root.querySelector<SVGCircleElement>('.impact-ring-value')
       const ringHalo = root.querySelector<SVGCircleElement>('.impact-ring-halo')
       const line = root.querySelector<SVGPathElement>('.chart-line')
@@ -332,7 +333,7 @@ function ImpactVisual({ active }: VisualProps) {
           0,
         )
       }
-    }, root)
+    }, 'Impact scene animation')
 
     timelineRef.current = timeline
     setTimelineState(timeline, activeRef.current)
@@ -340,7 +341,7 @@ function ImpactVisual({ active }: VisualProps) {
     return () => {
       timelineRef.current = null
       timeline.kill()
-      context.revert()
+      context?.revert()
     }
   }, [reduced])
 
@@ -456,10 +457,10 @@ function SecurityVisual({ active }: VisualProps) {
 
   useLayoutEffect(() => {
     const root = rootRef.current
-    if (!root) return
+    if (!root || reduced) return
 
     const timeline = gsap.timeline({ paused: true })
-    const context = gsap.context(() => {
+    const context = createSafeGsapContext(root, () => {
       gsap.set([
         '.security-stage',
         '.security-node',
@@ -507,7 +508,7 @@ function SecurityVisual({ active }: VisualProps) {
           0,
         )
       }
-    }, root)
+    }, 'Security scene animation')
 
     timelineRef.current = timeline
     setTimelineState(timeline, activeRef.current)
@@ -515,7 +516,7 @@ function SecurityVisual({ active }: VisualProps) {
     return () => {
       timelineRef.current = null
       timeline.kill()
-      context.revert()
+      context?.revert()
     }
   }, [reduced])
 
@@ -652,7 +653,7 @@ function StoryScene({ scene, index, compact }: StorySceneProps) {
     const x = compact ? Math.min(floatConfig.x, 1.5) : floatConfig.x
     const y = compact ? Math.max(floatConfig.y, -5) : floatConfig.y
     const scale = compact ? Math.min(floatConfig.scale, 1.004) : floatConfig.scale
-    const context = gsap.context(() => {
+    const context = createSafeGsapContext(float, () => {
       gsap.to(float, {
         x,
         y,
@@ -664,11 +665,11 @@ function StoryScene({ scene, index, compact }: StorySceneProps) {
         force3D: true,
       })
       float.style.willChange = 'transform'
-    }, float)
+    }, 'Scene float animation')
 
     return () => {
       float.style.willChange = 'auto'
-      context.revert()
+      context?.revert()
     }
   }, [compact, floatConfig, reduced])
 

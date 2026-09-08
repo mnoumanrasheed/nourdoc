@@ -11,8 +11,10 @@ import { AnimatedSection } from '../components/ui/AnimatedSection'
 
 import { buildGroups } from '../data/site'
 import { useHeroVisualScroll } from '../hooks/useHeroVisualScroll'
+import { useMediaQuery } from '../hooks/useMediaQuery'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { createAnimationVisibilityController } from '../utils/animationPerformance'
+import { createSafeGsapContext } from '../utils/animationSafety'
 
 const buildDescriptions = [
   'Ground product decisions in real clinical workflows.',
@@ -30,6 +32,7 @@ const roadmap = [
 
 export default function About() {
   const heroRef = useRef<HTMLDivElement>(null)
+  const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
   useHeroVisualScroll(heroRef)
   const outerOrbitRef = useRef<HTMLDivElement>(null)
   const innerOrbitRef = useRef<HTMLDivElement>(null)
@@ -40,7 +43,9 @@ export default function About() {
   )
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
+    const root = heroRef.current
+    if (!root || reducedMotion) return
+    const ctx = createSafeGsapContext(root, () => {
       // Whole visual subtle float
       gsap.to('.about-hero-visual', {
         y: -5,
@@ -209,11 +214,11 @@ export default function About() {
           ease: 'power1.inOut',
         },
       )
-    }, heroRef)
+    }, 'About hero animation')
 
-    const stopVisibilityControl = createAnimationVisibilityController(heroRef.current!)
-    return () => { stopVisibilityControl(); ctx.revert() }
-  }, [])
+    const stopVisibilityControl = createAnimationVisibilityController(root)
+    return () => { stopVisibilityControl(); ctx?.revert() }
+  }, [reducedMotion])
 
   return (
     <>
@@ -484,6 +489,7 @@ export default function About() {
               border: '1px solid rgba(137,238,242,.38)',
               background: 'rgba(4,31,39,.82)',
               backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
               boxShadow: '0 12px 30px rgba(0,15,22,.22)',
             }}
           >
@@ -517,6 +523,7 @@ export default function About() {
               border: '1px solid rgba(137,238,242,.38)',
               background: 'rgba(4,31,39,.82)',
               backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
               boxShadow: '0 12px 30px rgba(0,15,22,.22)',
             }}
           >
@@ -550,6 +557,7 @@ export default function About() {
               border: '1px solid rgba(137,238,242,.38)',
               background: 'rgba(4,31,39,.82)',
               backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
               boxShadow: '0 12px 30px rgba(0,15,22,.22)',
             }}
           >
@@ -583,6 +591,7 @@ export default function About() {
               border: '1px solid rgba(137,238,242,.38)',
               background: 'rgba(4,31,39,.82)',
               backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
               boxShadow: '0 12px 30px rgba(0,15,22,.22)',
             }}
           >

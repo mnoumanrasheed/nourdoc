@@ -1,4 +1,5 @@
 import { useEffect, type RefObject } from 'react'
+import { subscribeToMediaQuery } from '../utils/browserCompatibility'
 
 const VISUAL_SELECTOR = '.inner-page-hero-visual, .rotating-scene-visual'
 
@@ -47,15 +48,15 @@ export function useHeroVisualScroll(
     render()
     window.addEventListener('scroll', scheduleRender, { passive: true })
     window.addEventListener('resize', scheduleRender)
-    motionQuery.addEventListener('change', scheduleRender)
-    compactQuery.addEventListener('change', scheduleRender)
+    const unsubscribeMotion = subscribeToMediaQuery(motionQuery, scheduleRender)
+    const unsubscribeCompact = subscribeToMediaQuery(compactQuery, scheduleRender)
 
     return () => {
       if (frame) window.cancelAnimationFrame(frame)
       window.removeEventListener('scroll', scheduleRender)
       window.removeEventListener('resize', scheduleRender)
-      motionQuery.removeEventListener('change', scheduleRender)
-      compactQuery.removeEventListener('change', scheduleRender)
+      unsubscribeMotion()
+      unsubscribeCompact()
       visual.classList.remove('hero-scroll-visual')
       visual.style.removeProperty('--hero-scroll-x')
       visual.style.removeProperty('--hero-scroll-y')

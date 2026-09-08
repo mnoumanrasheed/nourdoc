@@ -20,6 +20,7 @@ import { impactAreas } from '../data/site'
 import { useHeroVisualScroll } from '../hooks/useHeroVisualScroll'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { createAnimationVisibilityController } from '../utils/animationPerformance'
+import { createSafeGsapContext } from '../utils/animationSafety'
 
 export default function HealthcareImpact() {
   const heroRef = useRef<HTMLDivElement>(null)
@@ -34,7 +35,9 @@ export default function HealthcareImpact() {
   )
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
+    const root = heroRef.current
+    if (!root || reducedMotion) return
+    const ctx = createSafeGsapContext(root, () => {
       // Overall floating visual
       gsap.to('.impact-visual', {
         y: -5,
@@ -203,11 +206,11 @@ export default function HealthcareImpact() {
           ease: 'power1.inOut',
         },
       )
-    }, heroRef)
+    }, 'Healthcare impact hero animation')
 
-    const stopVisibilityControl = createAnimationVisibilityController(heroRef.current!)
-    return () => { stopVisibilityControl(); ctx.revert() }
-  }, [])
+    const stopVisibilityControl = createAnimationVisibilityController(root)
+    return () => { stopVisibilityControl(); ctx?.revert() }
+  }, [reducedMotion])
 
   return (
     <>
@@ -478,6 +481,7 @@ export default function HealthcareImpact() {
               border: '1px solid rgba(135,237,241,.38)',
               background: 'rgba(4,31,38,.78)',
               backdropFilter: 'blur(9px)',
+              WebkitBackdropFilter: 'blur(9px)',
               boxShadow: '0 12px 30px rgba(0,15,22,.2)',
             }}
           >
@@ -510,6 +514,7 @@ export default function HealthcareImpact() {
               border: '1px solid rgba(135,237,241,.38)',
               background: 'rgba(4,31,38,.78)',
               backdropFilter: 'blur(9px)',
+              WebkitBackdropFilter: 'blur(9px)',
               boxShadow: '0 12px 30px rgba(0,15,22,.2)',
             }}
           >
@@ -542,6 +547,7 @@ export default function HealthcareImpact() {
               border: '1px solid rgba(135,237,241,.38)',
               background: 'rgba(4,31,38,.78)',
               backdropFilter: 'blur(9px)',
+              WebkitBackdropFilter: 'blur(9px)',
               boxShadow: '0 12px 30px rgba(0,15,22,.2)',
             }}
           >
@@ -574,6 +580,7 @@ export default function HealthcareImpact() {
               border: '1px solid rgba(135,237,241,.38)',
               background: 'rgba(4,31,38,.78)',
               backdropFilter: 'blur(9px)',
+              WebkitBackdropFilter: 'blur(9px)',
               boxShadow: '0 12px 30px rgba(0,15,22,.2)',
             }}
           >
