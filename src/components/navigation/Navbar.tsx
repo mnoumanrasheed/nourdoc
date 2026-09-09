@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import { ArrowUpRight, Menu, Play, X } from 'lucide-react'
 import { motion, useReducedMotion } from 'framer-motion'
 import logo from '../../assets/nourdoc-logo.png'
@@ -9,6 +9,8 @@ import { preloadRoute } from '../../utils/routeLoaders'
 export function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const location = useLocation()
+  const isSolidNav = scrolled || location.pathname === '/contact'
   const reduced = useReducedMotion()
   const menuButtonRef = useRef<HTMLButtonElement>(null)
   const mobileNavRef = useRef<HTMLElement>(null)
@@ -47,7 +49,7 @@ export function Navbar() {
   }, [open])
 
   return (
-    <header className={`nav-wrap ${scrolled ? 'nav-scrolled' : ''} ${open ? 'nav-open' : ''}`}>
+    <header className={`nav-wrap ${isSolidNav ? 'nav-scrolled' : ''} ${open ? 'nav-open' : ''}`}>
       <nav className="navbar" aria-label="Primary navigation">
         <Link to="/" className="brand" onPointerEnter={() => preloadRoute('/')} onFocus={() => preloadRoute('/')} onTouchStart={() => preloadRoute('/')} onClick={() => setOpen(false)} aria-label="NourDoc home">
           <img src={logo} alt="" width="240" height="240" loading="eager" fetchPriority="high" decoding="async" /><span>Nour<span>Doc</span></span>

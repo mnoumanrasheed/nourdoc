@@ -318,34 +318,6 @@ export function DemoBookingFlow() {
   return (
     <section className="section demo-booking-section" aria-labelledby="demo-booking-title">
       <div className="container demo-booking-shell">
-        <motion.div
-          className="demo-transition-bridge"
-          initial={reducedMotion ? false : { opacity: 0, y: 20 }}
-          whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.8 }}
-          transition={reducedMotion ? undefined : { duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <motion.span
-            className="demo-transition-line"
-            aria-hidden="true"
-            initial={reducedMotion ? false : { scaleX: 0, opacity: 0.3 }}
-            whileInView={reducedMotion ? undefined : { scaleX: 1, opacity: 1 }}
-            viewport={{ once: true, amount: 0.8 }}
-            transition={reducedMotion ? undefined : { duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-          />
-          <div className="demo-transition-copy">
-            <span className="demo-transition-dot" aria-hidden="true" />
-            <p>A better conversation starts with the right context.</p>
-          </div>
-          <motion.span
-            className="demo-transition-line"
-            aria-hidden="true"
-            initial={reducedMotion ? false : { scaleX: 0, opacity: 0.3 }}
-            whileInView={reducedMotion ? undefined : { scaleX: 1, opacity: 1 }}
-            viewport={{ once: true, amount: 0.8 }}
-            transition={reducedMotion ? undefined : { duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-          />
-        </motion.div>
         <div className="demo-progress" aria-label={`Demo request progress: step ${step} of 4`}>
           {progressSteps.map(([number, label], index) => {
             const position = index + 1
@@ -363,7 +335,12 @@ export function DemoBookingFlow() {
         </div>
 
         <div className="demo-booking-layout">
-          <aside className="demo-booking-context">
+          <motion.aside
+            className="demo-booking-context"
+            initial={reducedMotion ? false : { opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={reducedMotion ? { duration: 0 } : { duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          >
             <span className="eyebrow">A more relevant conversation</span>
             <h2 id="demo-booking-title">
               <span>Let&apos;s see if NourDoc</span>
@@ -398,9 +375,14 @@ export function DemoBookingFlow() {
                 <span>Please do not include patient-identifiable information.</span>
               </div>
             </div>
-          </aside>
+          </motion.aside>
 
-          <div className="demo-booking-panel">
+          <motion.div
+            className="demo-booking-panel"
+            initial={reducedMotion ? false : { opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={reducedMotion ? { duration: 0 } : { duration: 0.55, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+          >
             {submitted ? (
               <motion.div
                 className="demo-success"
@@ -676,7 +658,7 @@ export function DemoBookingFlow() {
                 </div>
               </form>
             )}
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>
