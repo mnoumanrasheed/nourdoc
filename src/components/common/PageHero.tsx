@@ -1,6 +1,6 @@
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { ArrowDown } from 'lucide-react'
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef, type ReactNode } from 'react'
 import { gsap } from 'gsap'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import type { ResponsiveImageAsset } from '../../data/responsiveImages'
@@ -76,7 +76,7 @@ function HeroSignal({ variant, reduced }: { variant: HeroVariant; reduced: boole
   )
 }
 
-export function PageHero({ eyebrow, title, text, variant, image, imageAlt, imagePosition = 'center' }: { eyebrow: string; title: string; text: string; variant: HeroVariant; image?: ResponsiveImageAsset; imageAlt?: string; imagePosition?: string }) {
+export function PageHero({ eyebrow, title, text, supportingText, variant, image, imageAlt, imagePosition = 'center', minimal = false }: { eyebrow: ReactNode; title: ReactNode; text: string; supportingText?: string; variant: HeroVariant; image?: ResponsiveImageAsset; imageAlt?: string; imagePosition?: string; minimal?: boolean }) {
   const reduced = useReducedMotion()
   const compact = useMediaQuery('(max-width: 900px)')
   const heroRef = useRef<HTMLElement>(null)
@@ -112,7 +112,7 @@ export function PageHero({ eyebrow, title, text, variant, image, imageAlt, image
   }, [compact, image, reduced])
 
   return (
-    <header ref={heroRef} className={`page-hero page-hero-theme page-hero-${variant}-theme section-grid-bg ${image ? 'page-hero-has-image' : ''}`}>
+    <header ref={heroRef} className={`page-hero page-hero-theme page-hero-${variant}-theme section-grid-bg ${image ? 'page-hero-has-image' : ''}${minimal ? ' page-hero-minimal' : ''}`}>
       {image && <div className={`hero-media hero-media-${variant}`}>
         <div className="hero-media-image-plane">
           <ResponsivePicture asset={image} sizes="100vw" pictureClassName="hero-media-picture" alt={imageAlt ?? ''} loading="eager" fetchPriority="high" decoding="async" onDecoded={signalCriticalHeroReady} style={{ objectPosition: imagePosition, x: still ? 0 : mediaX, y: still ? 0 : mediaY, rotateX: still ? 0 : mediaRotateX, rotateY: still ? 0 : mediaRotateY }} />
@@ -124,14 +124,15 @@ export function PageHero({ eyebrow, title, text, variant, image, imageAlt, image
         {Array.from({ length: 6 }, (_, index) => <i key={index} />)}
       </div>
       <motion.div className="page-hero-ambient" aria-hidden="true" initial={reduced ? false : { opacity: 0, scale: .99 }} animate={reduced ? undefined : { opacity: 1, scale: [1, 1.06, 1], x: [0, 18, 0], y: [0, -10, 0] }} transition={{ opacity: { duration: .3 }, scale: { duration: 15, repeat: Infinity, ease: 'easeInOut' }, x: { duration: 15, repeat: Infinity, ease: 'easeInOut' }, y: { duration: 15, repeat: Infinity, ease: 'easeInOut' } }} />
-      <motion.div className={`container page-hero-inner page-hero-${variant}`} initial={reduced ? false : 'hidden'} animate="visible" variants={{ hidden: {}, visible: { transition: { staggerChildren: .07, delayChildren: .04 } } }}>
+      <motion.div className={`container page-hero-inner page-hero-${variant}`} initial={reduced ? false : 'hidden'} animate="visible" variants={minimal ? { hidden: {}, visible: { transition: { delayChildren: .04 } } } : { hidden: {}, visible: { transition: { staggerChildren: .07, delayChildren: .04 } } }}>
         <div className="page-hero-content">
           <motion.span className="eyebrow" variants={{ hidden: { opacity: 0, y: 6 }, visible: { opacity: 1, y: 0, transition: { duration: .24, ease: motionEase } } }}>{eyebrow}</motion.span>
-          <div className="page-hero-title-mask"><motion.h1 variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: .28, ease: motionEaseSoft } } }}>{title}</motion.h1></div>
+          <div className="page-hero-title-mask"><motion.h1 variants={minimal ? { hidden: {}, visible: {} } : { hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: .28, ease: motionEaseSoft } } }}>{title}</motion.h1></div>
         </div>
-        <motion.div className="page-hero-copy" variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: .28, ease: motionEase } } }}>
+        <motion.div className="page-hero-copy" variants={minimal ? { hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: .56, delay: 1, ease: motionEase } } } : { hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: .28, ease: motionEase } } }}>
           <p>{text}</p>
-          <motion.div variants={{ hidden: { opacity: 0, y: -6 }, visible: { opacity: 1, y: 0, transition: { duration: .5, ease: motionEase } } }}><ArrowDown aria-hidden="true" /></motion.div>
+          {supportingText && <p className="page-hero-supporting-text">{supportingText}</p>}
+          <motion.div className="page-hero-scroll-indicator" variants={{ hidden: { opacity: 0, y: -6 }, visible: { opacity: 1, y: 0, transition: { duration: .5, delay: minimal ? .09 : 0, ease: motionEase } } }}><ArrowDown aria-hidden="true" /></motion.div>
         </motion.div>
         {!image && <HeroSignal variant={variant} reduced={reduced} />}
       </motion.div>
