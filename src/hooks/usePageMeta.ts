@@ -2,7 +2,10 @@ import { useEffect } from 'react'
 
 export function usePageMeta(title: string, description: string) {
   useEffect(() => {
-    document.title = `${title} | NourDoc`
+    const pageTitle = title === 'NourDoc — AI-assisted Clinical Documentation & Intelligence Tool'
+      ? title
+      : `${title} | NourDoc`
+    document.title = pageTitle
     const upsert = (selector: string, attr: string, value: string, content: string) => {
       let node = document.head.querySelector<HTMLMetaElement>(selector)
       if (!node) {
@@ -13,12 +16,12 @@ export function usePageMeta(title: string, description: string) {
       node.content = content
     }
     upsert('meta[name="description"]', 'name', 'description', description)
-    upsert('meta[property="og:title"]', 'property', 'og:title', `${title} | NourDoc`)
+    upsert('meta[property="og:title"]', 'property', 'og:title', pageTitle)
     upsert('meta[property="og:description"]', 'property', 'og:description', description)
     upsert('meta[property="og:type"]', 'property', 'og:type', 'website')
     upsert('meta[property="og:url"]', 'property', 'og:url', window.location.href)
     upsert('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image')
-    upsert('meta[name="twitter:title"]', 'name', 'twitter:title', `${title} | NourDoc`)
+    upsert('meta[name="twitter:title"]', 'name', 'twitter:title', pageTitle)
     upsert('meta[name="twitter:description"]', 'name', 'twitter:description', description)
     let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')
     if (!canonical) {

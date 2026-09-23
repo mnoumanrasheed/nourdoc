@@ -31,8 +31,8 @@ export default function Home() {
   const reducedMotion = useReducedMotion()
 
   usePageMeta(
-    'Ambient Clinical Intelligence',
-    'NourDoc turns natural doctor-patient conversations into structured clinical documentation for clinician review.',
+    'NourDoc — AI-assisted Clinical Documentation & Intelligence Tool',
+    'Meet the AI that listens, understands, and turns doctor–patient conversations into structured clinical notes.',
   )
 
   return (
@@ -101,13 +101,15 @@ export default function Home() {
         <div className="container global-readiness-layout">
           <AnimatedSection className="global-readiness-copy" variant="left">
             <span className="eyebrow eyebrow-light">Trust at the foundation. Global readiness.</span>
-            <h2>Healthcare trust, from local relevance to global readiness.</h2>
+            <h2>
+              From Pakistan.
+              <span>Shaped by Global</span>
+              <span>Healthcare Expertise.</span>
+            </h2>
             <p>
-              NourDoc brings Pakistani healthcare relevance together with the
-              privacy, confidentiality and access-control priorities considered
-              by U.S., U.K. and international organizations.
+              NourDoc brings together Pakistani AI engineering with research and clinical perspectives from Finland to build practical, physician-centered ambient clinical intelligence for healthcare systems worldwide.
             </p>
-            <div className="differentiator-list" style={{ marginTop: '24px' }}>
+            <div className="global-readiness-trust-list">
               {securityTopics.slice(0, 3).map(({ title, icon: Icon }) => (
                 <div key={title}>
                   <Icon />

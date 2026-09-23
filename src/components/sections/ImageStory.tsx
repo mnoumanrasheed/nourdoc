@@ -11,7 +11,7 @@ type ImageStoryProps = {
   alt: string
   eyebrow: string
   title: string
-  text: string
+  text: string | string[]
   points?: string[]
   reverse?: boolean
   objectPosition?: string
@@ -93,8 +93,9 @@ export function ImageStory({
             </>
           )}
         </motion.div>
-        <AnimatedSection className="image-story-copy" variant={reverse ? 'left' : 'right'}>
-          <span className="eyebrow">{eyebrow}</span><h2>{title}</h2><p>{text}</p>
+        <AnimatedSection className={`image-story-copy ${Array.isArray(text) ? 'image-story-copy-paragraphs' : ''}`} variant={reverse ? 'left' : 'right'}>
+          <span className="eyebrow">{eyebrow}</span><h2>{title}</h2>
+          {Array.isArray(text) ? text.map((paragraph) => <p key={paragraph}>{paragraph}</p>) : <p>{text}</p>}
           {points && <ul className="check-list">{points.map(point => <li key={point}>{point}</li>)}</ul>}
         </AnimatedSection>
       </div>

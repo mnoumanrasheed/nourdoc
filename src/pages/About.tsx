@@ -685,9 +685,13 @@ export default function About() {
         image={humanMomentImage}
         objectPosition="50% center"
         alt="A clinician offering a calm, reassuring touch to a patient"
-        eyebrow="Origin story"
-        title="The best clinical technology makes room for the human moment."
-        text="NourDoc began with a simple observation: the record matters, but so does the conversation that creates it. The platform is designed to make those two needs work together."
+        eyebrow="Global collaboration"
+        title="A Global Healthcare AI Collaboration"
+        text={[
+          'NourDoc is Canadian-owned and Pakistani-engineered, informed by Finnish research and clinical expertise, and built for global healthcare. Our team combines deep expertise in AI, machine learning, and healthcare technology with research-led and clinical perspectives from Finland.',
+          'This collaboration brings together engineering, clinical insight, and research-driven thinking to create an AI platform designed around the realities of healthcare professionals—not simply the capabilities of AI.',
+          'Our ambition is global: to help physicians and healthcare organizations reduce documentation burden, improve clinical workflows, and unlock greater value from every patient encounter.',
+        ]}
       />
 
       {/* MISSION / VISION */}
