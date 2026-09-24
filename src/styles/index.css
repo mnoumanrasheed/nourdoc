@@ -6753,7 +6753,7 @@ p {
   margin-bottom: 30px;
   font-size: clamp(56px, 5vw, 88px);
   line-height: .99;
-  letter-spacing: -.045em;
+  letter-spacing: -.04em;
 }
 
 .cinematic-scene-why .cinematic-copy h2,
@@ -7605,7 +7605,7 @@ p {
   .page-hero-impact h1,
   .page-hero-security h1 {
     font-size: clamp(36px, 10.6vw, 48px);
-    line-height: 1.02;
+    line-height: 1.06;
     letter-spacing: -.038em;
     max-width: 94%
   }
@@ -14279,7 +14279,7 @@ p {
     max-width: 100%;
     margin-bottom: 12px;
     font-size: clamp(30px, 9.1vw, 40px);
-    line-height: 1.02;
+    line-height: 1.06;
   }
 
   .hero-story .rotating-scene-copy>p {
@@ -15009,7 +15009,7 @@ p {
   margin: 16px 0 22px;
   font-size: clamp(48px, 5vw, 62px);
   line-height: 1.05;
-  letter-spacing: -.045em;
+  letter-spacing: -.04em;
 }
 
 .global-readiness-copy h2 span {
@@ -15320,14 +15320,14 @@ p {
 }
 
 .hero-story .rotating-scene-2 .rotating-scene-copy h2.why-nourdoc-heading {
-  max-width: 620px;
+  max-width: 600px;
   margin: 0 0 24px;
   color: #f7fbfb;
   font-family: 'Manrope', sans-serif;
-  font-size: clamp(44px, 4.2vw, 64px);
+  font-size: clamp(42px, 3.2vw, 50px);
   font-weight: 600;
-  line-height: 1.05;
-  letter-spacing: -.025em;
+  line-height: 1.06;
+  letter-spacing: -.04em;
 }
 
 .hero-story .rotating-scene-2 .why-heading-line {
@@ -15453,7 +15453,8 @@ p {
 
   .hero-story .rotating-scene-2 .rotating-scene-copy h2.why-nourdoc-heading {
     margin-bottom: 24px;
-    font-size: clamp(38px, 10.25vw, 40px);
+    font-size: clamp(33px, 9vw, 38px);
+    line-height: 1.04;
   }
 
   .hero-story .rotating-scene-2 .rotating-scene-copy > p.why-nourdoc-supporting {
@@ -15621,7 +15622,7 @@ p {
   font-size: clamp(56px, 5.45vw, 80px);
   font-weight: 600;
   line-height: 1.01;
-  letter-spacing: -.045em;
+  letter-spacing: -.04em;
   text-wrap: balance;
 }
 

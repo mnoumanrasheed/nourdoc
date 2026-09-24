@@ -610,7 +610,7 @@ type StorySceneDefinition = {
 
 const storyScenes: StorySceneDefinition[] = [
   { eyebrow: 'Ambient Intelligence', title: 'Patient conversations, perfectly documented.', description: 'NourDoc listens to natural doctor-patient dialogue and creates structured clinical documentation, helping physicians reduce time spent on manual note-taking.', image: consultationImage, position: '52% center', showPrimaryActions: true, showAppAccess: true, visual: (active) => <AmbientVisual active={active} /> },
-  { eyebrow: 'Why NourDoc', identityStatement: true, title: 'Technology that stays out of the clinical conversation.', description: 'NourDoc works quietly around the encounter, helping clinicians stay present while ambient AI organizes the conversation into useful clinical context.', image: naturalCareImage, position: '62% center', visual: (active) => <ContextVisual active={active} /> },
+  { eyebrow: 'Why NourDoc', identityStatement: true, title: 'Canadian-owned. Pakistani-engineered. Informed by Finnish research and clinical expertise. Built for global healthcare.', description: 'NourDoc works quietly around the encounter, helping clinicians stay present while ambient AI organizes the conversation into useful clinical context.', image: naturalCareImage, position: '62% center', visual: (active) => <ContextVisual active={active} /> },
   { eyebrow: 'Healthcare Impact', title: 'Better documentation. Better clinical focus.', description: 'Reduce clerical friction around the encounter so more attention remains available for the patient, the clinical decision and the care that follows.', image: impactImage, position: '40% center', visual: (active) => <ImpactVisual active={active} /> },
   { eyebrow: 'Security & Compliance', title: 'Clinical intelligence built for trusted healthcare.', description: 'Patient information requires strong privacy, access-control and governance practices. NourDoc positions security and privacy as foundational requirements.', image: securityImage, position: '48% center', visual: (active) => <SecurityVisual active={active} /> },
 ]
@@ -748,26 +748,23 @@ function StoryScene({ scene, index, compact }: StorySceneProps) {
       <svg className="scene-data-lines" viewBox="0 0 1440 900" preserveAspectRatio="none" aria-hidden="true"><path d="M0 690 C300 650 400 510 685 520 S1080 690 1440 410" /><path d="M610 0 C610 230 820 290 955 370 S1230 420 1440 225" /><circle cx="685" cy="520" r="3" /><circle cx="955" cy="370" r="3" /><circle cx="1215" cy="535" r="3" /></svg>
       <div className="scene-depth-nodes" aria-hidden="true"><i /><i /><i /><i /><i /><i /></div>
       <div className="container rotating-scene-layout">
-        <motion.div className={`rotating-scene-copy${scene.identityStatement ? ' why-nourdoc-copy' : ''}`} initial={reduced ? false : 'hidden'} whileInView={reduced ? undefined : 'visible'} viewport={{ once: true, amount: .3 }} variants={scene.identityStatement ? whyCopyVariants : copyVariants}>
+        <motion.div className={`rotating-scene-copy${scene.identityStatement ? ' why-nourdoc-copy' : ''}`} initial={reduced ? false : 'hidden'} whileInView={reduced ? undefined : 'visible'} viewport={{ once: true, amount: .3 }} variants={copyVariants}>
           {scene.identityStatement ? (
             <>
-              <motion.span className="eyebrow why-nourdoc-eyebrow" variants={whyEyebrowVariants}>
-                <motion.i variants={whyEyebrowLineVariants} />
-                <motion.span variants={whyEyebrowLabelVariants}>{scene.eyebrow}</motion.span>
+              <motion.span className="eyebrow why-nourdoc-eyebrow" variants={copyItemVariants}>
+                <motion.i  />
+                <motion.span >{scene.eyebrow}</motion.span>
               </motion.span>
-              <motion.h2 className="why-nourdoc-heading" variants={whyHeadingVariants} aria-label={scene.title}>
-                <span className="why-heading-line"><motion.span variants={whyHeadingLineVariants}>Technology that </motion.span></span>
-                <span className="why-heading-line"><motion.span variants={whyHeadingLineVariants}>stays out of the </motion.span></span>
-                <span className="why-heading-line"><motion.span className="why-heading-gradient" variants={whyHeadingLineVariants}>clinical </motion.span></span>
-                <span className="why-heading-line"><motion.span className="why-heading-gradient" variants={whyHeadingLineVariants}>conversation.</motion.span></span>
+
+              <motion.h2 className="why-nourdoc-heading" variants={copyItemVariants} aria-label={scene.title}>
+                <span className="why-heading-line"><motion.span>Canadian-owned.</motion.span></span>
+                <span className="why-heading-line"><motion.span>Pakistani-engineered.</motion.span></span>
+                <span className="why-heading-line"><motion.span>Informed by Finnish research</motion.span></span>
+                <span className="why-heading-line"><motion.span>and clinical expertise.</motion.span></span>
+                <span className="why-heading-line"><motion.span className="why-heading-gradient">Built for global healthcare.</motion.span></span>
               </motion.h2>
-              <motion.p className="why-nourdoc-supporting" variants={whyBodyVariants}>{scene.description}</motion.p>
-              <motion.div className="hero-global-identity" variants={whyIdentityVariants} aria-label="NourDoc global identity">
-                <motion.span className="hero-global-identity-accent" variants={whyIdentityItemVariants}>Canadian-owned.</motion.span>
-                <motion.span className="hero-global-identity-accent" variants={whyIdentityItemVariants}>Pakistani-engineered.</motion.span>
-                <motion.span className="hero-global-identity-accent" variants={whyIdentityItemVariants}>Informed by Finnish research and clinical expertise.</motion.span>
-                <motion.span className="hero-global-identity-tail" variants={whyIdentityItemVariants}>Built for global healthcare.</motion.span>
-              </motion.div>
+              <motion.p className="why-nourdoc-supporting" variants={copyItemVariants}>{scene.description}</motion.p>
+
             </>
           ) : (
             <>
