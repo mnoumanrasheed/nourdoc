@@ -119,8 +119,3 @@ export const clinicalAttentionImage = responsiveImage(
   1200,
 )
 
-export const globalHealthcareReadinessImage = responsiveImage(
-  '11_global-healthcare-readiness',
-  1600,
-  1200,
-)

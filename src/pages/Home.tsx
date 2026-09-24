@@ -1,18 +1,13 @@
-import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowRight, CheckCircle2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { CTASection } from '../components/common/CTASection'
-import { ResponsivePicture } from '../components/common/ResponsivePicture'
 import { SectionHeader } from '../components/common/SectionHeader'
 import { CinematicStory } from '../components/sections/CinematicStory'
 import { ImageStory } from '../components/sections/ImageStory'
 import { WorkflowJourney } from '../components/sections/WorkflowJourney'
 import { AnimatedSection } from '../components/ui/AnimatedSection'
-import { partnerCategories, securityTopics, workflow } from '../data/site'
-import {
-  globalHealthcareReadinessImage,
-  moreTimeForCareImage,
-} from '../data/responsiveImages'
+import { partnerCategories, workflow } from '../data/site'
+import { moreTimeForCareImage } from '../data/responsiveImages'
 import { usePageMeta } from '../hooks/usePageMeta'
 
 const whyNourDocHighlights = [
@@ -28,8 +23,6 @@ const homePartnerCategories = [
 ]
 
 export default function Home() {
-  const reducedMotion = useReducedMotion()
-
   usePageMeta(
     'NourDoc — AI-assisted Clinical Documentation & Intelligence Tool',
     'Meet the AI that listens, understands, and turns doctor–patient conversations into structured clinical notes.',
@@ -95,63 +88,6 @@ export default function Home() {
             <ArrowRight />
           </Link>
         </AnimatedSection>
-      </section>
-
-      <section className="section security-preview global-readiness-section">
-        <div className="container global-readiness-layout">
-          <AnimatedSection className="global-readiness-copy" variant="left">
-            <span className="eyebrow eyebrow-light">Trust at the foundation. Global readiness.</span>
-            <h2>
-              From Pakistan.
-              <span>Shaped by Global</span>
-              <span>Healthcare Expertise.</span>
-            </h2>
-            <p>
-              NourDoc brings together Pakistani AI engineering with research and clinical perspectives from Finland to build practical, physician-centered ambient clinical intelligence for healthcare systems worldwide.
-            </p>
-            <div className="global-readiness-trust-list">
-              {securityTopics.slice(0, 3).map(({ title, icon: Icon }) => (
-                <div key={title}>
-                  <Icon />
-                  {title}
-                </div>
-              ))}
-            </div>
-            <Link className="text-link light-link" to="/security-compliance">
-              Explore Security
-              <ArrowRight />
-            </Link>
-          </AnimatedSection>
-
-          <motion.div
-            className="global-readiness-visual"
-            initial={reducedMotion ? false : { opacity: 0, x: 24, scale: 0.98 }}
-            whileInView={reducedMotion ? undefined : { opacity: 1, x: 0, scale: 1 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.82, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <motion.div
-              className="global-readiness-frame"
-              initial={false}
-              whileInView={reducedMotion ? undefined : { y: [0, -3, 0] }}
-              viewport={{ once: false, amount: 0.2 }}
-              transition={{ duration: 8, ease: 'easeInOut', repeat: Infinity, delay: 0.8 }}
-            >
-              <ResponsivePicture
-                asset={globalHealthcareReadinessImage}
-                sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1200px) 46vw, 620px"
-                pictureClassName="global-readiness-picture"
-                alt="Healthcare professional using a connected clinical workflow in a modern care setting"
-                loading="lazy"
-                fetchPriority="auto"
-                decoding="async"
-                style={{ objectPosition: '55% center' }}
-              />
-              <span className="global-readiness-badge">Global-ready care</span>
-              <span className="global-readiness-sheen" aria-hidden="true" />
-            </motion.div>
-          </motion.div>
-        </div>
       </section>
 
       <section className="section home-ecosystem-section">
